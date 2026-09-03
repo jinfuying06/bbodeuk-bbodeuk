@@ -1,0 +1,379 @@
+<!DOCTYPE html><html lang="ko" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#f6faff;-webkit-tap-highlight-color:transparent;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"outline":"#6f7883","tertiary-container":"#00b17b","on-error-container":"#93000a","tertiary-fixed":"#6ffbbe","inverse-on-surface":"#edf1f6","primary-container":"#00a1ff","secondary-fixed":"#c4e7ff","secondary":"#00668a","surface-container-highest":"#dfe3e8","on-tertiary-container":"#003b26","on-tertiary":"#ffffff","on-surface":"#171c20","primary-fixed":"#cfe5ff","on-secondary-container":"#004d6a","on-secondary":"#ffffff","on-surface-variant":"#3f4852","error-container":"#ffdad6","surface":"#f6faff","on-error":"#ffffff","surface-container":"#eaeef3","background":"#f6faff","on-tertiary-fixed-variant":"#005236","surface-bright":"#f6faff","tertiary-fixed-dim":"#4edea3","secondary-container":"#40c2fd","tertiary":"#006c49","inverse-surface":"#2c3135","surface-container-lowest":"#ffffff","on-secondary-fixed-variant":"#004c69","outline-variant":"#bec7d4","on-secondary-fixed":"#001e2c","error":"#ba1a1a","inverse-primary":"#9acbff","on-primary-fixed":"#001d34","primary":"#00629e","on-primary-fixed-variant":"#004a79","primary-fixed-dim":"#9acbff","on-tertiary-fixed":"#002113","secondary-fixed-dim":"#7bd0ff","surface-variant":"#dfe3e8","surface-dim":"#d6dadf","surface-container-low":"#f0f4f9","surface-tint":"#00629e","on-primary":"#ffffff","surface-container-high":"#e4e9ee","on-primary-container":"#003559","on-background":"#171c20"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-lg":"1.25rem","space-2xl":"2rem","space-xs":"0.5rem","gutter-mobile":"1rem","margin-screen":"1.25rem","space-sm":"0.75rem","space-xl":"1.5rem","space-xxs":"0.25rem","space-md":"1rem"},"fontFamily":{"headline-md":["plusJakartaSans"],"headline-lg":["plusJakartaSans"],"label-md":["plusJakartaSans"],"title-sm":["plusJakartaSans"],"body-md":["plusJakartaSans"],"caption":["plusJakartaSans"],"title-md":["plusJakartaSans"],"label-sm":["plusJakartaSans"],"body-lg":["plusJakartaSans"]},"fontSize":{"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.015em","fontWeight":"700"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-md":["13px",{"lineHeight":"18px","letterSpacing":"0.01em","fontWeight":"600"}],"title-sm":["16px",{"lineHeight":"24px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"caption":["11px",{"lineHeight":"14px","letterSpacing":"0.02em","fontWeight":"500"}],"title-md":["18px",{"lineHeight":"26px","letterSpacing":"-0.01em","fontWeight":"600"}],"label-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"500"}],"body-lg":["15px",{"lineHeight":"22px","letterSpacing":"-0.005em","fontWeight":"400"}]}}}};</script></head><body class="bg-surface text-on-surface min-h-screen pt-safe pb-safe flex flex-col selection:bg-primary-fixed"><header class="fixed top-0 left-0 right-0 z-50 pt-safe bg-surface/80 backdrop-blur-xl transition-colors"><div class="h-14 flex items-center justify-between px-margin-screen"><button aria-label="뒤로가기" class="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface active:bg-surface-container active:scale-95 transition-all -ml-2" onclick="window.history.back()" type="button"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><h1 class="font-title-md text-title-md text-on-surface font-semibold truncate text-center flex-1 mx-2">대청소 하기</h1><button aria-label="도움말 안내" class="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary active:bg-surface-container active:scale-95 transition-all -mr-2" type="button"><span class="material-symbols-outlined text-[22px]">help_outline</span></button></div></header><main class="flex-1 flex flex-col relative w-full pt-14 pb-safe bg-surface"><div class="flex flex-col w-full px-margin-screen pb-32">
+<!-- Hero Reassurance Banner -->
+<section class="mt-4 mb-5 p-5 bg-surface-container-lowest rounded-xl shadow-sm relative overflow-hidden">
+<div class="absolute -right-8 -top-8 w-32 h-32 bg-primary-fixed/30 rounded-full blur-2xl pointer-events-none"></div>
+
+</section>
+<!-- Accordion List: Spaces -->
+<div class="flex flex-col gap-4">
+<!-- Space 1: 욕실 (Bathroom) -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden" data-space-card="bathroom">
+<!-- Accordion Header -->
+<button class="w-full p-4 flex items-center justify-between text-left active:bg-surface-container-low transition-colors" onclick="toggleAccordion('bathroom-content', 'bathroom-chevron')" type="button">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[20px]">bathtub</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface">욕실</span>
+<span class="px-2 py-0.5 rounded-full text-caption font-caption bg-primary-fixed text-primary font-medium" id="badge-bathroom">2곳 선택됨</span>
+</div>
+<span class="font-caption text-caption text-on-surface-variant">샤워부스 · 세면대 · 배수구</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[22px] transition-transform duration-200" id="bathroom-chevron">keyboard_arrow_down</span>
+</button>
+<!-- Accordion Body -->
+<div class="px-4 pb-4 flex flex-col gap-2.5 hidden" id="bathroom-content">
+<!-- Item 1: Checked -->
+<div class="clean-item group flex items-center justify-between p-3 rounded-lg bg-primary-fixed/20 active:scale-[0.99] transition-all cursor-pointer" onclick="toggleItem(this, 'bathroom')">
+<div class="flex items-center gap-3 min-w-0 pr-2">
+<div class="checkbox-indicator w-6 h-6 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[16px] font-bold">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface truncate">세면대 수전 물기 닦기</span>
+<div class="flex items-center gap-1.5 mt-0.5">
+<span class="font-caption text-caption text-secondary">마지막 기록 6일 전</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="inline-flex items-center text-caption font-caption text-primary">슬슬 다시 볼 때</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">water_drop</span>
+</div>
+<!-- Item 2: Checked -->
+<div class="clean-item group flex items-center justify-between p-3 rounded-lg bg-primary-fixed/20 active:scale-[0.99] transition-all cursor-pointer" onclick="toggleItem(this, 'bathroom')">
+<div class="flex items-center gap-3 min-w-0 pr-2">
+<div class="checkbox-indicator w-6 h-6 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[16px] font-bold">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface truncate">변기 안팎 가벼운 솔질</span>
+<div class="flex items-center gap-1.5 mt-0.5">
+<span class="font-caption text-caption text-tertiary">마지막 기록 1일 전</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-caption text-caption text-tertiary">깨끗함 유지 중</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">cleaning_services</span>
+</div>
+<!-- Item 3: Unchecked -->
+<div class="clean-item group flex items-center justify-between p-3 rounded-lg bg-surface-container-low active:scale-[0.99] transition-all cursor-pointer" onclick="toggleItem(this, 'bathroom')">
+<div class="flex items-center gap-3 min-w-0 pr-2">
+<div class="checkbox-indicator w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-transparent">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface truncate">욕실 유리 거울 얼룩 닦기</span>
+<span class="font-caption text-caption text-on-surface-variant mt-0.5">마지막 기록 4일 전</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">auto_awesome</span>
+</div>
+<!-- Item 4: Unchecked with tip -->
+<div class="clean-item group flex items-center justify-between p-3 rounded-lg bg-surface-container-low active:scale-[0.99] transition-all cursor-pointer" onclick="toggleItem(this, 'bathroom')">
+<div class="flex items-center gap-3 min-w-0 pr-2">
+<div class="checkbox-indicator w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-transparent">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface truncate">바닥 배수구 유가 세척</span>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[12px] text-primary">arrow_back_ios_new</span>
+<span class="font-caption text-caption text-primary">숨은 케어 추천</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">shower</span>
+</div>
+</div>
+</section>
+<!-- Space 2: 주방 (Kitchen) -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden" data-space-card="kitchen">
+<!-- Accordion Header -->
+<button class="w-full p-4 flex items-center justify-between text-left active:bg-surface-container-low transition-colors" onclick="toggleAccordion('kitchen-content', 'kitchen-chevron')" type="button">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">countertops</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface">주방</span>
+<span class="px-2 py-0.5 rounded-full text-caption font-caption bg-primary-fixed text-primary font-medium" id="badge-kitchen">1곳 선택됨</span>
+</div>
+<span class="font-caption text-caption text-on-surface-variant">싱크대 · 조리대 · 환풍기</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[22px] transition-transform duration-200" id="kitchen-chevron">keyboard_arrow_down</span>
+</button>
+<!-- Accordion Body -->
+<div class="px-4 pb-4 flex flex-col gap-2.5 hidden" id="kitchen-content">
+<!-- Item 1: Checked -->
+<div class="clean-item group flex items-center justify-between p-3 rounded-lg bg-primary-fixed/20 active:scale-[0.99] transition-all cursor-pointer" onclick="toggleItem(this, 'kitchen')">
+<div class="flex items-center gap-3 min-w-0 pr-2">
+<div class="checkbox-indicator w-6 h-6 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[16px] font-bold">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface truncate">싱크대 거름망 비우기</span>
+<div class="flex items-center gap-1.5 mt-0.5">
+<span class="font-caption text-caption text-secondary">마지막 기록 4일 전</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-caption text-caption text-primary">슬슬 다시 볼 때</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">recycling</span>
+</div>
+<!-- Item 2: Unchecked -->
+<div class="clean-item group flex items-center justify-between p-3 rounded-lg bg-surface-container-low active:scale-[0.99] transition-all cursor-pointer" onclick="toggleItem(this, 'kitchen')">
+<div class="flex items-center gap-3 min-w-0 pr-2">
+<div class="checkbox-indicator w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-transparent">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface truncate">인덕션 / 조리대 상판 닦기</span>
+<span class="font-caption text-caption text-on-surface-variant mt-0.5">마지막 기록 어제</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">soup_kitchen</span>
+</div>
+<!-- Item 3: Unchecked -->
+<div class="clean-item group flex items-center justify-between p-3 rounded-lg bg-surface-container-low active:scale-[0.99] transition-all cursor-pointer" onclick="toggleItem(this, 'kitchen')">
+<div class="flex items-center gap-3 min-w-0 pr-2">
+<div class="checkbox-indicator w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-transparent">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface truncate">레인지 후드 필터 청소</span>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="font-caption text-caption text-on-surface-variant">숨은 케어 · 30일 주기</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">mode_fan</span>
+</div>
+<!-- Item 4: Unchecked -->
+<div class="clean-item group flex items-center justify-between p-3 rounded-lg bg-surface-container-low active:scale-[0.99] transition-all cursor-pointer" onclick="toggleItem(this, 'kitchen')">
+<div class="flex items-center gap-3 min-w-0 pr-2">
+<div class="checkbox-indicator w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-transparent">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface truncate">냉장고 도어 및 손잡이</span>
+<span class="font-caption text-caption text-tertiary mt-0.5">가벼운 관리</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">kitchen</span>
+</div>
+</div>
+</section>
+<!-- Space 3: 거실 & 침실 (Living & Bedroom) -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden" data-space-card="living">
+<!-- Accordion Header -->
+<button class="w-full p-4 flex items-center justify-between text-left active:bg-surface-container-low transition-colors" onclick="toggleAccordion('living-content', 'living-chevron')" type="button">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-container shrink-0">
+<span class="material-symbols-outlined text-[20px]">chair</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface">거실 &amp; 침실</span>
+<span class="px-2 py-0.5 rounded-full text-caption font-caption bg-primary-fixed text-primary font-medium" id="badge-living">2곳 선택됨</span>
+</div>
+<span class="font-caption text-caption text-on-surface-variant">바닥 밀대 · 선반 먼지 · 침구 환기</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[22px] transition-transform duration-200 rotate-180" id="living-chevron">keyboard_arrow_down</span>
+</button>
+<!-- Accordion Body -->
+<div class="px-4 pb-4 flex flex-col gap-2.5" id="living-content">
+<!-- Item 1: Checked -->
+<div class="clean-item group flex items-center justify-between p-3 rounded-lg bg-primary-fixed/20 active:scale-[0.99] transition-all cursor-pointer" onclick="toggleItem(this, 'living')">
+<div class="flex items-center gap-3 min-w-0 pr-2">
+<div class="checkbox-indicator w-6 h-6 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[16px] font-bold">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface truncate">바닥 정전기 청소포 밀기</span>
+<span class="font-caption text-caption text-on-surface-variant mt-0.5">마지막 기록 3일 전</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">mop</span>
+</div>
+<!-- Item 2: Checked -->
+<div class="clean-item group flex items-center justify-between p-3 rounded-lg bg-primary-fixed/20 active:scale-[0.99] transition-all cursor-pointer" onclick="toggleItem(this, 'living')">
+<div class="flex items-center gap-3 min-w-0 pr-2">
+<div class="checkbox-indicator w-6 h-6 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[16px] font-bold">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface truncate">테이블 및 선반 먼지 털기</span>
+<span class="font-caption text-caption text-on-surface-variant mt-0.5">마지막 기록 2일 전</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">nest_heat_link_gen_3</span>
+</div>
+<!-- Item 3: Unchecked -->
+<div class="clean-item group flex items-center justify-between p-3 rounded-lg bg-surface-container-low active:scale-[0.99] transition-all cursor-pointer" onclick="toggleItem(this, 'living')">
+<div class="flex items-center gap-3 min-w-0 pr-2">
+<div class="checkbox-indicator w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-transparent">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface truncate">침구 털기 &amp; 환기 10분</span>
+<span class="font-caption text-caption text-tertiary mt-0.5">쾌적 루틴</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">air</span>
+</div>
+<!-- Item 4: Unchecked -->
+<div class="clean-item group flex items-center justify-between p-3 rounded-lg bg-surface-container-low active:scale-[0.99] transition-all cursor-pointer" onclick="toggleItem(this, 'living')">
+<div class="flex items-center gap-3 min-w-0 pr-2">
+<div class="checkbox-indicator w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-transparent">check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface truncate">창틀 틈새 먼지 닦기</span>
+<span class="font-caption text-caption text-on-surface-variant mt-0.5">새로운 케어</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">window</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Realtime Achievement Status Preview Card -->
+
+<!-- Floating Sticky Action Bar -->
+<div class="fixed bottom-0 left-0 right-0 z-40 bg-surface/90 backdrop-blur-xl px-margin-screen pt-3 pb-safe">
+<div class="max-w-md mx-auto flex flex-col gap-2 mb-2">
+<!-- Primary Save Action Button -->
+<button class="w-full h-[52px] rounded-full bg-primary-container text-on-primary font-title-sm text-title-sm font-semibold flex items-center justify-center gap-2 shadow-md hover:bg-primary active:scale-[0.98] transition-all" id="save-btn" onclick="submitCleaningLog()" type="button">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+<span id="save-btn-text" class="">오늘의 청소 완료</span>
+</button>
+<!-- Secondary Soft Action Button -->
+<button class="w-full py-2 text-center text-label-md font-label-md text-secondary hover:text-primary active:opacity-75 transition-colors" onclick="submitCleaningLog()" type="button">
+        오늘은 여기까지 (현재 상태로 저장)
+      </button>
+</div>
+</div>
+<!-- Micro Interaction Toast Confirmation Modal -->
+<div class="fixed inset-x-4 bottom-24 z-50 transform transition-all duration-300 flex justify-center translate-y-32 opacity-0 pointer-events-none" id="toast-modal">
+<div class="bg-inverse-surface text-inverse-on-surface px-5 py-3.5 rounded-full shadow-xl flex items-center gap-2.5">
+<span class="material-symbols-outlined text-tertiary-fixed text-[20px]">task_alt</span>
+<span class="font-body-md text-body-md font-medium" id="toast-message">5곳의 손길이 새 기록으로 안전하게 남겨졌어요 ✨</span>
+</div>
+</div>
+</div>
+<script>
+  // Accordion Toggle
+  function toggleAccordion(contentId, chevronId) {
+    const content = document.getElementById(contentId);
+    const chevron = document.getElementById(chevronId);
+    if (!content || !chevron) return;
+    
+    if (content.classList.contains('hidden')) {
+      content.classList.remove('hidden');
+      chevron.classList.add('rotate-180');
+    } else {
+      content.classList.add('hidden');
+      chevron.classList.remove('rotate-180');
+    }
+  }
+
+  // Interactive Checklist Logic (Non-punitive)
+  function toggleItem(cardElement, spaceKey) {
+    const indicator = cardElement.querySelector('.checkbox-indicator');
+    const checkIcon = indicator.querySelector('.material-symbols-outlined');
+    const isChecked = indicator.classList.contains('bg-primary-container');
+
+    if (isChecked) {
+      // Uncheck
+      indicator.classList.remove('bg-primary-container', 'text-on-primary');
+      indicator.classList.add('bg-surface-container-lowest');
+      checkIcon.classList.add('text-transparent');
+      checkIcon.classList.remove('font-bold');
+      cardElement.classList.remove('bg-primary-fixed/20');
+      cardElement.classList.add('bg-surface-container-low');
+    } else {
+      // Check (Delight ripple)
+      indicator.classList.remove('bg-surface-container-lowest');
+      indicator.classList.add('bg-primary-container', 'text-on-primary');
+      checkIcon.classList.remove('text-transparent');
+      checkIcon.classList.add('font-bold');
+      cardElement.classList.remove('bg-surface-container-low');
+      cardElement.classList.add('bg-primary-fixed/20');
+    }
+
+    recalculateCounts();
+  }
+
+  function recalculateCounts() {
+    const spaces = ['bathroom', 'kitchen', 'living'];
+    const spaceNames = { bathroom: '욕실', kitchen: '주방', living: '거실 & 침실' };
+    let totalCount = 0;
+
+    spaces.forEach(space => {
+      const card = document.querySelector(`[data-space-card="${space}"]`);
+      if (!card) return;
+      const checkedCount = card.querySelectorAll('.clean-item .bg-primary-container').length;
+      totalCount += checkedCount;
+
+      // Update individual section badge
+      const badge = document.getElementById(`badge-${space}`);
+      if (badge) {
+        if (checkedCount > 0) {
+          badge.textContent = `${checkedCount}곳 선택됨`;
+          badge.classList.remove('hidden');
+        } else {
+          badge.textContent = '선택 없음';
+        }
+      }
+
+      // Update distribution chip
+      const distChip = document.getElementById(`dist-${space}`);
+      if (distChip) {
+        distChip.textContent = `${spaceNames[space]} ${checkedCount}`;
+      }
+    });
+
+    // Update bottom action & status headline without percentages or totals
+    const saveBtnText = document.getElementById('save-btn-text');
+    const achievementHeadline = document.getElementById('achievement-headline');
+
+    if (totalCount === 0) {
+      saveBtnText.textContent = '선택한 곳 저장하기';
+      achievementHeadline.textContent = '가볍게 둘러보는 중이에요 ✨';
+    } else {
+      saveBtnText.textContent = `${totalCount}곳 맑게 칠하기 (기록 완료)`;
+      achievementHeadline.textContent = `오늘 ${totalCount}곳을 가볍게 돌봤어요 ✨`;
+    }
+  }
+
+  // Submit Feedback Micro-interaction
+  function submitCleaningLog() {
+    const totalCount = document.querySelectorAll('.clean-item .bg-primary-container').length;
+    const toast = document.getElementById('toast-modal');
+    const toastMessage = document.getElementById('toast-message');
+
+    if (totalCount === 0) {
+      toastMessage.textContent = '오늘은 둘러보기만 해도 충분해요. 언제든 다시 오세요!';
+    } else {
+      toastMessage.textContent = `${totalCount}곳의 손길이 새 기록으로 안전하게 남겨졌어요 ✨`;
+    }
+
+    toast.classList.remove('translate-y-32', 'opacity-0', 'pointer-events-none');
+    toast.classList.add('translate-y-0', 'opacity-100');
+
+    setTimeout(() => {
+      toast.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
+      toast.classList.remove('translate-y-0', 'opacity-100');
+    }, 2400);
+  }
+</script></main></body></html>
