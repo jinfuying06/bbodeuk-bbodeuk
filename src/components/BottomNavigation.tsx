@@ -2,11 +2,11 @@ import { Link, useLocation } from "react-router-dom";
 import Icon from "./Icon";
 
 const tabs = [
-  { label: "홈", icon: "cottage", to: "/" },
-  { label: "공간", icon: "grid_view", to: "/" },
+  { label: "홈", icon: "cottage", to: "/home" },
+  { label: "공간", icon: "grid_view", to: "/spaces" },
   { label: "기록", icon: "add", to: "/quick-record", center: true },
-  { label: "히스토리", icon: "calendar_month", to: "/" },
-  { label: "케어", icon: "auto_awesome", to: "/weekend-bigclean" },
+  { label: "히스토리", icon: "calendar_month", to: "/history" },
+  { label: "청소가이드", icon: "menu_book", to: "/care" },
 ];
 
 export default function BottomNavigation() {
@@ -16,7 +16,7 @@ export default function BottomNavigation() {
     <nav className="fixed bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 bg-surface/90 pb-safe shadow-[0_-2px_12px_rgba(0,0,0,0.04)] backdrop-blur-xl">
       <div className="flex h-16 items-center justify-around px-space-xs">
         {tabs.map((tab) => {
-          const active = tab.to === pathname || (pathname === "/weekend-bigclean" && tab.label === "케어");
+          const active = tab.to === pathname || (pathname === "/deep-clean" && tab.label === "청소가이드");
 
           if (tab.center) {
             return (
@@ -38,7 +38,7 @@ export default function BottomNavigation() {
               to={tab.to}
             >
               <Icon name={tab.icon} className="text-[24px]" fill={active} />
-              <span className="text-label-sm">{tab.label}</span>
+              <span className="whitespace-nowrap text-[11px] leading-4">{tab.label}</span>
             </Link>
           );
         })}
