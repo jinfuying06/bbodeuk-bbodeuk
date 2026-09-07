@@ -1,13 +1,6 @@
 import AppHeader from "../components/AppHeader";
-import BrandLogo from "../components/BrandLogo";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-
-const intervals = [
-  ["세면대", "기본 7일", "내 설정 10일"],
-  ["싱크대", "기본 3일", "기본 추천 사용"],
-  ["후드 필터", "기본 30일", "추천 켜짐"],
-];
 
 export default function Settings() {
   return (
@@ -15,33 +8,19 @@ export default function Settings() {
       <AppHeader title="설정" />
       <main className="flex min-h-[844px] flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-16">
         <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-          <div className="flex items-center gap-space-sm">
-            <BrandLogo className="h-12 w-12" />
+          <div className="flex items-center justify-between gap-space-sm">
             <div>
-              <h1 className="text-title-md">설정</h1>
-              <p className="text-caption text-on-surface-variant">권장 주기와 알림을 관리해요.</p>
+              <span className="text-label-sm text-secondary">내 포인트</span>
+              <h1 className="mt-1 text-headline-lg text-on-surface">000포인트</h1>
             </div>
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-fixed text-primary">
+              <Icon name="toll" className="text-[26px]" />
+            </span>
           </div>
-        </section>
-        <section className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
-          <span className="text-label-sm text-secondary">연속 4주째 관리 중</span>
-          <h2 className="mt-space-sm text-headline-lg">이번 달 총 28번의 맑은 기록</h2>
-          <p className="mt-1 text-body-md text-on-surface-variant">이번 달 기록을 기준으로 자주 관리한 공간을 보여줘요.</p>
-          <p className="mt-space-md text-caption text-on-surface-variant">욕실 12회 · 주방 9회 · 침실&거실 7회</p>
-        </section>
-        <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-          <h2 className="text-title-sm">권장 주기 설정</h2>
-          <div className="mt-space-sm flex flex-col gap-space-xs">
-            {intervals.map(([title, base, setting]) => (
-              <div key={title} className="flex items-center justify-between rounded-xl bg-surface-container-low p-space-sm">
-                <div>
-                  <span className="block text-body-md font-semibold">{title}</span>
-                  <span className="text-caption text-on-surface-variant">{base}</span>
-                </div>
-                <span className="text-caption text-on-surface-variant">{setting}</span>
-              </div>
-            ))}
-          </div>
+          <button className="mt-space-md flex min-h-11 w-full items-center justify-between rounded-lg bg-surface-container-low px-space-sm text-left text-label-md text-on-surface transition-colors active:bg-surface-container-high" type="button">
+            사용내역 보기
+            <Icon name="chevron_right" className="text-[18px] text-outline-variant" />
+          </button>
         </section>
         <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
           <h2 className="text-title-sm">추천과 알림</h2>
