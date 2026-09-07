@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import BottomNavigation from "../components/BottomNavigation";
 import Icon from "../components/Icon";
@@ -199,6 +199,7 @@ export default function QuickRecord() {
   const [flashCard, setFlashCard] = useState<string | null>(null);
   const currentSpace = availableSpaces.includes(space) ? space : availableSpaces[0] ?? "bathroom";
   const availableSpaceTabs = spaceTabs.filter((item) => availableSpaces.includes(item.key));
+  const selectedItemId = searchParams.get("item");
 
   useEffect(() => {
     const nextFilter = searchParams.get("filter");
@@ -236,6 +237,8 @@ export default function QuickRecord() {
     setSearchParams({ filter: "space", space: nextSpace });
   };
 
+  const selectedItem = filter === "space" ? activeItems.find((item) => item.id === selectedItemId) : undefined;
+
   const paintItem = (item: RecordItem) => {
     if (paintedItems.includes(item.id)) {
       setPaintedItems((current) => {
@@ -263,7 +266,7 @@ export default function QuickRecord() {
       />
       <main className="flex min-h-[844px] flex-col bg-surface pb-24 pt-16">
         <section className="px-margin-screen pb-space-sm pt-space-md">
-          <h1 className="text-headline-lg text-on-surface">어디를 청소했나요?</h1>
+          <h1 className="text-headline-lg text-on-surface">{selectedItem ? `${selectedItem.name} 청소를 기록할까요?` : "어디를 청소했나요?"}</h1>
         </section>
 
         <section className="px-margin-screen py-space-xs">
@@ -312,22 +315,21 @@ export default function QuickRecord() {
               {activeItems.map((item) => {
                 const flashed = flashCard === item.id;
                 const painted = paintedItems.includes(item.id);
+                const selected = selectedItemId === item.id;
                 const tone = spaceTones[currentSpace];
 
                 return (
                   <button
                     key={item.id}
                     className={`relative flex aspect-square flex-col items-center justify-center gap-space-xs overflow-hidden rounded-lg border p-space-xs text-center transition-all active:scale-95 ${
-                      painted ? `${tone.border} ${tone.active} ${tone.text} shadow-sm` : "border-outline-variant/60 bg-surface-container-lowest text-on-surface"
+                      painted || selected ? `${tone.border} ${tone.active} ${tone.text} shadow-sm` : "border-outline-variant/60 bg-surface-container-lowest text-on-surface"
                     }`}
                     type="button"
                     onClick={() => paintItem(item)}
-                  >
-                    <Icon name={item.icon} className={`text-[24px] ${painted ? tone.text : "text-on-surface-variant"}`} />
+                    >
+                    {selected ? <span className="absolute right-2 top-2 rounded-full bg-surface-container-lowest px-2 py-0.5 text-caption font-semibold">선택됨</span> : null}
                     <span className="text-label-sm font-semibold">{item.name}</span>
-                    {!painted && item.meta ? (
-                      <span className="text-caption text-on-surface-variant">{item.meta}</span>
-                    ) : null}
+                    <span className="text-caption text-on-surface-variant">{item.meta ? `최근 청소 ${item.meta}` : "최근 기록 없음"}</span>
                     <div className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
                       <span className={`rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
                         이제 깨끗해요!
@@ -336,17 +338,19 @@ export default function QuickRecord() {
                   </button>
                 );
               })}
-              <button className="flex aspect-square flex-col items-center justify-center gap-space-xs rounded-lg border border-dashed border-outline-variant/60 bg-surface-container-lowest text-on-surface-variant" type="button">
+              <Link className="flex aspect-square flex-col items-center justify-center gap-space-xs rounded-lg border border-dashed border-outline-variant/60 bg-surface-container-lowest text-on-surface-variant" to={`/item-add?space=${currentSpace}`}>
                 <Icon name="add" className="text-[24px]" />
                 <span className="text-label-sm">항목 추가</span>
-              </button>
+              </Link>
             </div>
           ) : (
             <div className="flex flex-col gap-space-xs">
               {activeItems.map((item) => {
                 const flashed = flashCard === item.id;
                 const painted = paintedItems.includes(item.id);
-                const tone = spaceTones[item.space ?? "bathroom"];
+                const itemSpace = item.space ?? "bathroom";
+                const tone = spaceTones[itemSpace];
+                const spaceIcon = spaceTabs.find((tab) => tab.key === itemSpace)?.icon ?? "grid_view";
 
                 return (
                   <button
@@ -358,13 +362,12 @@ export default function QuickRecord() {
                     onClick={() => paintItem(item)}
                   >
                     <div className="flex min-w-0 items-center gap-space-sm">
-                      <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${painted ? `${tone.soft} ${tone.text}` : "bg-surface-container text-primary"}`}>
-                        <Icon name={item.icon} className="text-[22px]" />
-                      </div>
+                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone.soft} ${tone.text}`}>
+                        <Icon name={spaceIcon} className="text-[22px]" />
+                      </span>
                       <div className="flex min-w-0 flex-col">
                         <span className={`text-title-sm ${painted ? tone.text : "text-on-surface"}`}>{item.name}</span>
-                        <span className="truncate text-caption text-outline">{item.desc}</span>
-                        {!painted && item.meta ? <span className="mt-0.5 text-caption text-on-surface-variant">{item.meta}</span> : null}
+                        <span className="truncate text-caption text-on-surface-variant">{item.meta ? `최근 청소 ${item.meta}` : "최근 기록 없음"}</span>
                       </div>
                     </div>
                     <div className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>

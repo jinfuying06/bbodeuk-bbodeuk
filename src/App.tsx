@@ -4,9 +4,13 @@ import CareAction from "./pages/CareAction";
 import History from "./pages/History";
 import Home from "./pages/Home";
 import HomeStateDemo from "./pages/HomeStateDemo";
+import ItemAdd from "./pages/ItemAdd";
+import ItemHistory from "./pages/ItemHistory";
+import ItemInfo from "./pages/ItemInfo";
 import QuickRecord from "./pages/QuickRecord";
 import Settings from "./pages/Settings";
 import Setup from "./pages/Setup";
+import SpaceInfo from "./pages/SpaceInfo";
 import Spaces from "./pages/Spaces";
 import WeekendBigClean from "./pages/WeekendBigClean";
 import SamplePaint from "./pages/SamplePaint";
@@ -25,6 +29,10 @@ export default function App() {
       <Route path="/sample-paint" element={<SamplePaint />} />
       <Route path="/setup" element={<Setup />} />
       <Route path="/home/:state" element={<HomeStateDemo />} />
+      <Route path="/item-add" element={<ItemAdd />} />
+      <Route path="/item-history" element={<ItemHistory />} />
+      <Route path="/item-info" element={<ItemInfo />} />
+      <Route path="/space-info" element={<SpaceInfo />} />
       <Route path="/spaces" element={<Spaces />} />
       <Route path="/quick-record" element={<QuickRecord />} />
       <Route path="/deep-clean" element={<WeekendBigClean />} />

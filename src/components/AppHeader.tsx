@@ -40,13 +40,7 @@ export default function AppHeader({ title, home = false, right }: AppHeaderProps
       <div className="flex h-16 items-center justify-between gap-space-xs px-margin-screen">
         <Link aria-label="홈으로 이동" className="flex min-h-[44px] min-w-0 flex-1 items-center gap-space-xs transition-opacity active:opacity-70" to="/home">
           <BrandLogo />
-          <span className="shrink-0 text-title-md text-on-surface">뽀득뽀득</span>
-          {title ? (
-            <>
-              <Icon name="chevron_right" className="shrink-0 text-[20px] text-outline" />
-              <span className="truncate text-title-sm font-semibold text-on-surface">{title}</span>
-            </>
-          ) : null}
+          <span className="truncate text-title-md text-on-surface">{title ?? "뽀득뽀득"}</span>
         </Link>
         {actions}
       </div>

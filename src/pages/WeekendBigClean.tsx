@@ -302,10 +302,7 @@ export default function WeekendBigClean() {
                           type="button"
                           onClick={() => toggleItem(item.id)}
                         >
-                          <div className="flex min-w-0 items-center gap-space-sm pr-space-xs">
-                            <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${isChecked ? `bg-surface-container-lowest ${tone.text}` : "bg-surface-container-lowest text-on-surface-variant"}`}>
-                              <Icon name={item.icon} className="text-[20px]" />
-                            </span>
+                          <div className="flex min-w-0 items-center pr-space-xs">
                             <div className="flex min-w-0 flex-col">
                               <span className={`truncate text-body-md ${isChecked ? tone.text : "text-on-surface"}`}>{item.title}</span>
                               {!isChecked && meta ? <span className="mt-0.5 truncate text-caption text-on-surface-variant">{meta}</span> : null}
