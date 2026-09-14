@@ -166,7 +166,7 @@ export default function QuickRecord() {
   const [searchParams, setSearchParams] = useSearchParams();
   const setup = useMemo(() => {
     try {
-      return JSON.parse(window.localStorage.getItem("bbodeuk.setup.v1") ?? "{}") as { spaces?: string[] };
+      return JSON.parse(window.localStorage.getItem("bbodeuk.setup.v1") ?? "{}") as { spaces?: string[]; roomName?: string };
     } catch {
       return {};
     }
@@ -262,7 +262,7 @@ export default function QuickRecord() {
   return (
     <div className="phone-shell bg-surface text-on-surface">
       <AppHeader
-        title={filter === "space" ? spaceLabels[currentSpace] : "기록"}
+        title={filter === "space" ? currentSpace === "bedroom" ? setup.roomName?.trim() || "방" : spaceLabels[currentSpace] : "기록"}
       />
       <main className="flex min-h-[844px] flex-col bg-surface pb-24 pt-16">
         <section className="px-margin-screen pb-space-sm pt-space-md">
@@ -301,7 +301,7 @@ export default function QuickRecord() {
                     onClick={() => updateSpace(item.key)}
                   >
                     <Icon name={item.icon} className="text-[16px]" />
-                    {item.label}
+                    {item.key === "bedroom" ? setup.roomName?.trim() || "방" : item.label}
                   </button>
                 ))}
               </div>

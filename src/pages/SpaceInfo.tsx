@@ -85,6 +85,13 @@ export default function SpaceInfo() {
   const requestedSpace = searchParams.get("space");
   const spaceKey: SpaceKey = isSpaceKey(requestedSpace) ? requestedSpace : "bathroom";
   const space = spaces[spaceKey];
+  const roomName = (() => {
+    try {
+      return (JSON.parse(window.localStorage.getItem("bbodeuk.setup.v1") ?? "{}") as { roomName?: string }).roomName?.trim() || "방";
+    } catch {
+      return "방";
+    }
+  })();
 
   return (
     <PageShell>
@@ -95,7 +102,7 @@ export default function SpaceInfo() {
             <Icon name={space.icon} className="text-[32px]" />
           </span>
           <div className="flex items-center justify-center gap-space-xs">
-            <h1 className="text-headline-lg">{space.title}</h1>
+            <h1 className="text-headline-lg">{spaceKey === "bedroom" ? roomName : space.title}</h1>
             <Pill className={`${space.tone} ${space.text}`}>{space.intervalBadge}</Pill>
           </div>
           <p className="mt-1 text-body-md text-on-surface-variant">{space.statusDetail}</p>

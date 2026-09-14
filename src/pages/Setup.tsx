@@ -1,47 +1,32 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import SpaceExpansionDialog from "../components/SpaceExpansionDialog";
 
-const homes = [
-  ["원룸 / 오피스텔", "home"],
-  ["투룸 / 1.5룸", "cottage"],
-  ["쓰리룸 이상", "domain"],
-];
-
-const spaces = [
-  ["현관", "door_front"],
-  ["욕실", "water_drop"],
-  ["주방", "soup_kitchen"],
-  ["거실", "weekend"],
-  ["침실 / 방", "bed"],
-  ["베란다 / 다용도실", "balcony"],
-];
-
-const defaultSpacesByHome = [
-  ["현관", "욕실", "주방", "침실 / 방"],
-  ["현관", "욕실", "주방", "거실", "침실 / 방"],
-  ["현관", "욕실", "주방", "거실", "침실 / 방", "베란다 / 다용도실"],
+const basicSpaces = [
+  { key: "거실", icon: "weekend" },
+  { key: "주방", icon: "soup_kitchen" },
+  { key: "욕실", icon: "water_drop" },
+  { key: "침실 / 방", icon: "bed" },
 ];
 
 export default function Setup() {
   const navigate = useNavigate();
-  const [home, setHome] = useState(0);
-  const [selected, setSelected] = useState(defaultSpacesByHome[0]);
+  const [selected, setSelected] = useState(basicSpaces.map((space) => space.key));
+  const [showExpansion, setShowExpansion] = useState(false);
 
-  const selectHome = (index: number) => {
-    setHome(index);
-    setSelected(defaultSpacesByHome[index]);
+  const toggleSpace = (key: string) => {
+    setSelected((current) =>
+      current.includes(key) ? current.filter((space) => space !== key) : [...current, key],
+    );
   };
 
   const completeSetup = () => {
+    if (selected.length === 0) return;
     window.localStorage.setItem(
       "bbodeuk.setup.v1",
-      JSON.stringify({
-        homeType: homes[home][0],
-        spaces: selected,
-      }),
+      JSON.stringify({ spaces: selected, roomName: "방" }),
     );
     navigate("/home");
   };
@@ -50,64 +35,57 @@ export default function Setup() {
     <PageShell bottomNav={false}>
       <main className="flex min-h-[100dvh] flex-col px-margin-screen pb-space-2xl pt-space-md">
         <div className="mb-space-lg flex items-center">
-          <Link className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-low text-on-surface" to="/welcome">
+          <Link className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-low text-on-surface" to="/welcome" aria-label="이전 화면으로">
             <Icon name="arrow_back_ios_new" className="text-[22px]" />
           </Link>
         </div>
+
         <section className="mb-space-lg">
-          <h1 className="text-headline-lg">청소준비</h1>
-          <p className="mt-2 text-body-md text-on-surface-variant">살고 계신 집의 형태를 알려주세요. 권장 청소 주기는 뽀득뽀득이 알아서 챙겨드릴게요.</p>
+          <h1 className="text-headline-lg">관리할 공간을 선택해주세요</h1>
+          <p className="mt-2 text-body-md text-on-surface-variant">자주 관리하는 공간부터 먼저 시작해보세요.</p>
         </section>
+
         <section className="mb-space-lg">
-          <div className="mb-space-sm">
-            <h2 className="text-title-sm">주거 형태</h2>
+          <div className="mb-space-sm flex items-center justify-between gap-space-xs">
+            <h2 className="text-title-sm">기본 공간</h2>
+            <span className="text-label-sm text-secondary">4개 공간 무료</span>
           </div>
-          <div className="grid grid-cols-3 gap-space-xs">
-            {homes.map(([title, icon], index) => {
-              const locked = index === 2;
+          <div className="grid grid-cols-2 gap-space-xs">
+            {basicSpaces.map(({ key, icon }) => {
+              const active = selected.includes(key);
               return (
-              <button
-                key={title}
-                className={`relative min-h-[108px] overflow-hidden rounded-xl p-space-sm text-center shadow-sm ${
-                  locked ? "bg-surface-container text-outline" : home === index ? "bg-primary-container text-on-primary" : "bg-surface-container-lowest text-on-surface"
-                }`}
-                type="button"
-                onClick={() => {
-                  if (!locked) selectHome(index);
-                }}
-              >
-                {locked ? <div className="absolute inset-0 bg-surface/45 backdrop-blur-[1px]" /> : null}
-                {locked ? <span className="absolute inset-x-1 top-2 z-20 text-center text-[10px] font-semibold leading-tight text-primary drop-shadow-sm">plus를 구독해보세요!</span> : null}
-                <span className="relative z-10 block">
-                  <Icon name={locked ? "lock" : icon} className="mx-auto mb-space-xs text-[28px]" fill={home === index && !locked} />
-                  <span className="block text-title-sm leading-tight">{title}</span>
-                </span>
-              </button>
-              );
-            })}
-          </div>
-        </section>
-        <section className="mb-space-lg">
-          <div className="mb-space-sm">
-            <h2 className="text-title-sm">청소할 공간</h2>
-          </div>
-          <div className="flex flex-wrap gap-space-xs">
-            {spaces.map(([label, icon]) => {
-              const active = selected.includes(label);
-              return (
-                <button key={label} className={`flex items-center gap-1.5 rounded-full px-space-md py-space-xs text-label-md ${active ? "bg-primary-container text-on-primary" : "bg-surface-container-lowest text-on-surface-variant shadow-sm"}`} type="button" onClick={() => setSelected((current) => (active ? current.filter((item) => item !== label) : [...current, label]))}>
-                  <Icon name={icon} className="text-[16px]" />
-                  {label}
-                  {active ? <Icon name="check" className="text-[16px]" /> : null}
+                <button
+                  key={key}
+                  className={`flex min-h-[88px] items-center gap-space-sm rounded-xl p-space-md text-left shadow-sm transition-colors ${active ? "bg-primary-fixed text-on-surface" : "bg-surface-container-lowest text-on-surface-variant"}`}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => toggleSpace(key)}
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-container-lowest text-primary">
+                    <Icon name={icon} className="text-[24px]" />
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-title-sm">{key === "침실 / 방" ? "방" : key}</span>
+                  <Icon name={active ? "check_circle" : "radio_button_unchecked"} className={`text-[22px] ${active ? "text-primary" : "text-outline"}`} />
                 </button>
               );
             })}
           </div>
         </section>
-        <button className="mt-auto flex h-14 items-center justify-center rounded-full bg-primary-container text-title-sm text-on-primary shadow-md" type="button" onClick={completeSetup}>
-          뽀득뽀득 시작하기
+
+        <section className="mb-space-xl rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
+          <h2 className="text-title-sm">다른 공간도 관리하고 싶나요?</h2>
+          <p className="mt-1 text-body-md text-on-surface-variant">베란다, 드레스룸처럼 필요한 공간은 1개당 300P로 확장할 수 있어요.</p>
+          <button className="mt-space-sm flex min-h-11 w-full items-center justify-center gap-space-xs rounded-lg border border-outline-variant bg-surface-container-lowest px-space-sm text-label-md text-primary" type="button" onClick={() => setShowExpansion(true)}>
+            <Icon name="add" className="text-[20px]" />
+            공간 추가 · 300P
+          </button>
+        </section>
+
+        <button className="mt-auto flex h-14 items-center justify-center rounded-full bg-primary-container text-title-sm text-on-primary shadow-md disabled:opacity-50" type="button" onClick={completeSetup} disabled={selected.length === 0}>
+          {selected.length > 0 ? "기본 공간으로 시작하기" : "공간을 하나 이상 선택해주세요"}
         </button>
       </main>
+      <SpaceExpansionDialog open={showExpansion} onClose={() => setShowExpansion(false)} />
     </PageShell>
   );
 }

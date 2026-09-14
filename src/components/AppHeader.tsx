@@ -15,7 +15,7 @@ export default function AppHeader({ title, home = false, right }: AppHeaderProps
       <button aria-label="알림" className="flex h-11 w-11 items-center justify-center text-on-surface-variant transition-colors active:text-primary">
         <Icon name="notifications" className="text-[24px]" />
       </button>
-      <Link aria-label="포인트" className="flex h-11 w-11 items-center justify-center text-on-surface-variant transition-colors active:text-primary" to="/settings">
+      <Link aria-label="포인트 구매" className="flex h-11 w-11 items-center justify-center text-on-surface-variant transition-colors active:text-primary" to="/points">
         <Icon name="toll" className="text-[24px]" />
       </Link>
       <Link aria-label="설정" className="flex h-11 w-11 items-center justify-center text-on-surface-variant transition-colors active:text-primary" to="/settings">

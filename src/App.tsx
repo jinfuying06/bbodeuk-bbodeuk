@@ -8,6 +8,7 @@ import ItemAdd from "./pages/ItemAdd";
 import ItemHistory from "./pages/ItemHistory";
 import ItemInfo from "./pages/ItemInfo";
 import QuickRecord from "./pages/QuickRecord";
+import Points from "./pages/Points";
 import Settings from "./pages/Settings";
 import Setup from "./pages/Setup";
 import SpaceInfo from "./pages/SpaceInfo";
@@ -35,6 +36,7 @@ export default function App() {
       <Route path="/space-info" element={<SpaceInfo />} />
       <Route path="/spaces" element={<Spaces />} />
       <Route path="/quick-record" element={<QuickRecord />} />
+      <Route path="/points" element={<Points />} />
       <Route path="/deep-clean" element={<WeekendBigClean />} />
       <Route path="/weekend-bigclean" element={<WeekendBigClean />} />
       <Route path="/care-action" element={<CareAction />} />

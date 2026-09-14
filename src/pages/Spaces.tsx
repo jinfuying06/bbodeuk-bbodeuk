@@ -74,7 +74,12 @@ const spaces: Space[] = [
   },
 ];
 
-const tabs = ["전체 보기", "욕실", "주방", "침실", "거실"];
+const setupSpaceMap: Record<string, string> = {
+  욕실: "bathroom",
+  주방: "kitchen",
+  거실: "living",
+  "침실 / 방": "bedroom",
+};
 
 const statusTone: Record<CareStatus, string> = {
   "확인 필요": "bg-secondary-fixed text-on-secondary-fixed-variant",
@@ -104,7 +109,20 @@ const getSummary = (items: CareItem[]) => {
 
 export default function Spaces() {
   const [selectedTab, setSelectedTab] = useState("전체 보기");
-  const visibleSpaces = selectedTab === "전체 보기" ? spaces : spaces.filter((space) => space.title === selectedTab);
+  const setup = (() => {
+    try {
+      return JSON.parse(window.localStorage.getItem("bbodeuk.setup.v1") ?? "{}") as { spaces?: string[]; roomName?: string };
+    } catch {
+      return {};
+    }
+  })();
+  const selectedKeys = new Set((setup.spaces ?? []).map((name) => setupSpaceMap[name]).filter(Boolean));
+  const availableSpaces = selectedKeys.size > 0 ? spaces.filter((space) => selectedKeys.has(space.key)) : spaces;
+  const tabs = [{ key: "전체 보기", label: "전체 보기" }, ...availableSpaces.map((space) => ({
+    key: space.key,
+    label: space.key === "bedroom" ? setup.roomName?.trim() || "방" : space.title,
+  }))];
+  const visibleSpaces = selectedTab === "전체 보기" ? availableSpaces : availableSpaces.filter((space) => space.key === selectedTab);
 
   return (
     <PageShell>
@@ -113,10 +131,10 @@ export default function Spaces() {
         <div className="flex flex-col gap-space-md px-margin-screen pb-space-2xl">
           <div className="hide-scrollbar -mx-margin-screen overflow-x-auto px-margin-screen">
             <div className="flex min-w-max gap-space-xs">
-              {tabs.map((label) => {
-                const active = selectedTab === label;
+              {tabs.map(({ key, label }) => {
+                const active = selectedTab === key;
                 return (
-                  <button key={label} className={`min-h-11 rounded-full px-4 py-2 text-label-md ${active ? "bg-primary text-on-primary shadow-sm" : "bg-surface-container-low text-on-surface-variant"}`} type="button" onClick={() => setSelectedTab(label)}>
+                  <button key={key} className={`min-h-11 rounded-full px-4 py-2 text-label-md ${active ? "bg-primary text-on-primary shadow-sm" : "bg-surface-container-low text-on-surface-variant"}`} type="button" onClick={() => setSelectedTab(key)}>
                     {label}
                   </button>
                 );
@@ -132,7 +150,7 @@ export default function Spaces() {
                     <Icon name={space.icon} className="text-[22px]" />
                   </span>
                   <div className="min-w-0">
-                    <h2 className="truncate text-title-md">{space.title}</h2>
+                    <h2 className="truncate text-title-md">{space.key === "bedroom" ? setup.roomName?.trim() || "방" : space.title}</h2>
                     <p className="text-caption text-on-surface-variant">{getSummary(space.items)}</p>
                   </div>
                 </div>
@@ -157,6 +175,15 @@ export default function Spaces() {
               </div>
             </section>
           ))}
+
+          <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
+            <h2 className="text-title-sm">우리 집에 다른 공간도 있나요?</h2>
+            <p className="mt-1 text-body-md text-on-surface-variant">베란다, 드레스룸처럼 필요한 공간은 1개당 300P로 확장할 수 있어요.</p>
+            <Link className="mt-space-sm flex min-h-11 w-full items-center justify-center gap-space-xs rounded-lg border border-dashed border-outline-variant text-label-md text-primary" to="/points?intent=space">
+              <Icon name="add" className="text-[20px]" />
+              공간 추가 · 300P
+            </Link>
+          </section>
 
           {visibleSpaces.length === 0 ? (
             <section className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">

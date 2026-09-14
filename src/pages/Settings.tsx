@@ -1,8 +1,13 @@
+import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { readPoints } from "../data/points";
 
 export default function Settings() {
+  const balance = readPoints();
+  const availableRooms = Math.floor(balance / 300);
+
   return (
     <PageShell>
       <AppHeader title="설정" />
@@ -10,17 +15,20 @@ export default function Settings() {
         <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
           <div className="flex items-center justify-between gap-space-sm">
             <div>
-              <span className="text-label-sm text-secondary">내 포인트</span>
-              <h1 className="mt-1 text-headline-lg text-on-surface">000포인트</h1>
+              <span className="text-label-sm text-secondary">보유 포인트</span>
+              <h1 className="mt-1 text-headline-lg text-on-surface">{balance.toLocaleString()}P</h1>
             </div>
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-fixed text-primary">
               <Icon name="toll" className="text-[26px]" />
             </span>
           </div>
-          <button className="mt-space-md flex min-h-11 w-full items-center justify-between rounded-lg bg-surface-container-low px-space-sm text-left text-label-md text-on-surface transition-colors active:bg-surface-container-high" type="button">
-            사용내역 보기
-            <Icon name="chevron_right" className="text-[18px] text-outline-variant" />
-          </button>
+          <p className="mt-space-sm text-body-md text-on-surface-variant">
+            {availableRooms > 0 ? `방 ${availableRooms}개를 추가할 수 있어요.` : "포인트를 구매하면 방을 추가할 수 있어요."}
+          </p>
+          <Link className="mt-space-md inline-flex min-h-11 items-center gap-space-xs text-label-md text-primary" to="/points">
+            포인트 구매하기
+            <Icon name="chevron_right" className="text-[18px]" />
+          </Link>
         </section>
         <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
           <h2 className="text-title-sm">추천과 알림</h2>

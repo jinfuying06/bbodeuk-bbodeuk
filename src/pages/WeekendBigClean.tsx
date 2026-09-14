@@ -154,7 +154,7 @@ export default function WeekendBigClean() {
   const navigate = useNavigate();
   const setup = useMemo(() => {
     try {
-      return JSON.parse(window.localStorage.getItem("bbodeuk.setup.v1") ?? "{}") as { spaces?: string[] };
+      return JSON.parse(window.localStorage.getItem("bbodeuk.setup.v1") ?? "{}") as { spaces?: string[]; roomName?: string };
     } catch {
       return {};
     }
@@ -211,7 +211,7 @@ export default function WeekendBigClean() {
           id: `deep-${item.id}`,
           name: item.title,
           icon: item.icon,
-          desc: `${spaceLabels[space.key]} · 대청소`,
+          desc: `${space.key === "bedroom" ? setup.roomName?.trim() || "방" : spaceLabels[space.key]} · 대청소`,
           meta: "방금",
           space: space.key,
         })),
@@ -251,7 +251,7 @@ export default function WeekendBigClean() {
               {prioritySpaces.map((space, index) => (
                 <div key={space.key} className="flex items-center gap-space-xs py-1">
                   <span className="w-4 shrink-0 text-caption text-outline">{index + 1}</span>
-                  <span className="shrink-0 text-body-md font-semibold text-on-surface">{space.title}</span>
+                  <span className="shrink-0 text-body-md font-semibold text-on-surface">{space.key === "bedroom" ? setup.roomName?.trim() || "방" : space.title}</span>
                   <span className="min-w-0 truncate text-caption text-on-surface-variant">
                     숨은 관리 {space.hiddenCount}곳 · 다시 볼 곳 {space.revisitCount}곳
                   </span>
@@ -280,7 +280,7 @@ export default function WeekendBigClean() {
                         <Icon name={space.icon} className={`relative z-10 text-[20px] ${count > 0 ? tone.text : "text-on-surface-variant"}`} />
                       </div>
                       <div className="min-w-0">
-                        <span className="text-title-sm text-on-surface">{space.title}</span>
+                        <span className="text-title-sm text-on-surface">{space.key === "bedroom" ? setup.roomName?.trim() || "방" : space.title}</span>
                         {count > 0 ? <span className="ml-2 text-caption text-on-surface-variant">{count}곳</span> : null}
                       </div>
                     </div>

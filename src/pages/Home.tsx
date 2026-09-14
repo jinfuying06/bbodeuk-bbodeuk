@@ -254,7 +254,7 @@ export default function Home() {
   })();
   const setup = (() => {
     try {
-      return JSON.parse(window.localStorage.getItem("bbodeuk.setup.v1") ?? "{}") as { spaces?: string[]; homeType?: string };
+      return JSON.parse(window.localStorage.getItem("bbodeuk.setup.v1") ?? "{}") as { spaces?: string[]; roomName?: string };
     } catch {
       return {};
     }
@@ -272,7 +272,11 @@ export default function Home() {
   const effectiveCanvasCards = visibleCanvasCards.map((card) => {
     const completedCount = recommendations.filter((item) => completed.includes(item.id) && item.spaceKey === card.spaceKey).length;
     const sessionBoost = deepCleanSpaces.has(card.spaceKey) ? 1 : 0;
-    return { ...card, healthyItems: Math.min(card.managedItems, card.healthyItems + completedCount + sessionBoost) };
+    return {
+      ...card,
+      room: card.spaceKey === "bedroom" ? setup.roomName?.trim() || "방" : card.room,
+      healthyItems: Math.min(card.managedItems, card.healthyItems + completedCount + sessionBoost),
+    };
   });
   const baseRecentRecords = hasSetup ? recentRecords.filter((record) => enabledSpaceKeys.has(record.spaceKey)) : recentRecords;
   const allRecentRecords = [...sessionRecentRecords, ...baseRecentRecords];
@@ -333,6 +337,10 @@ export default function Home() {
                 ))}
               </div>
             </div>
+            <Link className="flex min-h-11 items-center justify-center gap-space-xs rounded-xl border border-dashed border-outline-variant/70 bg-surface-container-lowest px-space-md text-label-md text-primary" to="/points?intent=space">
+              <Icon name="add" className="text-[20px]" />
+              공간을 추가하고 싶나요?
+            </Link>
           </section>
 
           <section className="flex flex-col gap-space-sm">
