@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { grantSignupBonus, SIGNUP_BONUS } from "../data/points";
+import { spaceTones } from "../data/spaceTones";
 
 const termsList = [
   { key: "service", required: true, label: "뽀득뽀득 서비스 이용약관 동의" },
@@ -24,6 +26,9 @@ export default function SignUp() {
     privacy: false,
     marketing: false,
   });
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [grantedBalance, setGrantedBalance] = useState(0);
+  const continueButtonRef = useRef<HTMLButtonElement>(null);
 
   const allAgreed = termsList.every((term) => agreed[term.key]);
   const requiredAgreed = termsList.filter((term) => term.required).every((term) => agreed[term.key]);
@@ -40,8 +45,19 @@ export default function SignUp() {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!requiredAgreed) return;
-    navigate("/setup");
+    setGrantedBalance(grantSignupBonus());
+    setShowWelcome(true);
   };
+
+  useEffect(() => {
+    if (!showWelcome) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    continueButtonRef.current?.focus();
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [showWelcome]);
 
   return (
     <PageShell bottomNav={false}>
@@ -57,10 +73,10 @@ export default function SignUp() {
         <form className="relative flex flex-1 flex-col gap-space-xl px-margin-screen pb-space-2xl pt-space-lg" onSubmit={handleSubmit}>
           <section className="flex flex-col gap-space-xs">
             <div className="flex items-center gap-1.5">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary-fixed">
-                <Icon name="water_drop" className="text-[12px] text-primary-container" fill />
+              <span className={`flex h-6 w-6 items-center justify-center rounded-full ${spaceTones.bathroom.fill}`}>
+                <Icon name="water_drop" className={`text-[12px] ${spaceTones.bathroom.text}`} fill />
               </span>
-              <span className="text-body-md font-bold text-primary-container">뽀득뽀득</span>
+              <span className={`text-body-md font-bold ${spaceTones.bathroom.text}`}>뽀득뽀득</span>
             </div>
             <h1 className="whitespace-pre-line text-headline-lg text-on-surface">
               {"새로운 청소 여정,\n지금 시작해 볼까요?"}
@@ -155,11 +171,13 @@ export default function SignUp() {
             <h2 className="text-label-md text-on-surface-variant">서비스 이용 동의</h2>
             <button
               type="button"
-              className="flex items-center gap-space-xs rounded-xl border border-surface-container bg-surface-container-lowest p-space-md shadow-sm"
+              className={`flex items-center gap-space-xs rounded-xl border p-space-md shadow-sm transition-colors ${
+                allAgreed ? `${spaceTones.bathroom.border} ${spaceTones.bathroom.fill}` : "border-surface-container bg-surface-container-lowest"
+              }`}
               onClick={toggleAll}
               aria-pressed={allAgreed}
             >
-              <Icon name="check_circle" fill className={`text-[22px] ${allAgreed ? "text-primary-container" : "text-surface-container"}`} />
+              <Icon name="check_circle" fill className={`text-[22px] ${allAgreed ? spaceTones.bathroom.text : "text-surface-container"}`} />
               <span className="flex-1 text-left text-body-md font-bold text-on-surface">만 14세 이상이며, 모든 약관에 동의합니다</span>
             </button>
 
@@ -172,7 +190,7 @@ export default function SignUp() {
                   onClick={() => toggleTerm(term.key)}
                   aria-pressed={agreed[term.key]}
                 >
-                  <Icon name="check_circle" fill className={`text-[20px] ${agreed[term.key] ? "text-primary-container" : "text-surface-container"}`} />
+                  <Icon name="check_circle" fill className={`text-[20px] ${agreed[term.key] ? spaceTones.bathroom.text : "text-surface-container"}`} />
                   <span className="flex-1 text-left text-body-md text-on-surface-variant">
                     <span>{term.required ? "[필수] " : "[선택] "}</span>
                     <span className="text-on-surface">{term.label}</span>
@@ -193,13 +211,31 @@ export default function SignUp() {
             </button>
             <p className="flex items-center justify-center gap-1.5 text-body-md text-on-surface-variant">
               이미 계정이 있으신가요?
-              <Link to="/login" className="font-bold text-primary-container underline decoration-primary-container">
+              <Link to="/login" className={`font-bold underline decoration-current ${spaceTones.bathroom.text}`}>
                 로그인하기
               </Link>
             </p>
           </section>
         </form>
       </main>
+
+      {showWelcome ? (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-on-surface/40" role="presentation">
+          <section aria-labelledby="signup-welcome-title" aria-modal="true" className="w-full max-w-[430px] rounded-t-xl bg-surface-container-lowest px-margin-screen pb-[calc(24px+env(safe-area-inset-bottom,0px))] pt-space-lg text-center shadow-xl" role="dialog">
+            <span aria-hidden="true" className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-tertiary-fixed/60 text-tertiary">
+              <Icon name="celebration" className="text-[30px]" fill />
+            </span>
+            <h2 id="signup-welcome-title" className="mt-space-md text-headline-md text-on-surface">
+              {nickname.trim() || "회원"}님, 뽀득뽀득에 오신 걸 환영해요!
+            </h2>
+            <p className="mt-space-sm text-body-md text-on-surface-variant">가입 축하로 시작 포인트 {SIGNUP_BONUS}P가 지급됐어요. 공간을 추가할 때 사용해보세요.</p>
+            <p className={`mt-space-xs text-title-sm ${spaceTones.bathroom.text}`}>현재 보유 포인트 {grantedBalance.toLocaleString()}P</p>
+            <button ref={continueButtonRef} type="button" className="mt-space-lg flex h-12 w-full items-center justify-center rounded-full bg-primary-container text-title-sm text-on-primary shadow-md" onClick={() => navigate("/setup")}>
+              공간 설정하러 가기
+            </button>
+          </section>
+        </div>
+      ) : null}
     </PageShell>
   );
 }

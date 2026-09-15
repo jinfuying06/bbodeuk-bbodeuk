@@ -73,6 +73,18 @@ const spaces: Space[] = [
       { id: "door-handle", title: "문 손잡이", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 14 },
     ],
   },
+  {
+    key: "terrace",
+    title: "테라스",
+    icon: "balcony",
+    tone: sharedSpaceTones.terrace.fill,
+    iconTone: sharedSpaceTones.terrace.text,
+    items: [
+      { id: "terrace-floor", title: "테라스 바닥", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 14 },
+      { id: "rail", title: "난간", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 21 },
+      { id: "laundry", title: "빨래 공간", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 14 },
+    ],
+  },
 ];
 
 const setupSpaceMap: Record<string, string> = {
@@ -80,6 +92,7 @@ const setupSpaceMap: Record<string, string> = {
   주방: "kitchen",
   거실: "living",
   "침실 / 방": "bedroom",
+  "베란다 / 다용도실": "terrace",
 };
 
 const statusTone: Record<CareStatus, string> = {
@@ -180,7 +193,7 @@ export default function Spaces() {
           <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
             <h2 className="text-title-sm">우리 집에 다른 공간도 있나요?</h2>
             <p className="mt-1 text-body-md text-on-surface-variant">베란다, 드레스룸처럼 필요한 공간은 1개당 300P로 확장할 수 있어요.</p>
-            <Link className="mt-space-sm flex min-h-11 w-full items-center justify-center gap-space-xs rounded-lg border border-dashed border-outline-variant text-label-md text-primary" to="/points?intent=space">
+            <Link className="mt-space-sm flex min-h-11 w-full items-center justify-center gap-space-xs rounded-lg border border-dashed border-outline-variant text-label-md text-primary" to="/space-manage">
               <Icon name="add" className="text-[20px]" />
               공간 추가 · 300P
             </Link>

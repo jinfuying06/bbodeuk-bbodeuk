@@ -14,6 +14,7 @@ import Settings from "./pages/Settings";
 import Setup from "./pages/Setup";
 import SignUp from "./pages/SignUp";
 import SpaceInfo from "./pages/SpaceInfo";
+import SpaceManage from "./pages/SpaceManage";
 import Spaces from "./pages/Spaces";
 import WeekendBigClean from "./pages/WeekendBigClean";
 import SamplePaint from "./pages/SamplePaint";
@@ -38,6 +39,7 @@ export default function App() {
       <Route path="/item-history" element={<ItemHistory />} />
       <Route path="/item-info" element={<ItemInfo />} />
       <Route path="/space-info" element={<SpaceInfo />} />
+      <Route path="/space-manage" element={<SpaceManage />} />
       <Route path="/spaces" element={<Spaces />} />
       <Route path="/quick-record" element={<QuickRecord />} />
       <Route path="/points" element={<Points />} />

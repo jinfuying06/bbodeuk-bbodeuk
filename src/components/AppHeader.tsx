@@ -7,9 +7,10 @@ type AppHeaderProps = {
   title?: string;
   home?: boolean;
   right?: ReactNode;
+  onBack?: () => void;
 };
 
-export default function AppHeader({ title, home = false, right }: AppHeaderProps) {
+export default function AppHeader({ title, home = false, right, onBack }: AppHeaderProps) {
   const actions = right ?? (
     <div className="flex items-center gap-space-xxs">
       <button aria-label="알림" className="flex h-11 w-11 items-center justify-center text-on-surface-variant transition-colors active:text-primary">
@@ -33,6 +34,19 @@ export default function AppHeader({ title, home = false, right }: AppHeaderProps
             <span className="text-title-md text-on-surface">뽀득뽀득</span>
           </div>
           {actions}
+        </div>
+      </header>
+    );
+  }
+
+  if (onBack) {
+    return (
+      <header className="fixed left-1/2 top-0 z-50 w-full max-w-[430px] -translate-x-1/2 bg-surface/80 pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl">
+        <div className="flex h-16 items-center gap-space-sm px-margin-screen">
+          <button aria-label="이전 화면으로" className="-ml-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-container-low text-on-surface" type="button" onClick={onBack}>
+            <Icon name="arrow_back_ios_new" className="text-[22px]" />
+          </button>
+          <span className="truncate text-title-md text-on-surface">{title ?? "뽀득뽀득"}</span>
         </div>
       </header>
     );

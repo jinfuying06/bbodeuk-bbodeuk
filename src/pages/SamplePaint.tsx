@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { resetToGuest } from "../data/points";
 
 export default function SamplePaint() {
   const [painted, setPainted] = useState(false);
@@ -76,7 +77,7 @@ export default function SamplePaint() {
             </div>
           </div>
         </section>
-        <Link className="mt-auto flex h-14 items-center justify-center gap-2 rounded-full bg-primary text-title-sm text-on-primary shadow-md" to="/setup">
+        <Link className="mt-auto flex h-14 items-center justify-center gap-2 rounded-full bg-primary text-title-sm text-on-primary shadow-md" to="/setup" onClick={() => resetToGuest()}>
           내 집 설정하러 가기
           <Icon name="arrow_forward" className="text-[20px]" />
         </Link>

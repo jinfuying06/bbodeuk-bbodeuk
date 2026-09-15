@@ -2,16 +2,24 @@ import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-import { readPoints } from "../data/points";
+import { isMember, readPoints, SIGNUP_BONUS } from "../data/points";
 
 export default function Settings() {
   const balance = readPoints();
   const availableRooms = Math.floor(balance / 300);
+  const member = isMember();
 
   return (
     <PageShell>
       <AppHeader title="설정" />
       <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
+        {!member ? (
+          <Link className="flex items-center gap-space-xs rounded-xl bg-primary-fixed/50 px-space-md py-space-sm text-label-md text-primary" to="/signup">
+            <Icon name="redeem" className="text-[18px]" />
+            <span className="flex-1">회원가입 하시면 {SIGNUP_BONUS}P를 드려요</span>
+            <Icon name="chevron_right" className="text-[18px]" />
+          </Link>
+        ) : null}
         <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
           <div className="flex items-center justify-between gap-space-sm">
             <div>
@@ -28,6 +36,13 @@ export default function Settings() {
           <Link className="mt-space-md inline-flex min-h-11 items-center gap-space-xs text-label-md text-primary" to="/points">
             포인트 구매하기
             <Icon name="chevron_right" className="text-[18px]" />
+          </Link>
+        </section>
+        <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
+          <h2 className="text-title-sm">내 공간</h2>
+          <Link className="mt-space-sm flex min-h-[44px] items-center justify-between" to="/space-manage">
+            <span className="text-body-md text-on-surface-variant">공간 관리</span>
+            <Icon name="chevron_right" className="text-[18px] text-outline-variant" />
           </Link>
         </section>
         <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">

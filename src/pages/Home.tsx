@@ -293,7 +293,7 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <Link className="flex min-h-11 items-center justify-center gap-space-xs rounded-xl border border-dashed border-outline-variant/70 bg-surface-container-lowest px-space-md text-label-md text-primary" to="/points?intent=space">
+            <Link className="flex min-h-11 items-center justify-center gap-space-xs rounded-xl border border-dashed border-outline-variant/70 bg-surface-container-lowest px-space-md text-label-md text-primary" to="/space-manage">
               <Icon name="add" className="text-[20px]" />
               공간을 추가하고 싶나요?
             </Link>

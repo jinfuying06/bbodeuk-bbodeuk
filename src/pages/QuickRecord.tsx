@@ -288,7 +288,7 @@ export default function QuickRecord() {
                     >
                     {selected ? <span className="absolute right-2 top-2 rounded-full bg-surface-container-lowest px-2 py-0.5 text-caption font-semibold">선택됨</span> : null}
                     <span className="text-label-sm font-semibold">{item.name}</span>
-                    <span className="text-caption text-on-surface-variant">{item.meta ? `최근 청소 ${item.meta}` : "최근 기록 없음"}</span>
+                    <span className="text-caption text-on-surface-variant">{painted ? "최근 청소 오늘" : item.meta ? `최근 청소 ${item.meta}` : "최근 기록 없음"}</span>
                     <div role="status" aria-live="polite" className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
                       {flashed ? (
                         <span className={`rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
@@ -329,7 +329,7 @@ export default function QuickRecord() {
                       </span>
                       <div className="flex min-w-0 flex-col">
                         <span className={`text-title-sm ${painted ? tone.text : "text-on-surface"}`}>{item.name}</span>
-                        <span className="truncate text-caption text-on-surface-variant">{item.meta ? `최근 청소 ${item.meta}` : "최근 기록 없음"}</span>
+                        <span className="truncate text-caption text-on-surface-variant">{painted ? "최근 청소 오늘" : item.meta ? `최근 청소 ${item.meta}` : "최근 기록 없음"}</span>
                       </div>
                     </div>
                     <div role="status" aria-live="polite" className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
