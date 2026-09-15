@@ -35,7 +35,7 @@ export default function Setup() {
     <PageShell bottomNav={false}>
       <main className="flex min-h-[100dvh] flex-col px-margin-screen pb-space-2xl pt-space-md">
         <div className="mb-space-lg flex items-center">
-          <Link className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-low text-on-surface" to="/welcome" aria-label="이전 화면으로">
+          <Link className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-low text-on-surface" to="/login" aria-label="이전 화면으로">
             <Icon name="arrow_back_ios_new" className="text-[22px]" />
           </Link>
         </div>
