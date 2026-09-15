@@ -3,8 +3,9 @@ import { useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { spaceTones, type SpaceToneKey } from "../data/spaceTones";
 
-type SpaceKey = "bathroom" | "kitchen" | "bedroom" | "living";
+type SpaceKey = Extract<SpaceToneKey, "bathroom" | "kitchen" | "bedroom" | "living">;
 
 type ItemData = {
   id: string;
@@ -13,13 +14,6 @@ type ItemData = {
   spaceLabel: string;
   icon: string;
   intervalDays: number;
-};
-
-const spaceTones: Record<SpaceKey, { fill: string; text: string }> = {
-  bathroom: { fill: "bg-[#EAF4FF]", text: "text-primary" },
-  kitchen: { fill: "bg-[#FFF1E7]", text: "text-[#8A4C00]" },
-  bedroom: { fill: "bg-[#EFF8F5]", text: "text-tertiary" },
-  living: { fill: "bg-[#FFECEF]", text: "text-[#9A4251]" },
 };
 
 const spaceIcons: Record<SpaceKey, string> = {
@@ -73,7 +67,7 @@ export default function ItemInfo() {
   return (
     <PageShell>
       <AppHeader title="아이템 상세 보기" />
-      <form id="item-info-form" className="flex min-h-[844px] flex-col gap-space-md bg-surface px-margin-screen pb-[156px] pt-16" onSubmit={handleSubmit}>
+      <form id="item-info-form" className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[156px] pt-header" onSubmit={handleSubmit}>
         <section className="rounded-xl bg-surface-container-lowest p-space-lg text-center shadow-sm">
           <span className={`mx-auto mb-space-sm flex h-16 w-16 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
             <Icon name={spaceIcons[space]} className="text-[32px]" />

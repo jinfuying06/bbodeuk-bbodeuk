@@ -48,7 +48,7 @@ export default function HomeStateDemo() {
   return (
     <PageShell>
       <AppHeader home />
-      <main className="flex min-h-[844px] flex-col bg-surface pb-[88px] pt-16">
+      <main className="flex flex-col bg-surface pb-[88px] pt-header">
         <div className="flex flex-col gap-space-lg px-margin-screen pb-space-2xl">
           <section className="relative mt-space-sm overflow-hidden rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
             <div className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-primary-fixed/40 blur-2xl" />

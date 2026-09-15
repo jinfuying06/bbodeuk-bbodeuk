@@ -3,15 +3,13 @@ import { useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { spaceToneLabels, spaceTones, type SpaceToneKey } from "../data/spaceTones";
 
-type SpaceKey = "bathroom" | "kitchen" | "bedroom" | "living";
+type SpaceKey = Extract<SpaceToneKey, "bathroom" | "kitchen" | "bedroom" | "living">;
 
-const spaceOptions: Array<{ key: SpaceKey; label: string; fill: string; text: string }> = [
-  { key: "bathroom", label: "욕실", fill: "bg-[#EAF4FF]", text: "text-primary" },
-  { key: "kitchen", label: "주방", fill: "bg-[#FFF1E7]", text: "text-[#8A4C00]" },
-  { key: "bedroom", label: "침실", fill: "bg-[#EFF8F5]", text: "text-tertiary" },
-  { key: "living", label: "거실", fill: "bg-[#FFECEF]", text: "text-[#9A4251]" },
-];
+const spaceOptions: Array<{ key: SpaceKey; label: string; fill: string; text: string }> = (
+  ["bathroom", "kitchen", "bedroom", "living"] as SpaceKey[]
+).map((key) => ({ key, label: spaceToneLabels[key], fill: spaceTones[key].fill, text: spaceTones[key].text }));
 
 const isSpaceKey = (value: string | null): value is SpaceKey => value === "bathroom" || value === "kitchen" || value === "bedroom" || value === "living";
 
@@ -35,7 +33,7 @@ export default function ItemAdd() {
   return (
     <PageShell>
       <AppHeader title="항목 추가" />
-      <form id="item-add-form" className="flex min-h-[844px] flex-col gap-space-md bg-surface px-margin-screen pb-[156px] pt-16" onSubmit={handleSubmit}>
+      <form id="item-add-form" className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[156px] pt-header" onSubmit={handleSubmit}>
         <section className="rounded-xl bg-surface-container-lowest p-space-lg text-center shadow-sm">
           <span className={`mx-auto mb-space-sm flex h-16 w-16 items-center justify-center rounded-xl ${currentSpace.fill} ${currentSpace.text}`}>
             <Icon name="add" className="text-[32px]" />

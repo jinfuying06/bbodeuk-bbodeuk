@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { spaceToneByLabel } from "../data/spaceTones";
 
 type HistoryTab = "일자별 기록" | "공간별 기록" | "자주 돌본 곳";
 
@@ -21,13 +22,6 @@ const spaceIcons: Record<string, string> = {
   주방: "countertops",
   침실: "bed",
   거실: "chair",
-};
-
-const spaceTones: Record<string, { fill: string; text: string; border: string }> = {
-  욕실: { fill: "bg-[#EAF4FF]", text: "text-primary", border: "border-[#B8DCFF]" },
-  주방: { fill: "bg-[#FFF1E7]", text: "text-[#8A4C00]", border: "border-[#FFD6B8]" },
-  침실: { fill: "bg-[#EFF8F5]", text: "text-tertiary", border: "border-[#C9E8DE]" },
-  거실: { fill: "bg-[#FFECEF]", text: "text-[#9A4251]", border: "border-[#F9C9D2]" },
 };
 
 const records: CleaningRecord[] = [
@@ -136,7 +130,7 @@ export default function History() {
   return (
     <PageShell>
       <AppHeader title="히스토리" />
-      <main className="flex min-h-[844px] flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-16">
+      <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
         <section className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
           <span className="text-label-sm text-secondary">{formatMonth(selectedDate)}</span>
           <h1 className="mt-space-sm text-headline-lg">이번 달 총 {monthRecords.length}번 기록했어요</h1>
@@ -170,7 +164,7 @@ export default function History() {
         <div className="hide-scrollbar -mx-margin-screen overflow-x-auto px-margin-screen">
           <div className="flex min-w-max gap-space-xs">
             {tabs.map((tab) => (
-              <button key={tab} className={`min-h-11 rounded-full px-4 py-2 text-label-md ${activeTab === tab ? "bg-primary text-on-primary" : "bg-surface-container-lowest text-on-surface-variant shadow-sm"}`} type="button" onClick={() => setActiveTab(tab)}>
+              <button key={tab} aria-pressed={activeTab === tab} className={`min-h-11 rounded-full px-4 py-2 text-label-md ${activeTab === tab ? "bg-primary text-on-primary" : "bg-surface-container-lowest text-on-surface-variant shadow-sm"}`} type="button" onClick={() => setActiveTab(tab)}>
                 {tab}
               </button>
             ))}
@@ -180,7 +174,7 @@ export default function History() {
         {monthRecords.length === 0 ? (
           <section className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
             <p className="text-title-sm text-on-surface">이달에는 아직 청소 기록이 없어요.</p>
-            <p className="mt-1 text-body-sm text-on-surface-variant">청소를 기록하면 여기에서 월별로 모아볼 수 있어요.</p>
+            <p className="mt-1 text-body-md text-on-surface-variant">청소를 기록하면 여기에서 월별로 모아볼 수 있어요.</p>
             <Link className="mt-space-md inline-flex min-h-11 items-center rounded-lg bg-primary-container px-space-md text-label-md font-semibold text-on-primary" to="/quick-record">
               청소 기록하러 가기
             </Link>
@@ -196,7 +190,7 @@ export default function History() {
                 </div>
                 <div className="flex flex-col gap-space-xs">
                   {dayRecords.map((record) => {
-                    const tone = spaceTones[record.space] ?? { fill: "bg-surface-container-low", text: "text-on-surface-variant", border: "border-outline-variant" };
+                    const tone = spaceToneByLabel[record.space] ?? { fill: "bg-surface-container-low", text: "text-on-surface-variant", border: "border-outline-variant" };
 
                     return (
                       <Link key={record.id} className="flex items-center gap-space-sm rounded-xl bg-surface-container-lowest p-space-md shadow-sm transition-transform active:scale-[0.99]" to={itemHistoryPath(record.item)}>
@@ -217,12 +211,14 @@ export default function History() {
 
         {activeTab === "공간별 기록"
           ? recordsBySpace.map(([space, spaceRecords]) => {
-              const tone = spaceTones[space] ?? { fill: "bg-surface-container-low", text: "text-on-surface-variant", border: "border-outline-variant" };
+              const tone = spaceToneByLabel[space] ?? { fill: "bg-surface-container-low", text: "text-on-surface-variant", border: "border-outline-variant" };
               const open = Boolean(openSpaces[space]);
+
+              const panelId = `history-space-panel-${space}`;
 
               return (
                 <section key={space} className="overflow-hidden rounded-xl bg-surface-container-lowest shadow-sm">
-                  <button className="flex w-full items-center justify-between p-space-md text-left transition-colors active:bg-surface-container-low" type="button" onClick={() => setOpenSpaces((current) => ({ ...current, [space]: !current[space] }))}>
+                  <button aria-expanded={open} aria-controls={panelId} className="flex w-full items-center justify-between p-space-md text-left transition-colors active:bg-surface-container-low" type="button" onClick={() => setOpenSpaces((current) => ({ ...current, [space]: !current[space] }))}>
                     <div className="flex min-w-0 items-center gap-space-sm">
                       <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
                         <Icon name={spaceIcons[space] ?? "grid_view"} className="text-[22px]" />
@@ -235,7 +231,7 @@ export default function History() {
                     <Icon name="keyboard_arrow_down" className={`text-[22px] text-on-surface-variant transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
                   </button>
                   {open ? (
-                    <div className="flex flex-col gap-space-xs px-space-md pb-space-md">
+                    <div id={panelId} className="flex flex-col gap-space-xs px-space-md pb-space-md">
                       {spaceRecords.map((record) => (
                         <Link key={record.id} className={`flex items-center gap-space-sm rounded-lg border bg-surface-container-low p-space-sm transition-transform active:scale-[0.99] ${tone.border}`} to={itemHistoryPath(record.item)}>
                           <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone.fill} ${tone.text}`}>
@@ -261,7 +257,7 @@ export default function History() {
               {frequentItems.map(([item, info]) => (
                 <Link key={item} className="flex min-h-[72px] items-center justify-between rounded-xl bg-surface-container-lowest p-space-md shadow-sm transition-transform active:scale-[0.99]" to={itemHistoryPath(item)}>
                   <div className="flex min-w-0 items-center gap-space-sm">
-                    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${spaceTones[info.space]?.fill ?? "bg-surface-container-low"} ${spaceTones[info.space]?.text ?? "text-on-surface-variant"}`}>
+                    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${spaceToneByLabel[info.space]?.fill ?? "bg-surface-container-low"} ${spaceToneByLabel[info.space]?.text ?? "text-on-surface-variant"}`}>
                       <Icon name={spaceIcons[info.space] ?? "task_alt"} className="text-[22px]" />
                     </span>
                     <div className="min-w-0">
@@ -269,7 +265,7 @@ export default function History() {
                       <p className="mt-0.5 text-caption text-on-surface-variant">최근 청소 {info.latestDate.replace("2026-", "").replace("-", "월 ")}일</p>
                     </div>
                   </div>
-                  <span className={`ml-space-sm shrink-0 rounded-full px-2.5 py-1 text-label-sm ${spaceTones[info.space]?.fill ?? "bg-surface-container-low"} ${spaceTones[info.space]?.text ?? "text-primary"}`}>{info.count}회</span>
+                  <span className={`ml-space-sm shrink-0 rounded-full px-2.5 py-1 text-label-sm ${spaceToneByLabel[info.space]?.fill ?? "bg-surface-container-low"} ${spaceToneByLabel[info.space]?.text ?? "text-primary"}`}>{info.count}회</span>
                 </Link>
               ))}
           </section>

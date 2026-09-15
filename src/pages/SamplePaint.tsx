@@ -26,7 +26,7 @@ export default function SamplePaint() {
           <p className="mt-2 text-body-md text-on-surface-variant">오늘 세면대를 가볍게 닦았다고 생각하고 아래 카드를 톡 터치해 보세요.</p>
         </section>
         {!painted ? (
-          <div className="mx-auto mb-3 flex animate-bounce items-center gap-1.5 rounded-full bg-primary-container px-3.5 py-1.5 text-label-md text-on-primary shadow-md">
+          <div className="mx-auto mb-3 flex animate-soft-bob items-center gap-1.5 rounded-full bg-primary-container px-3.5 py-1.5 text-label-md text-on-primary shadow-md">
             <Icon name="touch_app" className="text-[16px]" />
             여기를 탭해보세요!
           </div>

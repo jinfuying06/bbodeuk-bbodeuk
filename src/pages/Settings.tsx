@@ -11,7 +11,7 @@ export default function Settings() {
   return (
     <PageShell>
       <AppHeader title="설정" />
-      <main className="flex min-h-[844px] flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-16">
+      <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
         <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
           <div className="flex items-center justify-between gap-space-sm">
             <div>

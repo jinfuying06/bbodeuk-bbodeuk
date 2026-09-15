@@ -41,6 +41,18 @@
     padding-top: env(safe-area-inset-top, 0px);
   }
 
+  /* Clears the fixed AppHeader (h-16 + pt-safe: 64px plus whatever safe-area
+     inset the header itself added) plus a deliberate breathing-room gap, so
+     content reads as its own group below the header instead of butting into it. */
+  .pt-header {
+    padding-top: calc(4rem + 1rem + env(safe-area-inset-top, 0px));
+  }
+
+  /* Same, for the taller Points header (pt-[80px]). */
+  .pt-header-lg {
+    padding-top: calc(5rem + 1rem + env(safe-area-inset-top, 0px));
+  }
+
   .material-symbols-outlined {
     font-family: "Material Symbols Outlined";
     font-weight: normal;
@@ -58,6 +70,26 @@
 
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+
+  .animate-soft-bob {
+    animation: soft-bob 1.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-soft-bob {
+      animation: none;
+    }
+  }
+}
+
+@keyframes soft-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
   }
 }
 

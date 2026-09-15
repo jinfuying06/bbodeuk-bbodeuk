@@ -3,9 +3,10 @@ import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import BottomNavigation from "../components/BottomNavigation";
 import Icon from "../components/Icon";
+import { spaceTones, type SpaceToneKey } from "../data/spaceTones";
 
 type Filter = "recent" | "fav" | "space";
-type Space = "bathroom" | "kitchen" | "living" | "bedroom" | "entry" | "terrace";
+type Space = SpaceToneKey;
 
 type RecordItem = {
   id: string;
@@ -33,51 +34,6 @@ const spaceTabs: Array<{ key: Space; label: string; icon: string }> = [
   { key: "entry", label: "현관", icon: "door_front" },
   { key: "terrace", label: "테라스", icon: "balcony" },
 ];
-
-const spaceTones: Record<Space, { soft: string; active: string; border: string; text: string; feedback: string }> = {
-  bathroom: {
-    soft: "bg-[#EAF4FF]",
-    active: "bg-[#EAF4FF]",
-    border: "border-[#B8DCFF]",
-    text: "text-primary",
-    feedback: "bg-[#EAF4FF]/80",
-  },
-  kitchen: {
-    soft: "bg-[#FFF1E7]",
-    active: "bg-[#FFF1E7]",
-    border: "border-[#FFD6B8]",
-    text: "text-[#8A4C00]",
-    feedback: "bg-[#FFF1E7]/80",
-  },
-  living: {
-    soft: "bg-[#FFECEF]",
-    active: "bg-[#FFECEF]",
-    border: "border-[#F9C9D2]",
-    text: "text-[#9A4251]",
-    feedback: "bg-[#FFECEF]/80",
-  },
-  bedroom: {
-    soft: "bg-[#EFF8F5]",
-    active: "bg-[#EFF8F5]",
-    border: "border-[#C9E8DE]",
-    text: "text-tertiary",
-    feedback: "bg-[#EFF8F5]/80",
-  },
-  entry: {
-    soft: "bg-[#F7F4EE]",
-    active: "bg-[#F7F4EE]",
-    border: "border-[#DED7C9]",
-    text: "text-[#5E5545]",
-    feedback: "bg-[#F7F4EE]/80",
-  },
-  terrace: {
-    soft: "bg-[#F3F8E6]",
-    active: "bg-[#F3F8E6]",
-    border: "border-[#DAE9B0]",
-    text: "text-[#536B16]",
-    feedback: "bg-[#F3F8E6]/80",
-  },
-};
 
 const setupSpaceMap: Record<string, Space[]> = {
   현관: ["entry"],
@@ -264,7 +220,7 @@ export default function QuickRecord() {
       <AppHeader
         title={filter === "space" ? currentSpace === "bedroom" ? setup.roomName?.trim() || "방" : spaceLabels[currentSpace] : "기록"}
       />
-      <main className="flex min-h-[844px] flex-col bg-surface pb-24 pt-16">
+      <main className="flex flex-col bg-surface pb-24 pt-header">
         <section className="px-margin-screen pb-space-sm pt-space-md">
           <h1 className="text-headline-lg text-on-surface">{selectedItem ? `${selectedItem.name} 청소를 기록할까요?` : "어디를 청소했나요?"}</h1>
         </section>
@@ -274,6 +230,7 @@ export default function QuickRecord() {
             {filters.map((item) => (
               <button
                 key={item.key}
+                aria-pressed={filter === item.key}
                 className={`flex flex-1 items-center justify-center gap-1 rounded-full px-space-xs py-space-xs text-label-md transition-all duration-200 ${
                   filter === item.key ? "bg-surface-container-lowest text-primary shadow-sm" : "text-on-surface-variant"
                 }`}
@@ -294,8 +251,9 @@ export default function QuickRecord() {
                 {availableSpaceTabs.map((item) => (
                   <button
                     key={item.key}
+                    aria-pressed={currentSpace === item.key}
                     className={`flex items-center gap-1.5 rounded-full border px-space-md py-space-xs text-label-md transition-colors duration-150 ${
-                      currentSpace === item.key ? `${spaceTones[item.key].active} ${spaceTones[item.key].border} ${spaceTones[item.key].text}` : "border-transparent bg-surface-container text-on-surface-variant"
+                      currentSpace === item.key ? `${spaceTones[item.key].fill} ${spaceTones[item.key].border} ${spaceTones[item.key].text}` : "border-transparent bg-surface-container text-on-surface-variant"
                     }`}
                     type="button"
                     onClick={() => updateSpace(item.key)}
@@ -321,8 +279,9 @@ export default function QuickRecord() {
                 return (
                   <button
                     key={item.id}
+                    aria-pressed={painted}
                     className={`relative flex aspect-square flex-col items-center justify-center gap-space-xs overflow-hidden rounded-lg border p-space-xs text-center transition-all active:scale-95 ${
-                      painted || selected ? `${tone.border} ${tone.active} ${tone.text} shadow-sm` : "border-outline-variant/60 bg-surface-container-lowest text-on-surface"
+                      painted || selected ? `${tone.border} ${tone.fill} ${tone.text} shadow-sm` : "border-outline-variant/60 bg-surface-container-lowest text-on-surface"
                     }`}
                     type="button"
                     onClick={() => paintItem(item)}
@@ -330,10 +289,12 @@ export default function QuickRecord() {
                     {selected ? <span className="absolute right-2 top-2 rounded-full bg-surface-container-lowest px-2 py-0.5 text-caption font-semibold">선택됨</span> : null}
                     <span className="text-label-sm font-semibold">{item.name}</span>
                     <span className="text-caption text-on-surface-variant">{item.meta ? `최근 청소 ${item.meta}` : "최근 기록 없음"}</span>
-                    <div className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
-                      <span className={`rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
-                        이제 깨끗해요!
-                      </span>
+                    <div role="status" aria-live="polite" className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
+                      {flashed ? (
+                        <span className={`rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
+                          이제 깨끗해요!
+                        </span>
+                      ) : null}
                     </div>
                   </button>
                 );
@@ -355,14 +316,15 @@ export default function QuickRecord() {
                 return (
                   <button
                     key={item.id}
+                    aria-pressed={painted}
                     className={`relative flex items-center overflow-hidden rounded-xl border p-space-sm text-left transition-all duration-200 active:scale-[0.99] ${
-                      painted ? `${tone.border} ${tone.active} shadow-sm` : "border-transparent bg-surface-container-lowest"
+                      painted ? `${tone.border} ${tone.fill} shadow-sm` : "border-transparent bg-surface-container-lowest"
                     }`}
                     type="button"
                     onClick={() => paintItem(item)}
                   >
                     <div className="flex min-w-0 items-center gap-space-sm">
-                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone.soft} ${tone.text}`}>
+                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
                         <Icon name={spaceIcon} className="text-[22px]" />
                       </span>
                       <div className="flex min-w-0 flex-col">
@@ -370,10 +332,12 @@ export default function QuickRecord() {
                         <span className="truncate text-caption text-on-surface-variant">{item.meta ? `최근 청소 ${item.meta}` : "최근 기록 없음"}</span>
                       </div>
                     </div>
-                    <div className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
-                      <span className={`rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
-                        이제 깨끗해요!
-                      </span>
+                    <div role="status" aria-live="polite" className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
+                      {flashed ? (
+                        <span className={`rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
+                          이제 깨끗해요!
+                        </span>
+                      ) : null}
                     </div>
                   </button>
                 );

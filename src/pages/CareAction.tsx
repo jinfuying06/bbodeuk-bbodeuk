@@ -2,8 +2,9 @@ import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { spaceTones, type SpaceToneKey } from "../data/spaceTones";
 
-type SpaceKey = "bathroom" | "kitchen" | "living" | "entry";
+type SpaceKey = Extract<SpaceToneKey, "bathroom" | "kitchen" | "living" | "entry">;
 type CareStatus = "확인 필요" | "슬슬 확인" | "관리 중" | "아직 기록 없음";
 
 type GuideItem = {
@@ -19,29 +20,6 @@ type GuideItem = {
   steps: string[];
   related: Array<{ title: string; description: string; icon: string }>;
   records: Array<{ date: string; result: string }>;
-};
-
-const spaceTones: Record<SpaceKey, { fill: string; border: string; text: string }> = {
-  bathroom: {
-    fill: "bg-[#EAF4FF]",
-    border: "border-[#B8DCFF]",
-    text: "text-primary",
-  },
-  kitchen: {
-    fill: "bg-[#FFF1E7]",
-    border: "border-[#FFD6B8]",
-    text: "text-[#8A4C00]",
-  },
-  living: {
-    fill: "bg-[#FFECEF]",
-    border: "border-[#F9C9D2]",
-    text: "text-[#9A4251]",
-  },
-  entry: {
-    fill: "bg-[#F7F4EE]",
-    border: "border-[#DED7C9]",
-    text: "text-[#5E5545]",
-  },
 };
 
 const spaceIcons: Record<SpaceKey, string> = {
@@ -134,7 +112,7 @@ export default function CareAction() {
   return (
     <PageShell>
       <AppHeader title="가이드 상세" />
-      <main className="flex min-h-[844px] flex-col gap-space-md bg-surface px-margin-screen pb-[156px] pt-16">
+      <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[156px] pt-header">
         <section className="rounded-xl bg-surface-container-lowest p-space-lg text-center shadow-sm">
           <span className={`mx-auto mb-space-sm flex h-16 w-16 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
             <Icon name={spaceIcons[guide.space]} className="text-[30px]" />

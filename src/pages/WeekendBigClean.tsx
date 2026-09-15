@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import BottomNavigation from "../components/BottomNavigation";
 import Icon from "../components/Icon";
+import { spaceTones, type SpaceToneKey } from "../data/spaceTones";
 
-type SpaceKey = "entry" | "bathroom" | "kitchen" | "living" | "bedroom" | "terrace";
+type SpaceKey = SpaceToneKey;
 
 type CleanItem = {
   id: string;
@@ -22,51 +23,6 @@ type CleanSpace = {
   title: string;
   icon: string;
   items: CleanItem[];
-};
-
-const spaceTones: Record<SpaceKey, { fill: string; border: string; text: string; feedback: string; tint: string }> = {
-  bathroom: {
-    fill: "bg-[#EAF4FF]",
-    border: "border-[#B8DCFF]",
-    text: "text-primary",
-    feedback: "bg-[#EAF4FF]/80",
-    tint: "#EAF4FF",
-  },
-  kitchen: {
-    fill: "bg-[#FFF1E7]",
-    border: "border-[#FFD6B8]",
-    text: "text-[#8A4C00]",
-    feedback: "bg-[#FFF1E7]/80",
-    tint: "#FFF1E7",
-  },
-  living: {
-    fill: "bg-[#FFECEF]",
-    border: "border-[#F9C9D2]",
-    text: "text-[#9A4251]",
-    feedback: "bg-[#FFECEF]/80",
-    tint: "#FFECEF",
-  },
-  bedroom: {
-    fill: "bg-[#EFF8F5]",
-    border: "border-[#C9E8DE]",
-    text: "text-tertiary",
-    feedback: "bg-[#EFF8F5]/80",
-    tint: "#EFF8F5",
-  },
-  entry: {
-    fill: "bg-[#F7F4EE]",
-    border: "border-[#DED7C9]",
-    text: "text-[#5E5545]",
-    feedback: "bg-[#F7F4EE]/80",
-    tint: "#F7F4EE",
-  },
-  terrace: {
-    fill: "bg-[#F3F8E6]",
-    border: "border-[#DAE9B0]",
-    text: "text-[#536B16]",
-    feedback: "bg-[#F3F8E6]/80",
-    tint: "#F3F8E6",
-  },
 };
 
 const setupSpaceMap: Record<string, SpaceKey[]> = {
@@ -236,7 +192,7 @@ export default function WeekendBigClean() {
     <div className="phone-shell bg-surface text-on-surface">
       <AppHeader title="대청소 하기" />
 
-      <main className="flex min-h-[844px] flex-col bg-surface pb-[176px] pt-16">
+      <main className="flex flex-col bg-surface pb-[176px] pt-header">
         <div className="flex w-full flex-col gap-space-lg px-margin-screen pb-space-md pt-space-md">
           <section className="relative overflow-hidden rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
             <div className="relative z-10">
@@ -267,9 +223,13 @@ export default function WeekendBigClean() {
               const tone = spaceTones[space.key];
               const fillPercent = space.items.length === 0 ? 0 : Math.round((count / space.items.length) * 100);
 
+              const panelId = `deep-clean-panel-${space.key}`;
+
               return (
                 <section key={space.key} className="overflow-hidden rounded-xl bg-surface-container-lowest shadow-sm">
                   <button
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
                     className="flex w-full items-center justify-between p-space-md text-left transition-colors active:bg-surface-container-low"
                     type="button"
                     onClick={() => setOpen((current) => ({ ...current, [space.key]: !current[space.key] }))}
@@ -287,7 +247,7 @@ export default function WeekendBigClean() {
                     <Icon name="keyboard_arrow_down" className={`text-[22px] text-on-surface-variant transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
                   </button>
 
-                  <div className={`${isOpen ? "flex" : "hidden"} flex-col gap-space-xs px-space-md pb-space-md`}>
+                  <div id={panelId} className={`${isOpen ? "flex" : "hidden"} flex-col gap-space-xs px-space-md pb-space-md`}>
                     {[...space.items].sort((a, b) => a.priority - b.priority).map((item) => {
                       const isChecked = Boolean(checked[item.id]);
                       const flashed = flashItem === item.id;
@@ -296,6 +256,7 @@ export default function WeekendBigClean() {
                       return (
                         <button
                           key={item.id}
+                          aria-pressed={isChecked}
                           className={`relative flex items-center justify-between overflow-hidden rounded-lg border p-space-sm text-left transition-all active:scale-[0.99] ${
                             isChecked ? `${tone.fill} ${tone.border}` : "border-transparent bg-surface-container-low"
                           }`}
@@ -316,10 +277,12 @@ export default function WeekendBigClean() {
                           >
                             <Icon name="check" className={`text-[20px] transition-transform duration-200 ${isChecked ? "scale-100" : "scale-0"}`} />
                           </span>
-                          <div className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
-                            <span className={`rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
-                              이제 깨끗해요!
-                            </span>
+                          <div role="status" aria-live="polite" className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
+                            {flashed ? (
+                              <span className={`rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
+                                이제 깨끗해요!
+                              </span>
+                            ) : null}
                           </div>
                         </button>
                       );

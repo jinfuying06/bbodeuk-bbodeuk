@@ -20,7 +20,7 @@ export default function BottomNavigation() {
 
           if (tab.center) {
             return (
-              <Link key={tab.label} className="flex flex-1 -mt-4 min-h-[44px] flex-col items-center justify-center" to={tab.to}>
+              <Link key={tab.label} aria-current={active ? "page" : undefined} className="flex flex-1 -mt-4 min-h-[44px] flex-col items-center justify-center" to={tab.to}>
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-container text-on-primary shadow-[0_4px_12px_rgba(0,161,255,0.3)] transition-transform active:scale-95">
                   <Icon name={tab.icon} className="text-[26px]" />
                 </div>
@@ -32,6 +32,7 @@ export default function BottomNavigation() {
           return (
             <Link
               key={tab.label}
+              aria-current={active ? "page" : undefined}
               className={`flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 transition-colors ${
                 active ? "font-semibold text-primary" : "text-on-surface-variant"
               }`}

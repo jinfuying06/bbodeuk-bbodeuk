@@ -57,7 +57,7 @@ export default function Points() {
   return (
     <PageShell>
       <AppHeader title="내 포인트" />
-      <main className="flex min-h-[844px] flex-col gap-space-xl bg-surface px-margin-screen pb-[104px] pt-[80px]">
+      <main className="flex flex-col gap-space-xl bg-surface px-margin-screen pb-[104px] pt-header-lg">
         <section className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
           <div className="flex items-center gap-space-sm">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-fixed text-primary">
@@ -84,7 +84,7 @@ export default function Points() {
               </div>
             </div>
             <button className="mt-space-md flex min-h-11 w-full items-center justify-center rounded-lg bg-primary-container px-space-md text-label-md text-on-primary" type="button" onClick={handleSpacePurchase}>
-              {balance >= SPACE_PRICE ? `${SPACE_PRICE}P로 공간 추가하기` : "포인트가 부족해요 · 구매하러 가기"}
+              {balance >= SPACE_PRICE ? `공간 추가하기` : "포인트가 부족해요 · 구매하러 가기"}
             </button>
           </div>
         </section>

@@ -3,8 +3,9 @@ import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
+import { spaceTones, type SpaceToneKey } from "../data/spaceTones";
 
-type SpaceKey = "bathroom" | "kitchen" | "bedroom" | "living";
+type SpaceKey = Extract<SpaceToneKey, "bathroom" | "kitchen" | "bedroom" | "living">;
 
 type SpaceInfoData = {
   key: SpaceKey;
@@ -23,8 +24,8 @@ const spaces: Record<SpaceKey, SpaceInfoData> = {
     key: "bathroom",
     title: "욕실",
     icon: "bathtub",
-    tone: "bg-[#EAF4FF]",
-    text: "text-primary",
+    tone: spaceTones.bathroom.fill,
+    text: spaceTones.bathroom.text,
     status: "슬슬 확인",
     statusDetail: "세면대와 배수구처럼 물기가 남는 항목은 1주 안팎으로 확인하면 좋아요.",
     intervalBadge: "1주",
@@ -38,8 +39,8 @@ const spaces: Record<SpaceKey, SpaceInfoData> = {
     key: "kitchen",
     title: "주방",
     icon: "countertops",
-    tone: "bg-[#FFF1E7]",
-    text: "text-[#8A4C00]",
+    tone: spaceTones.kitchen.fill,
+    text: spaceTones.kitchen.text,
     status: "확인 필요",
     statusDetail: "싱크대 거름망과 후드 필터는 조리 후 흔적이 남기 쉬워 먼저 확인해보면 좋아요.",
     intervalBadge: "3~7일",
@@ -52,8 +53,8 @@ const spaces: Record<SpaceKey, SpaceInfoData> = {
     key: "bedroom",
     title: "침실",
     icon: "bed",
-    tone: "bg-[#EFF8F5]",
-    text: "text-tertiary",
+    tone: spaceTones.bedroom.fill,
+    text: spaceTones.bedroom.text,
     status: "관리 중",
     statusDetail: "침구와 베개 커버 기록이 이어지고 있어요. 바닥 모서리만 가끔 함께 보면 좋아요.",
     intervalBadge: "1~2주",
@@ -66,8 +67,8 @@ const spaces: Record<SpaceKey, SpaceInfoData> = {
     key: "living",
     title: "거실",
     icon: "chair",
-    tone: "bg-[#FFECEF]",
-    text: "text-[#9A4251]",
+    tone: spaceTones.living.fill,
+    text: spaceTones.living.text,
     status: "슬슬 확인",
     statusDetail: "바닥과 손잡이처럼 자주 닿는 곳은 최근 기록을 기준으로 다시 확인하면 좋아요.",
     intervalBadge: "1~2주",
@@ -96,7 +97,7 @@ export default function SpaceInfo() {
   return (
     <PageShell>
       <AppHeader title="공간 정보" />
-      <main className="flex min-h-[844px] flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-16">
+      <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
         <section className="rounded-xl bg-surface-container-lowest p-space-lg text-center shadow-sm">
           <span className={`mx-auto mb-space-sm flex h-16 w-16 items-center justify-center rounded-xl ${space.tone} ${space.text}`}>
             <Icon name={space.icon} className="text-[32px]" />
