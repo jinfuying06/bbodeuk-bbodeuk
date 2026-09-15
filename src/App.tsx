@@ -7,10 +7,12 @@ import HomeStateDemo from "./pages/HomeStateDemo";
 import ItemAdd from "./pages/ItemAdd";
 import ItemHistory from "./pages/ItemHistory";
 import ItemInfo from "./pages/ItemInfo";
+import Login from "./pages/Login";
 import QuickRecord from "./pages/QuickRecord";
 import Points from "./pages/Points";
 import Settings from "./pages/Settings";
 import Setup from "./pages/Setup";
+import SignUp from "./pages/SignUp";
 import SpaceInfo from "./pages/SpaceInfo";
 import Spaces from "./pages/Spaces";
 import WeekendBigClean from "./pages/WeekendBigClean";
@@ -18,7 +20,7 @@ import SamplePaint from "./pages/SamplePaint";
 import Welcome from "./pages/Welcome";
 
 function RootEntry() {
-  return <Welcome />;
+  return <Login />;
 }
 
 export default function App() {
@@ -27,6 +29,8 @@ export default function App() {
       <Route path="/" element={<RootEntry />} />
       <Route path="/home" element={<Home />} />
       <Route path="/welcome" element={<Welcome />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
       <Route path="/sample-paint" element={<SamplePaint />} />
       <Route path="/setup" element={<Setup />} />
       <Route path="/home/:state" element={<HomeStateDemo />} />
