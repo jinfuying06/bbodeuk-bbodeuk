@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { AX_ONBOARDING_ENABLED, AXOnboardingFlow } from "./features/ax-onboarding";
 import Care from "./pages/Care";
 import CareAction from "./pages/CareAction";
 import History from "./pages/History";
@@ -33,6 +34,7 @@ export default function App() {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/sample-paint" element={<SamplePaint />} />
       <Route path="/setup" element={<Setup />} />
+      {AX_ONBOARDING_ENABLED ? <Route path="/setup/photo" element={<AXOnboardingFlow />} /> : null}
       <Route path="/home/:state" element={<HomeStateDemo />} />
       <Route path="/item-add" element={<ItemAdd />} />
       <Route path="/item-history" element={<ItemHistory />} />

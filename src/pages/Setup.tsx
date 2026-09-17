@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
 import SpaceExpansionDialog from "../components/SpaceExpansionDialog";
+import { AX_ONBOARDING_ENABLED } from "../features/ax-onboarding";
 
 const basicSpaces = [
   { key: "거실", icon: "weekend" },
@@ -43,6 +44,15 @@ export default function Setup() {
         <section className="mb-space-lg">
           <h1 className="text-headline-lg">관리할 공간을 선택해주세요</h1>
           <p className="mt-2 text-body-md text-on-surface-variant">자주 관리하는 공간부터 먼저 시작해보세요.</p>
+          {AX_ONBOARDING_ENABLED ? (
+            <Link
+              className="mt-space-sm inline-flex items-center gap-1 text-label-md text-primary"
+              to="/setup/photo"
+            >
+              <Icon name="photo_camera" className="text-[18px]" />
+              내 공간 사진으로 맞춤 설정하기
+            </Link>
+          ) : null}
         </section>
 
         <section className="mb-space-lg">
