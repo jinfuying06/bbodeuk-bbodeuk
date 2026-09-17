@@ -32,7 +32,7 @@ const spaces: Space[] = [
     tone: sharedSpaceTones.bathroom.fill,
     iconTone: sharedSpaceTones.bathroom.text,
     items: [
-      { id: "basin", title: "세면대 수전 및 볼", status: "슬슬 확인", lastRecord: "최근 관리 6일 전", intervalDays: 7 },
+      { id: "basin", title: "세면대 수전 및 볼", status: "관리 중", lastRecord: "최근 관리 오늘", intervalDays: 7 },
       { id: "toilet", title: "양변기 안팎", status: "관리 중", lastRecord: "최근 관리 1일 전", intervalDays: 7 },
       { id: "mirror", title: "욕실 유리 거울", status: "관리 중", lastRecord: "최근 관리 4일 전", intervalDays: 10 },
       { id: "drain", title: "바닥 배수구 유가 거름망", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 7 },

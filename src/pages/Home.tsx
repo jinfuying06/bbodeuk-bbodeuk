@@ -99,7 +99,7 @@ const recentRecords = [
   { id: "toilet", spaceKey: "bathroom", title: "변기", lastText: "3일 전" },
   { id: "sink", spaceKey: "kitchen", title: "싱크대 거름망", lastText: "4일 전" },
   { id: "living-floor", spaceKey: "living", title: "바닥", lastText: "7일 전" },
-  { id: "basin", spaceKey: "bathroom", title: "세면대 수전 및 볼", lastText: "8일 전" },
+  { id: "basin", spaceKey: "bathroom", title: "세면대 수전 및 볼", lastText: "오늘" },
 ];
 
 const itemHistoryNames: Record<string, string> = {

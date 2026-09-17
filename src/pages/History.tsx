@@ -24,18 +24,27 @@ const spaceIcons: Record<string, string> = {
   거실: "chair",
 };
 
-const records: CleaningRecord[] = [
-  { id: "r1", item: "세면대 수전 및 볼", space: "욕실", date: "2026-09-04", time: "오후 08:30" },
-  { id: "r2", item: "싱크대 거름망", space: "주방", date: "2026-09-04", time: "오후 07:15" },
-  { id: "r3", item: "침실 침구", space: "침실", date: "2026-09-02", time: "오전 10:20" },
-  { id: "r4", item: "인덕션 상판 및 조리대", space: "주방", date: "2026-09-01", time: "오후 09:10" },
-  { id: "r5", item: "싱크대 거름망", space: "주방", date: "2026-08-30", time: "오후 08:40" },
-  { id: "r6", item: "거실 바닥", space: "거실", date: "2026-08-24", time: "오후 06:30" },
-  { id: "r7", item: "공기청정기 프리필터", space: "거실", date: "2026-08-20", time: "오전 11:00" },
-  { id: "r8", item: "양변기 안팎", space: "욕실", date: "2026-08-18", time: "오후 09:25" },
-];
+const today = new Date();
+today.setHours(0, 0, 0, 0);
 
-const today = new Date("2026-09-04T00:00:00");
+const formatISODate = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+const daysAgo = (offset: number) => {
+  const date = new Date(today);
+  date.setDate(date.getDate() - offset);
+  return formatISODate(date);
+};
+
+const records: CleaningRecord[] = [
+  { id: "r1", item: "세면대 수전 및 볼", space: "욕실", date: daysAgo(0), time: "오후 08:30" },
+  { id: "r2", item: "싱크대 거름망", space: "주방", date: daysAgo(0), time: "오후 07:15" },
+  { id: "r3", item: "침실 침구", space: "침실", date: daysAgo(2), time: "오전 10:20" },
+  { id: "r4", item: "인덕션 상판 및 조리대", space: "주방", date: daysAgo(3), time: "오후 09:10" },
+  { id: "r5", item: "싱크대 거름망", space: "주방", date: daysAgo(5), time: "오후 08:40" },
+  { id: "r6", item: "거실 바닥", space: "거실", date: daysAgo(11), time: "오후 06:30" },
+  { id: "r7", item: "공기청정기 프리필터", space: "거실", date: daysAgo(15), time: "오전 11:00" },
+  { id: "r8", item: "양변기 안팎", space: "욕실", date: daysAgo(17), time: "오후 09:25" },
+];
 
 const formatMonth = (date: Date) => `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
 
@@ -52,7 +61,7 @@ const getRecordMonthKey = (record: CleaningRecord) => record.date.slice(0, 7);
 const getDateLabel = (dateText: string, selectedMonth: Date) => {
   const date = new Date(`${dateText}T00:00:00`);
   const selectedIsCurrentMonth = getMonthKey(selectedMonth) === getMonthKey(today);
-  const isToday = dateText === "2026-09-04";
+  const isToday = dateText === formatISODate(today);
   const formatted = dateFormatter.format(date).replace(/\s/g, " ");
 
   return selectedIsCurrentMonth && isToday ? `오늘 (${formatted})` : formatted;
@@ -85,7 +94,7 @@ const countBy = <T,>(items: T[], getKey: (item: T) => string) =>
 const itemHistoryPath = (item: string) => `/item-history?item=${encodeURIComponent(item)}`;
 
 export default function History() {
-  const [selectedDate, setSelectedDate] = useState(() => new Date(2026, 8, 1));
+  const [selectedDate, setSelectedDate] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const [activeTab, setActiveTab] = useState<HistoryTab>("일자별 기록");
   const [openSpaces, setOpenSpaces] = useState<Record<string, boolean>>({ 주방: true });
   const monthKey = getMonthKey(selectedDate);
@@ -154,7 +163,7 @@ export default function History() {
               <Icon name="chevron_right" className="text-[20px]" />
             </button>
             {monthKey !== getMonthKey(today) ? (
-              <button className="min-h-11 rounded-full bg-surface-container-low px-3 text-label-sm text-on-surface-variant" type="button" onClick={() => setSelectedDate(new Date(2026, 8, 1))}>
+              <button className="min-h-11 rounded-full bg-surface-container-low px-3 text-label-sm text-on-surface-variant" type="button" onClick={() => setSelectedDate(new Date(today.getFullYear(), today.getMonth(), 1))}>
                 오늘로 이동
               </button>
             ) : null}

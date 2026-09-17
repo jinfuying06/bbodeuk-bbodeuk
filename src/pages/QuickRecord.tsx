@@ -46,7 +46,7 @@ const setupSpaceMap: Record<string, Space[]> = {
 
 const spaceItems: Record<Space, RecordItem[]> = {
   bathroom: [
-    { id: "basin", name: "세면대", icon: "wash", desc: "물때 및 수도꼭지 마감", meta: "6일 전" },
+    { id: "basin", name: "세면대", icon: "wash", desc: "물때 및 수도꼭지 마감", meta: "오늘" },
     { id: "toilet", name: "변기", icon: "cleaning_services", desc: "소독 및 안쪽 관리", meta: "1일 전" },
     { id: "shower", name: "샤워부스", icon: "shower", desc: "유리벽 스퀴지 작업" },
     { id: "mirror", name: "거울", icon: "auto_awesome", desc: "손자국 및 비누방울 닦기", meta: "8일 전" },
@@ -91,7 +91,7 @@ const spaceItems: Record<Space, RecordItem[]> = {
 };
 
 const recentItems: RecordItem[] = [
-  { id: "recent-basin", name: "세면대", icon: "wash", desc: "욕실 · 물때 및 수도꼭지 마감", meta: "6일 전", space: "bathroom" },
+  { id: "recent-basin", name: "세면대", icon: "wash", desc: "욕실 · 물때 및 수도꼭지 마감", meta: "오늘", space: "bathroom" },
   { id: "recent-sink", name: "싱크대", icon: "faucet", desc: "주방 · 배수망 헹굼 & 거름망", meta: "4일 전", space: "kitchen" },
   { id: "recent-bedding", name: "침구", icon: "bed", desc: "침실 · 침구 털기와 정리", meta: "어제", space: "bedroom" },
   { id: "recent-floor", name: "거실 바닥", icon: "mop", desc: "거실 · 정전기 청소포 밀기", meta: "3일 전", space: "living" },

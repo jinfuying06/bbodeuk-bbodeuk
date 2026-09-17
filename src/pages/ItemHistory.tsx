@@ -15,18 +15,29 @@ type CleaningRecord = {
 
 type HistoryView = "daily" | "monthly";
 
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const formatISODate = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+const daysAgo = (offset: number) => {
+  const date = new Date(today);
+  date.setDate(date.getDate() - offset);
+  return formatISODate(date);
+};
+
 const records: CleaningRecord[] = [
-  { id: "r1", item: "세면대 수전 및 볼", space: "욕실", date: "2026-09-04", time: "오후 08:30" },
-  { id: "r9", item: "세면대 수전 및 볼", space: "욕실", date: "2026-08-29", time: "오후 08:10" },
-  { id: "r10", item: "세면대 수전 및 볼", space: "욕실", date: "2026-08-18", time: "오후 07:50" },
-  { id: "r2", item: "싱크대 거름망", space: "주방", date: "2026-09-04", time: "오후 07:15" },
-  { id: "r5", item: "싱크대 거름망", space: "주방", date: "2026-08-30", time: "오후 08:40" },
-  { id: "r11", item: "싱크대 거름망", space: "주방", date: "2026-08-22", time: "오후 07:20" },
-  { id: "r3", item: "침실 침구", space: "침실", date: "2026-09-02", time: "오전 10:20" },
-  { id: "r4", item: "인덕션 상판 및 조리대", space: "주방", date: "2026-09-01", time: "오후 09:10" },
-  { id: "r6", item: "거실 바닥", space: "거실", date: "2026-08-24", time: "오후 06:30" },
-  { id: "r7", item: "공기청정기 프리필터", space: "거실", date: "2026-08-20", time: "오전 11:00" },
-  { id: "r8", item: "양변기 안팎", space: "욕실", date: "2026-08-18", time: "오후 09:25" },
+  { id: "r1", item: "세면대 수전 및 볼", space: "욕실", date: daysAgo(0), time: "오후 08:30" },
+  { id: "r9", item: "세면대 수전 및 볼", space: "욕실", date: daysAgo(6), time: "오후 08:10" },
+  { id: "r10", item: "세면대 수전 및 볼", space: "욕실", date: daysAgo(17), time: "오후 07:50" },
+  { id: "r2", item: "싱크대 거름망", space: "주방", date: daysAgo(0), time: "오후 07:15" },
+  { id: "r5", item: "싱크대 거름망", space: "주방", date: daysAgo(5), time: "오후 08:40" },
+  { id: "r11", item: "싱크대 거름망", space: "주방", date: daysAgo(13), time: "오후 07:20" },
+  { id: "r3", item: "침실 침구", space: "침실", date: daysAgo(2), time: "오전 10:20" },
+  { id: "r4", item: "인덕션 상판 및 조리대", space: "주방", date: daysAgo(3), time: "오후 09:10" },
+  { id: "r6", item: "거실 바닥", space: "거실", date: daysAgo(11), time: "오후 06:30" },
+  { id: "r7", item: "공기청정기 프리필터", space: "거실", date: daysAgo(15), time: "오전 11:00" },
+  { id: "r8", item: "양변기 안팎", space: "욕실", date: daysAgo(17), time: "오후 09:25" },
 ];
 
 const spaceIcons: Record<string, string> = {
@@ -44,8 +55,6 @@ const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
 });
 
 const formatDate = (dateText: string) => dateFormatter.format(new Date(`${dateText}T00:00:00`)).replace(/\s/g, " ");
-
-const today = new Date("2026-09-04T00:00:00");
 
 const getStartOfWeek = (date: Date) => {
   const next = new Date(date);

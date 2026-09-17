@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import Toast from "../components/Toast";
 import { spaceTones, type SpaceToneKey } from "../data/spaceTones";
 
 type SpaceKey = Extract<SpaceToneKey, "bathroom" | "kitchen" | "bedroom" | "living">;
@@ -47,19 +48,46 @@ const spaceOptions: Array<{ key: SpaceKey; label: string }> = [
 
 const isSpaceKey = (value: string): value is SpaceKey => value === "bathroom" || value === "kitchen" || value === "bedroom" || value === "living";
 
+const OVERRIDES_KEY = "bbodeuk.itemOverrides.v1";
+
+type ItemOverride = { name: string; space: SpaceKey; intervalDays: number };
+
+const readOverride = (id: string): ItemOverride | null => {
+  try {
+    const all = JSON.parse(window.localStorage.getItem(OVERRIDES_KEY) ?? "{}") as Record<string, ItemOverride>;
+    return all[id] ?? null;
+  } catch {
+    return null;
+  }
+};
+
+const writeOverride = (id: string, override: ItemOverride) => {
+  try {
+    const all = JSON.parse(window.localStorage.getItem(OVERRIDES_KEY) ?? "{}") as Record<string, ItemOverride>;
+    all[id] = override;
+    window.localStorage.setItem(OVERRIDES_KEY, JSON.stringify(all));
+  } catch {
+    // localStorage unavailable — edit still reflects in this session's UI state.
+  }
+};
+
 export default function ItemInfo() {
   const [searchParams] = useSearchParams();
   const item = items.find((entry) => entry.id === searchParams.get("item")) ?? items[0];
-  const [name, setName] = useState(item.name);
-  const [space, setSpace] = useState<SpaceKey>(item.space);
-  const [intervalDays, setIntervalDays] = useState(String(item.intervalDays));
+  const override = readOverride(item.id);
+  const [name, setName] = useState(override?.name ?? item.name);
+  const [space, setSpace] = useState<SpaceKey>(override?.space ?? item.space);
+  const [intervalDays, setIntervalDays] = useState(String(override?.intervalDays ?? item.intervalDays));
   const [saved, setSaved] = useState(false);
   const tone = spaceTones[space];
   const spaceLabel = spaceOptions.find((option) => option.key === space)?.label ?? item.spaceLabel;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!name.trim() || !intervalDays.trim()) return;
+    const trimmedName = name.trim();
+    const parsedInterval = Number(intervalDays);
+    if (!trimmedName || !intervalDays.trim() || !Number.isFinite(parsedInterval) || parsedInterval < 1) return;
+    writeOverride(item.id, { name: trimmedName, space, intervalDays: parsedInterval });
     setSaved(true);
     window.setTimeout(() => setSaved(false), 1200);
   };
@@ -115,6 +143,8 @@ export default function ItemInfo() {
           {saved ? "저장했어요" : "저장"}
         </button>
       </div>
+
+      <Toast message="변경사항을 저장했어요" visible={saved} pill />
     </PageShell>
   );
 }
