@@ -3,31 +3,9 @@ import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { spaceTones, type SpaceToneKey } from "../data/spaceTones";
 
-type SpaceKey = "bathroom" | "kitchen" | "living" | "entry";
-
-const spaceTones: Record<SpaceKey, { fill: string; border: string; text: string }> = {
-  bathroom: {
-    fill: "bg-[#EAF4FF]",
-    border: "border-[#B8DCFF]",
-    text: "text-primary",
-  },
-  kitchen: {
-    fill: "bg-[#FFF1E7]",
-    border: "border-[#FFD6B8]",
-    text: "text-[#8A4C00]",
-  },
-  living: {
-    fill: "bg-[#FFECEF]",
-    border: "border-[#F9C9D2]",
-    text: "text-[#9A4251]",
-  },
-  entry: {
-    fill: "bg-[#F7F4EE]",
-    border: "border-[#DED7C9]",
-    text: "text-[#5E5545]",
-  },
-};
+type SpaceKey = Extract<SpaceToneKey, "bathroom" | "kitchen" | "living" | "entry">;
 
 const spaceIcons: Record<SpaceKey, string> = {
   bathroom: "bathtub",
@@ -107,7 +85,7 @@ export default function Care() {
   return (
     <PageShell>
       <AppHeader title="청소가이드" />
-      <main className="flex min-h-[844px] flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-16">
+      <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
         <section className="pb-space-sm pt-space-md">
           <h1 className="text-headline-lg text-on-surface">청소 방법을 확인해보세요</h1>
         </section>
@@ -148,9 +126,13 @@ export default function Care() {
             const tone = spaceTones[space.key];
             const open = Boolean(openSpaces[space.key]);
 
+            const panelId = `care-guide-panel-${space.key}`;
+
             return (
               <section key={space.key} className="overflow-hidden rounded-xl bg-surface-container-lowest shadow-sm">
                 <button
+                  aria-expanded={open}
+                  aria-controls={panelId}
                   className="flex w-full items-center justify-between p-space-md text-left transition-colors active:bg-surface-container-low"
                   type="button"
                   onClick={() => setOpenSpaces((current) => ({ ...current, [space.key]: !current[space.key] }))}
@@ -167,7 +149,7 @@ export default function Care() {
                   <Icon name="keyboard_arrow_down" className={`text-[22px] text-on-surface-variant transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
                 </button>
                 {open ? (
-                  <div className="flex flex-col gap-space-xs px-space-md pb-space-md">
+                  <div id={panelId} className="flex flex-col gap-space-xs px-space-md pb-space-md">
                     {space.items.map((item) => (
                       <Link key={item.id} className="flex min-h-[64px] items-center justify-between rounded-lg bg-surface-container-low p-space-sm transition-transform active:scale-[0.99]" to={`/care-action?space=${space.key}&item=${item.id}`}>
                         <div className="min-w-0">

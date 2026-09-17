@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { markMember, resetToGuest } from "../data/points";
+import { spaceTones } from "../data/spaceTones";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -11,6 +13,7 @@ export default function Login() {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    markMember();
     navigate("/home");
   };
 
@@ -22,10 +25,10 @@ export default function Login() {
             <div className="pointer-events-none absolute left-1/2 top-2 h-64 w-64 -translate-x-1/2 rounded-full bg-primary-fixed/30 blur-3xl" />
 
             <div className="relative flex items-center gap-1.5">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary-fixed">
-                <Icon name="water_drop" className="text-[12px] text-primary-container" fill />
+              <span className={`flex h-6 w-6 items-center justify-center rounded-full ${spaceTones.bathroom.fill}`}>
+                <Icon name="water_drop" className={`text-[12px] ${spaceTones.bathroom.text}`} fill />
               </span>
-              <span className="text-body-md font-bold text-primary-container">뽀득뽀득</span>
+              <span className={`text-body-md font-bold ${spaceTones.bathroom.text}`}>뽀득뽀득</span>
             </div>
 
             <div className="relative mt-space-lg flex flex-col items-center gap-space-sm px-margin-screen">
@@ -105,10 +108,10 @@ export default function Login() {
         <div className="flex-1" />
 
         <div className="flex flex-col items-center gap-space-sm px-margin-screen pb-space-xl pt-space-lg">
-          <Link to="/signup" className="text-body-md font-bold text-primary-container">
+          <Link to="/signup" className={`text-body-md font-bold ${spaceTones.bathroom.text}`}>
             이메일로 회원가입
           </Link>
-          <Link to="/setup" className="py-2 text-label-md text-on-surface-variant underline decoration-outline-variant">
+          <Link to="/setup" className="py-2 text-label-md text-on-surface-variant underline decoration-outline-variant" onClick={() => resetToGuest()}>
             로그인 없이 둘러보기
           </Link>
           <p className="max-w-[320px] text-center text-caption text-outline">

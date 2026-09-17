@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { spaceToneByLabel } from "../data/spaceTones";
 
 type CleaningRecord = {
   id: string;
@@ -33,13 +34,6 @@ const spaceIcons: Record<string, string> = {
   주방: "countertops",
   침실: "bed",
   거실: "chair",
-};
-
-const spaceTones: Record<string, { fill: string; text: string; border: string }> = {
-  욕실: { fill: "bg-[#EAF4FF]", text: "text-primary", border: "border-[#B8DCFF]" },
-  주방: { fill: "bg-[#FFF1E7]", text: "text-[#8A4C00]", border: "border-[#FFD6B8]" },
-  침실: { fill: "bg-[#EFF8F5]", text: "text-tertiary", border: "border-[#C9E8DE]" },
-  거실: { fill: "bg-[#FFECEF]", text: "text-[#9A4251]", border: "border-[#F9C9D2]" },
 };
 
 const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
@@ -84,7 +78,7 @@ export default function ItemHistory() {
   const selectedItem = searchParams.get("item") ?? "세면대 수전 및 볼";
   const itemRecords = records.filter((record) => record.item === selectedItem).sort((a, b) => (a.date < b.date ? 1 : -1));
   const fallbackRecord = records.find((record) => record.item === selectedItem) ?? records[0];
-  const tone = spaceTones[fallbackRecord.space] ?? { fill: "bg-surface-container-low", text: "text-on-surface-variant", border: "border-outline-variant" };
+  const tone = spaceToneByLabel[fallbackRecord.space] ?? { fill: "bg-surface-container-low", text: "text-on-surface-variant", border: "border-outline-variant" };
   const latestRecord = itemRecords[0];
   const currentWeekStart = getStartOfWeek(today);
   const currentWeekEnd = new Date(currentWeekStart);
@@ -111,7 +105,7 @@ export default function ItemHistory() {
   return (
     <PageShell>
       <AppHeader title="상세 히스토리" />
-      <main className="flex min-h-[844px] flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-16">
+      <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
         <section className="rounded-xl bg-surface-container-lowest p-space-lg text-center shadow-sm">
           <span className={`mx-auto mb-space-sm flex h-16 w-16 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
             <Icon name={spaceIcons[fallbackRecord.space] ?? "task_alt"} className="text-[32px]" />
@@ -148,6 +142,7 @@ export default function ItemHistory() {
               ].map(([key, label]) => (
                 <button
                   key={key}
+                  aria-pressed={view === key}
                   className={`flex min-h-10 flex-1 items-center justify-center rounded-full text-label-md transition-all ${
                     view === key ? "bg-surface-container-lowest text-primary shadow-sm" : "text-on-surface-variant"
                   }`}
@@ -160,25 +155,37 @@ export default function ItemHistory() {
             </div>
 
             {view === "daily" ? (
-              <div className="flex flex-col gap-space-xs">
-                {itemRecords.map((record) => (
-                  <article key={record.id} className={`rounded-xl border bg-surface-container-lowest p-space-md shadow-sm ${tone.border}`}>
-                    <h2 className="text-title-sm">{formatDate(record.date)} {record.time}</h2>
-                    <p className="mt-0.5 text-caption text-on-surface-variant">청소 완료</p>
-                  </article>
-                ))}
+              <div className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
+                <ol className="flex flex-col">
+                  {itemRecords.map((record, index) => {
+                    const isLast = index === itemRecords.length - 1;
+
+                    return (
+                      <li key={record.id} className="flex gap-space-sm">
+                        <div className="flex flex-col items-center">
+                          <span aria-hidden="true" className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${tone.text.replace("text-", "bg-")}`} />
+                          {!isLast ? <span aria-hidden="true" className={`w-px flex-1 ${tone.border.replace("border-", "bg-")}`} /> : null}
+                        </div>
+                        <div className={`min-w-0 flex-1 ${isLast ? "pb-0.5" : "pb-space-md"}`}>
+                          <h2 className="text-title-sm text-on-surface">{formatDate(record.date)}</h2>
+                          <p className="mt-0.5 text-caption text-on-surface-variant">{record.time} · 청소 완료</p>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ol>
               </div>
             ) : (
               <div className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
                 <div className="mb-space-sm flex items-center justify-between">
-                  <button className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-container-low text-on-surface-variant" type="button" onClick={() => shiftMonth(-1)} aria-label="이전달">
+                  <button className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-low text-on-surface-variant" type="button" onClick={() => shiftMonth(-1)} aria-label="이전달">
                     <Icon name="chevron_left" className="text-[20px]" />
                   </button>
                   <div className="text-center">
                     <h2 className="text-title-sm">{selectedMonth.getFullYear()}년 {selectedMonth.getMonth() + 1}월</h2>
                     <span className="text-caption text-on-surface-variant">{selectedMonthCount}회 기록</span>
                   </div>
-                  <button className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-container-low text-on-surface-variant" type="button" onClick={() => shiftMonth(1)} aria-label="다음달">
+                  <button className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-low text-on-surface-variant" type="button" onClick={() => shiftMonth(1)} aria-label="다음달">
                     <Icon name="chevron_right" className="text-[20px]" />
                   </button>
                 </div>
@@ -211,7 +218,7 @@ export default function ItemHistory() {
         ) : (
           <section className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
             <p className="text-title-sm text-on-surface">아직 청소 기록이 없어요.</p>
-            <p className="mt-1 text-body-sm text-on-surface-variant">청소를 기록하면 이 항목의 히스토리를 모아볼 수 있어요.</p>
+            <p className="mt-1 text-body-md text-on-surface-variant">청소를 기록하면 이 항목의 히스토리를 모아볼 수 있어요.</p>
           </section>
         )}
 

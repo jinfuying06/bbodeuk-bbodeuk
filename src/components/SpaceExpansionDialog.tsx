@@ -1,4 +1,9 @@
+import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Icon from "./Icon";
+import { isMember, readPoints, SIGNUP_BONUS } from "../data/points";
+
+const SPACE_PRICE = 300;
 
 type SpaceExpansionDialogProps = {
   open: boolean;
@@ -6,7 +11,53 @@ type SpaceExpansionDialogProps = {
 };
 
 export default function SpaceExpansionDialog({ open, onClose }: SpaceExpansionDialogProps) {
+  const navigate = useNavigate();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open, onClose]);
+
   if (!open) return null;
+
+  const member = isMember();
+  const balance = readPoints();
+  const hasEnough = balance >= SPACE_PRICE;
+
+  const content = !member
+    ? {
+        title: `회원가입 하면 ${SIGNUP_BONUS}P를 드려요`,
+        body: "가입 시 받는 포인트로 공간 1개를 바로 추가할 수 있어요. 회원가입 후 진행해보세요.",
+        primaryLabel: "회원가입 하러 가기",
+        onPrimary: () => navigate("/signup"),
+      }
+    : hasEnough
+      ? {
+          title: `${SPACE_PRICE}P로 공간을 추가할 수 있어요`,
+          body: `보유 포인트 ${balance.toLocaleString()}P로 공간 1개를 추가할 수 있어요. 공간 관리에서 이어서 진행해보세요.`,
+          primaryLabel: "공간 추가하기",
+          onPrimary: () => navigate("/space-manage"),
+        }
+      : {
+          title: "포인트가 부족해요",
+          body: `공간 1개를 추가하려면 ${SPACE_PRICE}P가 필요해요. 지금 보유 포인트는 ${balance.toLocaleString()}P예요.`,
+          primaryLabel: "포인트 충전하러 가기",
+          onPrimary: () => navigate("/points?intent=charge"),
+        };
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center bg-on-surface/40" role="presentation" onClick={onClose}>
@@ -17,19 +68,22 @@ export default function SpaceExpansionDialog({ open, onClose }: SpaceExpansionDi
         role="dialog"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-space-sm">
-          <div>
-            <p className="text-label-sm text-secondary">공간 확장</p>
-            <h2 id="space-expansion-title" className="mt-1 text-headline-md">공간 1개를 300P로 추가할 수 있어요</h2>
-          </div>
-          <button aria-label="닫기" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-container-low" type="button" onClick={onClose}>
+        <div className="flex items-start justify-between gap-space-md">
+          <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-fixed text-primary">
+            <Icon name="add_home" className="text-[22px]" />
+          </span>
+          <button ref={closeButtonRef} aria-label="닫기" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-container-low" type="button" onClick={onClose}>
             <Icon name="close" className="text-[22px]" />
           </button>
         </div>
-        <p className="mt-space-md text-body-md text-on-surface-variant">가입하면 시작 포인트 300P가 제공되어 첫 공간을 추가할 수 있어요.</p>
-        <p className="mt-space-xs text-body-md text-on-surface-variant">기본 공간은 포인트 없이 바로 사용할 수 있어요.</p>
-        <p className="mt-space-md text-caption text-on-surface-variant">현재 체험판에서는 공간 구매와 회원가입이 제공되지 않아요.</p>
-        <button className="mt-space-lg flex h-12 w-full items-center justify-center rounded-full bg-primary-container text-title-sm text-on-primary" type="button" onClick={onClose}>기본 공간으로 계속하기</button>
+        <h2 id="space-expansion-title" className="mt-space-md text-headline-md">{content.title}</h2>
+        <p className="mt-space-sm text-body-md text-on-surface-variant">{content.body}</p>
+        <button className="mt-space-lg flex h-12 w-full items-center justify-center rounded-full bg-primary-container text-title-sm text-on-primary" type="button" onClick={content.onPrimary}>
+          {content.primaryLabel}
+        </button>
+        <button className="mt-space-sm flex h-12 w-full items-center justify-center rounded-full text-title-sm text-on-surface-variant" type="button" onClick={onClose}>
+          기본 공간으로 계속하기
+        </button>
       </section>
     </div>
   );

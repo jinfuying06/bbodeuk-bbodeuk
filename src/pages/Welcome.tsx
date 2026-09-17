@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import BrandLogo from "../components/BrandLogo";
 import PageShell from "../components/PageShell";
+import { resetToGuest } from "../data/points";
 
 export default function Welcome() {
   return (
@@ -24,7 +25,7 @@ export default function Welcome() {
           </p>
         </section>
         <div className="pb-[72px]">
-          <Link className="flex h-14 items-center justify-center rounded-full bg-primary text-title-sm text-on-primary shadow-md" to="/setup">
+          <Link className="flex h-14 items-center justify-center rounded-full bg-primary text-title-sm text-on-primary shadow-md" to="/setup" onClick={() => resetToGuest()}>
             게스트로 시작하기
           </Link>
         </div>

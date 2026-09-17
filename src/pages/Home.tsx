@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
-import BottomNavigation from "../components/BottomNavigation";
 import Icon from "../components/Icon";
+import PageShell from "../components/PageShell";
+import { getSpaceTone } from "../data/spaceTones";
 
 const recommendations = [
   {
@@ -38,51 +39,6 @@ const spaceIcons: Record<string, string> = {
   bedroom: "bed",
   entry: "door_front",
   terrace: "balcony",
-};
-
-const spaceTones: Record<string, { fill: string; border: string; text: string; feedback: string; rgb: [number, number, number] }> = {
-  bathroom: {
-    fill: "bg-[#EAF4FF]",
-    border: "border-[#B8DCFF]",
-    text: "text-primary",
-    feedback: "bg-[#EAF4FF]/80",
-    rgb: [184, 220, 255],
-  },
-  kitchen: {
-    fill: "bg-[#FFF1E7]",
-    border: "border-[#FFD6B8]",
-    text: "text-[#8A4C00]",
-    feedback: "bg-[#FFF1E7]/80",
-    rgb: [255, 214, 184],
-  },
-  living: {
-    fill: "bg-[#FFECEF]",
-    border: "border-[#F9C9D2]",
-    text: "text-[#9A4251]",
-    feedback: "bg-[#FFECEF]/80",
-    rgb: [249, 201, 210],
-  },
-  bedroom: {
-    fill: "bg-[#EFF8F5]",
-    border: "border-[#C9E8DE]",
-    text: "text-tertiary",
-    feedback: "bg-[#EFF8F5]/80",
-    rgb: [201, 232, 222],
-  },
-  entry: {
-    fill: "bg-[#F7F4EE]",
-    border: "border-[#DED7C9]",
-    text: "text-[#5E5545]",
-    feedback: "bg-[#F7F4EE]/80",
-    rgb: [222, 215, 201],
-  },
-  terrace: {
-    fill: "bg-[#F3F8E6]",
-    border: "border-[#DAE9B0]",
-    text: "text-[#536B16]",
-    feedback: "bg-[#F3F8E6]/80",
-    rgb: [218, 233, 176],
-  },
 };
 
 type CanvasCard = {
@@ -178,7 +134,7 @@ const getManagementRatio = (card: CanvasCard) => {
 };
 
 const getCanvasTone = (spaceKey: string, ratio: number) => {
-  const [r, g, b] = spaceTones[spaceKey].rgb;
+  const [r, g, b] = getSpaceTone(spaceKey).rgb;
   const alpha = ratio <= 0 ? 0.24 : ratio < 0.45 ? 0.38 : ratio < 0.75 ? 0.58 : 0.82;
   return {
     backgroundColor: `rgba(${r}, ${g}, ${b}, ${alpha})`,
@@ -289,9 +245,9 @@ export default function Home() {
   const canvasColumns = getCanvasColumns(effectiveCanvasCards);
 
   return (
-    <div className="phone-shell min-h-[844px] bg-surface text-on-surface">
+    <PageShell>
       <AppHeader home />
-      <main className="flex min-h-[844px] flex-1 flex-col bg-surface pb-[88px] pt-16">
+      <main className="flex flex-1 flex-col bg-surface pb-[88px] pt-header">
         <div className="flex w-full flex-col gap-space-xl px-margin-screen pb-space-2xl">
           <Link className="relative block w-full overflow-hidden rounded-xl bg-surface-container-lowest p-space-lg shadow-sm transition-transform active:scale-[0.99]" to={`/quick-record?filter=space&space=${heroTarget?.spaceKey ?? effectiveCanvasCards[0]?.spaceKey ?? "bathroom"}`}>
             <div className="flex items-start justify-between">
@@ -317,7 +273,7 @@ export default function Home() {
                   <div key={index === 0 ? "left" : "right"} className={`${index === 0 ? "w-[43%]" : "flex-1"} flex min-w-0 flex-col gap-1.5`}>
                     {column.map((card) => {
                       const ratio = getManagementRatio(card);
-                      const tone = spaceTones[card.spaceKey];
+                      const tone = getSpaceTone(card.spaceKey);
                       const style = getCanvasTone(card.spaceKey, ratio);
 
                       return (
@@ -337,7 +293,7 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <Link className="flex min-h-11 items-center justify-center gap-space-xs rounded-xl border border-dashed border-outline-variant/70 bg-surface-container-lowest px-space-md text-label-md text-primary" to="/points?intent=space">
+            <Link className="flex min-h-11 items-center justify-center gap-space-xs rounded-xl border border-dashed border-outline-variant/70 bg-surface-container-lowest px-space-md text-label-md text-primary" to="/space-manage">
               <Icon name="add" className="text-[20px]" />
               공간을 추가하고 싶나요?
             </Link>
@@ -351,7 +307,7 @@ export default function Home() {
             {visibleRecentRecords.length <= 1 ? (
               <div className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
                 <p className="text-title-sm text-on-surface">아직 최근 청소 기록이 많지 않아요.</p>
-                <p className="mt-1 text-body-sm text-on-surface-variant">작은 청소부터 하나씩 기록해보세요.</p>
+                <p className="mt-1 text-body-md text-on-surface-variant">작은 청소부터 하나씩 기록해보세요.</p>
                 <Link className="mt-space-md inline-flex min-h-11 items-center rounded-lg bg-primary-container px-space-md text-label-md font-semibold text-on-primary" to="/quick-record">
                   청소 기록하기
                 </Link>
@@ -362,7 +318,7 @@ export default function Home() {
                   {visibleRecentRecords.map((record) => (
                     <Link key={`${record.spaceKey}-${record.title}-${record.lastText}`} className="block rounded-xl bg-surface-container-lowest p-space-sm shadow-sm transition-transform active:scale-[0.99]" to={`/item-history?item=${encodeURIComponent(itemHistoryNames[record.id] ?? record.title)}`}>
                       <div className="mb-space-xs flex items-center gap-space-xs">
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${spaceTones[record.spaceKey].fill} ${spaceTones[record.spaceKey].text}`}>
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${getSpaceTone(record.spaceKey).fill} ${getSpaceTone(record.spaceKey).text}`}>
                           <Icon name={spaceIcons[record.spaceKey]} className="text-[18px]" />
                         </span>
                         <span className="min-w-0 truncate text-body-md font-semibold text-on-surface">{record.title}</span>
@@ -394,7 +350,7 @@ export default function Home() {
               </div>
               <div className="flex flex-col gap-space-sm">
                 {activeRecommendations.map((item) => {
-                  const tone = spaceTones[item.spaceKey];
+                  const tone = getSpaceTone(item.spaceKey);
 
                   return (
                     <Link
@@ -438,7 +394,6 @@ export default function Home() {
           </Link>
         </div>
       </main>
-      <BottomNavigation />
-    </div>
+    </PageShell>
   );
 }

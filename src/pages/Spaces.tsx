@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { spaceTones as sharedSpaceTones } from "../data/spaceTones";
 
 type CareStatus = "확인 필요" | "슬슬 확인" | "관리 중" | "아직 기록 없음";
 
@@ -28,8 +29,8 @@ const spaces: Space[] = [
     key: "bathroom",
     title: "욕실",
     icon: "bathtub",
-    tone: "bg-[#EAF4FF]",
-    iconTone: "text-primary",
+    tone: sharedSpaceTones.bathroom.fill,
+    iconTone: sharedSpaceTones.bathroom.text,
     items: [
       { id: "basin", title: "세면대 수전 및 볼", status: "슬슬 확인", lastRecord: "최근 관리 6일 전", intervalDays: 7 },
       { id: "toilet", title: "양변기 안팎", status: "관리 중", lastRecord: "최근 관리 1일 전", intervalDays: 7 },
@@ -41,8 +42,8 @@ const spaces: Space[] = [
     key: "kitchen",
     title: "주방",
     icon: "countertops",
-    tone: "bg-[#FFF1E7]",
-    iconTone: "text-[#8A4C00]",
+    tone: sharedSpaceTones.kitchen.fill,
+    iconTone: sharedSpaceTones.kitchen.text,
     items: [
       { id: "sink", title: "싱크대 거름망", status: "확인 필요", lastRecord: "최근 관리 5일 전", intervalDays: 3 },
       { id: "countertop", title: "인덕션 상판 및 조리대", status: "관리 중", lastRecord: "최근 관리 어제", intervalDays: 5 },
@@ -53,8 +54,8 @@ const spaces: Space[] = [
     key: "bedroom",
     title: "침실",
     icon: "bed",
-    tone: "bg-[#EFF8F5]",
-    iconTone: "text-tertiary",
+    tone: sharedSpaceTones.bedroom.fill,
+    iconTone: sharedSpaceTones.bedroom.text,
     items: [
       { id: "bedding", title: "침실 침구", status: "관리 중", lastRecord: "최근 관리 어제 저녁", intervalDays: 7 },
       { id: "pillow", title: "베개 커버", status: "관리 중", lastRecord: "최근 관리 2일 전", intervalDays: 7 },
@@ -64,12 +65,24 @@ const spaces: Space[] = [
     key: "living",
     title: "거실",
     icon: "chair",
-    tone: "bg-[#FFECEF]",
-    iconTone: "text-[#9A4251]",
+    tone: sharedSpaceTones.living.fill,
+    iconTone: sharedSpaceTones.living.text,
     items: [
       { id: "living-floor", title: "거실 바닥", status: "슬슬 확인", lastRecord: "최근 관리 7일 전", intervalDays: 7 },
       { id: "air-filter", title: "공기청정기 프리필터", status: "관리 중", lastRecord: "최근 관리 12일 전", intervalDays: 30 },
       { id: "door-handle", title: "문 손잡이", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 14 },
+    ],
+  },
+  {
+    key: "terrace",
+    title: "테라스",
+    icon: "balcony",
+    tone: sharedSpaceTones.terrace.fill,
+    iconTone: sharedSpaceTones.terrace.text,
+    items: [
+      { id: "terrace-floor", title: "테라스 바닥", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 14 },
+      { id: "rail", title: "난간", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 21 },
+      { id: "laundry", title: "빨래 공간", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 14 },
     ],
   },
 ];
@@ -79,6 +92,7 @@ const setupSpaceMap: Record<string, string> = {
   주방: "kitchen",
   거실: "living",
   "침실 / 방": "bedroom",
+  "베란다 / 다용도실": "terrace",
 };
 
 const statusTone: Record<CareStatus, string> = {
@@ -127,14 +141,14 @@ export default function Spaces() {
   return (
     <PageShell>
       <AppHeader title="공간 정보" />
-      <main className="flex min-h-[844px] flex-col bg-surface pb-[88px] pt-16">
+      <main className="flex flex-col bg-surface pb-[88px] pt-header">
         <div className="flex flex-col gap-space-md px-margin-screen pb-space-2xl">
           <div className="hide-scrollbar -mx-margin-screen overflow-x-auto px-margin-screen">
             <div className="flex min-w-max gap-space-xs">
               {tabs.map(({ key, label }) => {
                 const active = selectedTab === key;
                 return (
-                  <button key={key} className={`min-h-11 rounded-full px-4 py-2 text-label-md ${active ? "bg-primary text-on-primary shadow-sm" : "bg-surface-container-low text-on-surface-variant"}`} type="button" onClick={() => setSelectedTab(key)}>
+                  <button key={key} aria-pressed={active} className={`min-h-11 rounded-full px-4 py-2 text-label-md ${active ? "bg-primary text-on-primary shadow-sm" : "bg-surface-container-low text-on-surface-variant"}`} type="button" onClick={() => setSelectedTab(key)}>
                     {label}
                   </button>
                 );
@@ -179,7 +193,7 @@ export default function Spaces() {
           <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
             <h2 className="text-title-sm">우리 집에 다른 공간도 있나요?</h2>
             <p className="mt-1 text-body-md text-on-surface-variant">베란다, 드레스룸처럼 필요한 공간은 1개당 300P로 확장할 수 있어요.</p>
-            <Link className="mt-space-sm flex min-h-11 w-full items-center justify-center gap-space-xs rounded-lg border border-dashed border-outline-variant text-label-md text-primary" to="/points?intent=space">
+            <Link className="mt-space-sm flex min-h-11 w-full items-center justify-center gap-space-xs rounded-lg border border-dashed border-outline-variant text-label-md text-primary" to="/space-manage">
               <Icon name="add" className="text-[20px]" />
               공간 추가 · 300P
             </Link>
@@ -188,7 +202,7 @@ export default function Spaces() {
           {visibleSpaces.length === 0 ? (
             <section className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
               <p className="text-title-sm text-on-surface">이 공간에는 아직 관리 항목이 없어요.</p>
-              <p className="mt-1 text-body-sm text-on-surface-variant">관리할 곳을 추가하면 이 화면에서 모아볼 수 있어요.</p>
+              <p className="mt-1 text-body-md text-on-surface-variant">관리할 곳을 추가하면 이 화면에서 모아볼 수 있어요.</p>
             </section>
           ) : null}
         </div>
