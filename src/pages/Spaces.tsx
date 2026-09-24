@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-import { readHiddenItems, readOverrides } from "../data/itemStorage";
+import { formatRecency, getActiveSpaces, getItems, itemStaleness, lastRecord, useRecords } from "../data/cleaning";
 import { spaceTones as sharedSpaceTones } from "../data/spaceTones";
 
 type CareStatus = "확인 필요" | "슬슬 확인" | "관리 중" | "아직 기록 없음";
@@ -25,75 +25,11 @@ type Space = {
   items: CareItem[];
 };
 
-const spaces: Space[] = [
-  {
-    key: "bathroom",
-    title: "욕실",
-    icon: "space-bath",
-    tone: sharedSpaceTones.bathroom.fill,
-    iconTone: sharedSpaceTones.bathroom.text,
-    items: [
-      { id: "basin", title: "세면대 수전 및 볼", status: "관리 중", lastRecord: "최근 관리 오늘", intervalDays: 7 },
-      { id: "toilet", title: "양변기 안팎", status: "관리 중", lastRecord: "최근 관리 1일 전", intervalDays: 7 },
-      { id: "mirror", title: "욕실 유리 거울", status: "관리 중", lastRecord: "최근 관리 4일 전", intervalDays: 10 },
-      { id: "drain", title: "바닥 배수구 유가 거름망", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 7 },
-    ],
-  },
-  {
-    key: "kitchen",
-    title: "주방",
-    icon: "space-kitchen",
-    tone: sharedSpaceTones.kitchen.fill,
-    iconTone: sharedSpaceTones.kitchen.text,
-    items: [
-      { id: "sink", title: "싱크대 거름망", status: "확인 필요", lastRecord: "최근 관리 5일 전", intervalDays: 3 },
-      { id: "countertop", title: "인덕션 상판 및 조리대", status: "관리 중", lastRecord: "최근 관리 어제", intervalDays: 5 },
-      { id: "hood", title: "레인지 후드 필터", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 21 },
-    ],
-  },
-  {
-    key: "bedroom",
-    title: "침실",
-    icon: "space-bed",
-    tone: sharedSpaceTones.bedroom.fill,
-    iconTone: sharedSpaceTones.bedroom.text,
-    items: [
-      { id: "bedding", title: "침실 침구", status: "관리 중", lastRecord: "최근 관리 어제 저녁", intervalDays: 7 },
-      { id: "pillow", title: "베개 커버", status: "관리 중", lastRecord: "최근 관리 2일 전", intervalDays: 7 },
-    ],
-  },
-  {
-    key: "living",
-    title: "거실",
-    icon: "space-living",
-    tone: sharedSpaceTones.living.fill,
-    iconTone: sharedSpaceTones.living.text,
-    items: [
-      { id: "living-floor", title: "거실 바닥", status: "슬슬 확인", lastRecord: "최근 관리 7일 전", intervalDays: 7 },
-      { id: "air-filter", title: "공기청정기 프리필터", status: "관리 중", lastRecord: "최근 관리 12일 전", intervalDays: 30 },
-      { id: "door-handle", title: "문 손잡이", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 14 },
-    ],
-  },
-  {
-    key: "terrace",
-    title: "테라스",
-    icon: "space-terrace",
-    tone: sharedSpaceTones.terrace.fill,
-    iconTone: sharedSpaceTones.terrace.text,
-    items: [
-      { id: "terrace-floor", title: "테라스 바닥", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 14 },
-      { id: "rail", title: "난간", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 21 },
-      { id: "laundry", title: "빨래 공간", status: "아직 기록 없음", lastRecord: "최근 기록 없음", intervalDays: 14 },
-    ],
-  },
-];
-
-const setupSpaceMap: Record<string, string> = {
-  욕실: "bathroom",
-  주방: "kitchen",
-  거실: "living",
-  "침실 / 방": "bedroom",
-  "베란다 / 다용도실": "terrace",
+const getStatus = (staleness: number): CareStatus => {
+  if (staleness === Infinity) return "아직 기록 없음";
+  if (staleness >= 1.1) return "확인 필요";
+  if (staleness >= 0.6) return "슬슬 확인";
+  return "관리 중";
 };
 
 const statusTone: Record<CareStatus, string> = {
@@ -124,35 +60,28 @@ const getSummary = (items: CareItem[]) => {
 
 export default function Spaces() {
   const [selectedTab, setSelectedTab] = useState("전체 보기");
-  const setup = (() => {
-    try {
-      return JSON.parse(window.localStorage.getItem("bbodeuk.setup.v1") ?? "{}") as { spaces?: string[]; roomName?: string };
-    } catch {
-      return {};
-    }
-  })();
-  const selectedKeys = new Set((setup.spaces ?? []).map((name) => setupSpaceMap[name]).filter(Boolean));
-  // Reflect ItemInfo edits: hide deleted items, show renamed titles / changed intervals.
-  const hiddenItems = readHiddenItems();
-  const overrides = readOverrides();
-  const availableSpaces = (selectedKeys.size > 0 ? spaces.filter((space) => selectedKeys.has(space.key)) : spaces).map((space) => ({
-    ...space,
-    items: space.items
-      .filter((item) => !hiddenItems.includes(item.id))
-      .map((item) => {
-        const override = overrides[item.id];
-        return override ? { ...item, title: override.name, intervalDays: override.intervalDays } : item;
-      }),
-  }));
-  const tabs = [{ key: "전체 보기", label: "전체 보기" }, ...availableSpaces.map((space) => ({
+  const records = useRecords();
+  // Spaces/items/recency all come from src/data/cleaning (ItemInfo edits + deletes applied there).
+  const availableSpaces: Space[] = getActiveSpaces().map((space) => ({
     key: space.key,
-    label: space.key === "bedroom" ? setup.roomName?.trim() || "방" : space.title,
-  }))];
+    title: space.label,
+    icon: space.icon,
+    tone: sharedSpaceTones[space.key].fill,
+    iconTone: sharedSpaceTones[space.key].text,
+    items: getItems(space.key).map((item) => ({
+      id: item.id,
+      title: item.fullName,
+      status: getStatus(itemStaleness(item, records)),
+      lastRecord: formatRecency(lastRecord(item.id, records)?.at),
+      intervalDays: item.intervalDays,
+    })),
+  }));
+  const tabs = [{ key: "전체 보기", label: "전체 보기" }, ...availableSpaces.map((space) => ({ key: space.key, label: space.title }))];
   const visibleSpaces = selectedTab === "전체 보기" ? availableSpaces : availableSpaces.filter((space) => space.key === selectedTab);
 
   return (
     <PageShell>
-      <AppHeader title="공간 정보" />
+      <AppHeader title="내 공간" back />
       <main className="flex flex-col bg-surface pb-[88px] pt-header">
         <div className="flex flex-col gap-space-md px-margin-screen pb-space-2xl">
           <div className="hide-scrollbar -mx-margin-screen overflow-x-auto px-margin-screen">
@@ -176,7 +105,7 @@ export default function Spaces() {
                     <Icon name={space.icon} className="text-[22px]" />
                   </span>
                   <div className="min-w-0">
-                    <h2 className="truncate text-title-md text-sky-ink">{space.key === "bedroom" ? setup.roomName?.trim() || "방" : space.title}</h2>
+                    <h2 className="truncate text-title-md text-sky-ink">{space.title}</h2>
                     <p className="text-caption text-sky-muted">{getSummary(space.items)}</p>
                   </div>
                 </div>

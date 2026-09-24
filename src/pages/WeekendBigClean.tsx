@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import BottomNavigation from "../components/BottomNavigation";
 import Icon from "../components/Icon";
+import { addRecord, formatRecency, getItem, lastRecord } from "../data/cleaning";
 import { spaceTones, type SpaceToneKey } from "../data/spaceTones";
 
 type SpaceKey = SpaceToneKey;
@@ -39,7 +40,7 @@ const spaceLabels: Record<SpaceKey, string> = {
   bathroom: "욕실",
   kitchen: "주방",
   living: "거실",
-  bedroom: "침실",
+  bedroom: "방",
   terrace: "테라스",
 };
 
@@ -58,10 +59,10 @@ const spaces: CleanSpace[] = [
     title: "욕실",
     icon: "bathtub",
     items: [
-      { id: "bath-drain", title: "배수구", tip: "냄새가 나기 전에 거름망만 헹궈도 좋아요.", icon: "water_drop", priority: 1, hidden: true },
-      { id: "bath-basin", title: "세면대", lastText: "6일 전", status: "슬슬 다시 볼 때", tip: "수전 주변 물기부터 가볍게 닦아보세요.", icon: "wash", priority: 3 },
-      { id: "bath-mirror", title: "거울", lastText: "4일 전", tip: "마른 천으로 아래쪽 물자국을 먼저 훑어요.", icon: "auto_awesome", priority: 7 },
-      { id: "bath-toilet", title: "변기", lastText: "1일 전", status: "최근 관리", tip: "오늘은 손잡이 주변만 확인해도 충분해요.", icon: "cleaning_services", priority: 10 },
+      { id: "drain", title: "배수구", tip: "냄새가 나기 전에 거름망만 헹궈도 좋아요.", icon: "water_drop", priority: 1, hidden: true },
+      { id: "basin", title: "세면대", lastText: "6일 전", status: "슬슬 다시 볼 때", tip: "수전 주변 물기부터 가볍게 닦아보세요.", icon: "wash", priority: 3 },
+      { id: "mirror", title: "거울", lastText: "4일 전", tip: "마른 천으로 아래쪽 물자국을 먼저 훑어요.", icon: "auto_awesome", priority: 7 },
+      { id: "toilet", title: "변기", lastText: "1일 전", status: "최근 관리", tip: "오늘은 손잡이 주변만 확인해도 충분해요.", icon: "cleaning_services", priority: 10 },
     ],
   },
   {
@@ -69,10 +70,10 @@ const spaces: CleanSpace[] = [
     title: "주방",
     icon: "countertops",
     items: [
-      { id: "kit-hood", title: "후드 필터", lastText: "28일 전", tip: "기름때는 오래 두면 닦기 어려워져요.", icon: "filter_alt", priority: 2, hidden: true },
-      { id: "kit-sink", title: "싱크대", lastText: "4일 전", status: "청소가 필요해요", tip: "거름망을 비우고 따뜻한 물로 헹궈요.", icon: "faucet", priority: 4 },
+      { id: "hood", title: "후드 필터", lastText: "28일 전", tip: "기름때는 오래 두면 닦기 어려워져요.", icon: "filter_alt", priority: 2, hidden: true },
+      { id: "sink", title: "싱크대", lastText: "4일 전", status: "청소가 필요해요", tip: "거름망을 비우고 따뜻한 물로 헹궈요.", icon: "faucet", priority: 4 },
       { id: "kit-fridge", title: "냉장고 손잡이", lastText: "12일 전", tip: "손이 자주 닿는 부분만 먼저 닦아도 좋아요.", icon: "kitchen", priority: 6, hidden: true },
-      { id: "kit-top", title: "조리대", lastText: "어제", status: "최근 관리", tip: "상판에 남은 물기만 쓱 정리해요.", icon: "soup_kitchen", priority: 11 },
+      { id: "countertop", title: "조리대", lastText: "어제", status: "최근 관리", tip: "상판에 남은 물기만 쓱 정리해요.", icon: "soup_kitchen", priority: 11 },
     ],
   },
   {
@@ -81,18 +82,18 @@ const spaces: CleanSpace[] = [
     icon: "chair",
     items: [
       { id: "liv-window", title: "창틀", lastText: "18일 전", tip: "마른 티슈로 먼지를 먼저 걷어내요.", icon: "window", priority: 5, hidden: true },
-      { id: "liv-floor", title: "바닥", lastText: "3일 전", status: "슬슬 다시 볼 때", tip: "눈에 보이는 먼지 구역만 밀어도 충분해요.", icon: "mop", priority: 9 },
-      { id: "liv-dust", title: "선반", tip: "위쪽 선반부터 아래로 털면 다시 쌓이지 않아요.", icon: "shelves", priority: 13 },
+      { id: "living-floor", title: "바닥", lastText: "3일 전", status: "슬슬 다시 볼 때", tip: "눈에 보이는 먼지 구역만 밀어도 충분해요.", icon: "mop", priority: 9 },
+      { id: "shelf", title: "선반", tip: "위쪽 선반부터 아래로 털면 다시 쌓이지 않아요.", icon: "shelves", priority: 13 },
     ],
   },
   {
     key: "bedroom",
-    title: "침실",
+    title: "방",
     icon: "bed",
     items: [
-      { id: "bed-pillow", title: "베개 커버", lastText: "9일 전", tip: "커버 교체만 해도 잠자리가 개운해요.", icon: "hotel", priority: 14, hidden: true },
-      { id: "bed-bedding", title: "침구", lastText: "어제", status: "최근 관리", tip: "오늘은 가볍게 털고 환기만 해도 좋아요.", icon: "bed", priority: 15 },
-      { id: "bed-floor", title: "바닥", tip: "머리카락이 모이는 모서리만 먼저 훑어요.", icon: "mop", priority: 16 },
+      { id: "pillow", title: "베개 커버", lastText: "9일 전", tip: "커버 교체만 해도 잠자리가 개운해요.", icon: "hotel", priority: 14, hidden: true },
+      { id: "bedding", title: "침구", lastText: "어제", status: "최근 관리", tip: "오늘은 가볍게 털고 환기만 해도 좋아요.", icon: "bed", priority: 15 },
+      { id: "bedroom-floor", title: "바닥", tip: "머리카락이 모이는 모서리만 먼저 훑어요.", icon: "mop", priority: 16 },
     ],
   },
   {
@@ -100,8 +101,8 @@ const spaces: CleanSpace[] = [
     title: "테라스",
     icon: "balcony",
     items: [
-      { id: "ter-rail", title: "난간", lastText: "21일 전", tip: "바깥 먼지는 젖은 천보다 마른 천으로 먼저 닦아요.", icon: "fence", priority: 17, hidden: true },
-      { id: "ter-floor", title: "바닥", tip: "물청소 전 먼지를 먼저 쓸어내요.", icon: "balcony", priority: 18 },
+      { id: "rail", title: "난간", lastText: "21일 전", tip: "바깥 먼지는 젖은 천보다 마른 천으로 먼저 닦아요.", icon: "fence", priority: 17, hidden: true },
+      { id: "terrace-floor", title: "바닥", tip: "물청소 전 먼지를 먼저 쓸어내요.", icon: "balcony", priority: 18 },
     ],
   },
 ];
@@ -160,42 +161,26 @@ export default function WeekendBigClean() {
   };
 
   const submit = () => {
-    const selectedItems = rankedSpaces.flatMap((space) =>
-      space.items
-        .filter((item) => checked[item.id])
-        .map((item) => ({
-          id: `deep-${item.id}`,
-          name: item.title,
-          icon: item.icon,
-          desc: `${space.key === "bedroom" ? setup.roomName?.trim() || "방" : spaceLabels[space.key]} · 대청소`,
-          meta: "방금",
-          space: space.key,
-        })),
+    // Checked items that exist in the shared catalog become real records (History/Home pick them up).
+    rankedSpaces.forEach((space) =>
+      space.items.forEach((item) => {
+        if (checked[item.id] && getItem(item.id)) addRecord(item.id);
+      }),
     );
-    // Nothing selected: keep earlier records instead of wiping them.
-    if (selectedItems.length > 0) {
-      try {
-        window.sessionStorage.setItem("bbodeuk.session.deepClean.recent.v1", JSON.stringify(selectedItems));
-        const savedPaintedItems = JSON.parse(window.sessionStorage.getItem("bbodeuk.session.recordPainted.v1") ?? "[]") as string[];
-        const nextPaintedItems = Array.from(new Set([...savedPaintedItems, ...selectedItems.map((item) => item.id)]));
-        window.sessionStorage.setItem("bbodeuk.session.recordPainted.v1", JSON.stringify(nextPaintedItems));
-      } catch {
-        // no-op: storage unavailable or corrupted, still continue to Home
-      }
-    }
-
     navigate("/home");
   };
 
   const itemMeta = (item: CleanItem) => {
-    if (item.hidden) return `숨은 관리 · ${item.lastText ?? "놓치기 쉬워요"}`;
-    if (!item.lastText) return "";
-    return item.status ? `${item.lastText} · ${item.status}` : item.lastText;
+    // Catalog items show their real recency; the few extra 대청소-only spots keep their copy.
+    const recency = getItem(item.id) ? formatRecency(lastRecord(item.id)?.at) : item.lastText;
+    if (item.hidden) return `숨은 관리 · ${recency ?? "놓치기 쉬워요"}`;
+    if (!recency) return "";
+    return item.status ? `${recency} · ${item.status}` : recency;
   };
 
   return (
     <div className="phone-shell bg-surface text-on-surface">
-      <AppHeader title="대청소 하기" />
+      <AppHeader title="대청소 하기" back />
 
       <main className="flex flex-col bg-surface pb-[176px] pt-header">
         <div className="flex w-full flex-col gap-space-lg px-margin-screen pb-space-md pt-space-md">

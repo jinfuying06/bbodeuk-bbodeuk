@@ -84,7 +84,7 @@ export default function Care() {
 
   return (
     <PageShell>
-      <AppHeader title="청소가이드" />
+      <AppHeader title="청소 가이드" />
       <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
         <section className="pb-space-sm pt-space-md">
           <h1 className="text-headline-lg text-on-surface">청소 방법을 확인해보세요</h1>

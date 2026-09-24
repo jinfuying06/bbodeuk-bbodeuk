@@ -74,8 +74,8 @@ export default function Points() {
 
   return (
     <PageShell bottomNav={setupDone}>
-      {setupDone ? <AppHeader title="내 포인트" /> : <AppHeader title="내 포인트" onBack={() => navigate(-1)} />}
-      <main className="flex flex-col gap-space-xl bg-surface px-margin-screen pb-[104px] pt-header-lg">
+      <AppHeader title="내 포인트" back />
+      <main className="flex flex-col gap-space-xl bg-surface px-margin-screen pb-[104px] pt-header">
         {!member ? (
           <button className="flex items-center gap-space-xs rounded-xl bg-primary-fixed/50 px-space-md py-space-sm text-label-md text-primary" type="button" onClick={() => setShowSignupConfirm(true)}>
             <Icon name="redeem" className="text-[18px]" />

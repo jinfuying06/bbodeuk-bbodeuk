@@ -9,7 +9,7 @@ type PageShellProps = {
 
 export default function PageShell({ children, bottomNav = true, className = "" }: PageShellProps) {
   return (
-    <div className={`phone-shell bg-surface text-on-surface ${className}`}>
+    <div className={`phone-shell bg-sky-bg text-sky-ink ${className}`}>
       {children}
       {bottomNav ? <BottomNavigation /> : null}
     </div>

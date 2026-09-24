@@ -53,3 +53,23 @@ export const NavGuideIcon: IconComponent = (props) => (
     />
   </svg>
 );
+
+/** Header "내 정보" (Figma Account 22px). */
+export const AccountIcon: IconComponent = (props) => (
+  <svg viewBox="0 0 22 22" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <g fill="none" stroke="currentColor" strokeWidth={1.46667} strokeLinecap="round">
+      <path d="M11 11C13.025 11 14.6667 9.35838 14.6667 7.33333C14.6667 5.30829 13.025 3.66667 11 3.66667C8.97496 3.66667 7.33333 5.30829 7.33333 7.33333C7.33333 9.35838 8.97496 11 11 11Z" />
+      <path d="M3.66667 20.1667V18.3333C3.66667 16.3884 4.43928 14.5232 5.81455 13.1479C7.18982 11.7726 9.05508 11 11 11C12.9449 11 14.8102 11.7726 16.1855 13.1479C17.5607 14.5232 18.3333 16.3884 18.3333 18.3333V20.1667" />
+    </g>
+  </svg>
+);
+
+/** Glass / sparkle (4-point star + small star) shown during the record sweep. Fill = currentColor (white in Figma). */
+export const SparkleIcon: IconComponent = (props) => (
+  <svg viewBox="0 0 28 28" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <g fill="currentColor">
+      <path d="M14 1L17 11L27 14L17 17L14 27L11 17L1 14L11 11L14 1Z" />
+      <path d="M23 1L24 4L27 5L24 6L23 9L22 6L19 5L22 4L23 1Z" />
+    </g>
+  </svg>
+);

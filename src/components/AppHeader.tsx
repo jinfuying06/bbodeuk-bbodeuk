@@ -1,65 +1,62 @@
 import { ReactNode } from "react";
-import { Link } from "react-router-dom";
-import BrandLogo from "./BrandLogo";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Icon from "./Icon";
 
 type AppHeaderProps = {
-  title?: string;
-  home?: boolean;
-  right?: ReactNode;
-  onBack?: () => void;
+  title: string;
+  /**
+   * Sub-page variant (Figma "Brand / header" with ‹ back + centered title).
+   * `true` → navigate(-1), falling back to /home when there is no in-app history
+   * (direct URL entry). Pass a path string to choose the fallback.
+   */
+  back?: boolean | string;
+  /**
+   * Sub-page right slot. Omitted → decorative `⋯` (Figma "More", no action).
+   * `null` → empty 44px spacer (Login/SignUp/포인트 확인 variants), keeps the title centered.
+   */
+  right?: ReactNode | null;
 };
 
-export default function AppHeader({ title, home = false, right, onBack }: AppHeaderProps) {
-  const actions = right ?? (
-    <div className="flex items-center gap-space-xxs">
-      <button aria-label="알림" className="flex h-11 w-11 items-center justify-center text-sky-muted transition-colors active:text-sky-deep">
-        <Icon name="notifications" className="text-[24px]" />
-      </button>
-      <Link aria-label="포인트 구매" className="flex h-11 w-11 items-center justify-center text-sky-muted transition-colors active:text-sky-deep" to="/points">
-        <Icon name="toll" className="text-[24px]" />
-      </Link>
-      <Link aria-label="설정" className="flex h-11 w-11 items-center justify-center text-sky-muted transition-colors active:text-sky-deep" to="/settings">
-        <Icon name="settings" className="text-[24px]" />
-      </Link>
-    </div>
-  );
+const shell = "fixed left-1/2 top-0 z-50 w-full max-w-[430px] -translate-x-1/2 bg-sky-bg pt-safe";
 
-  if (home) {
+export default function AppHeader({ title, back, right }: AppHeaderProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  if (!back) {
+    // Tab-root variant: brand-colored title left, 내 정보 (account) right.
     return (
-      <header className="fixed left-1/2 top-0 z-50 w-full max-w-[430px] -translate-x-1/2 bg-surface/80 pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl">
-        <div className="flex h-16 items-center justify-between px-margin-screen">
-          <div className="flex items-center gap-space-xs">
-            <BrandLogo />
-            <span className="text-title-md text-on-surface">뽀득뽀득</span>
-          </div>
-          {actions}
+      <header className={shell}>
+        <div className="flex h-header items-center justify-between px-6">
+          <span className="truncate text-bb-title text-sky-deep">{title}</span>
+          <Link aria-label="내 정보" className="flex h-11 w-11 shrink-0 items-center justify-center text-sky-muted transition-colors active:text-sky-deep" to="/settings">
+            <Icon name="account" className="text-[22px]" />
+          </Link>
         </div>
       </header>
     );
   }
 
-  if (onBack) {
-    return (
-      <header className="fixed left-1/2 top-0 z-50 w-full max-w-[430px] -translate-x-1/2 bg-surface/80 pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl">
-        <div className="flex h-16 items-center gap-space-sm px-margin-screen">
-          <button aria-label="이전 화면으로" className="-ml-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-container-low text-on-surface" type="button" onClick={onBack}>
-            <Icon name="arrow_back_ios_new" className="text-[22px]" />
-          </button>
-          <span className="truncate text-title-md text-on-surface">{title ?? "뽀득뽀득"}</span>
-        </div>
-      </header>
-    );
-  }
+  const goBack = () => {
+    // location.key is "default" on the first entry of this tab — nothing in-app to go back to.
+    if (location.key === "default") navigate(typeof back === "string" ? back : "/home", { replace: true });
+    else navigate(-1);
+  };
 
   return (
-    <header className="fixed left-1/2 top-0 z-50 w-full max-w-[430px] -translate-x-1/2 bg-surface/80 pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl">
-      <div className="flex h-16 items-center justify-between gap-space-xs px-margin-screen">
-        <Link aria-label="홈으로 이동" className="flex min-h-[44px] min-w-0 flex-1 items-center gap-space-xs transition-opacity active:opacity-70" to="/home">
-          <BrandLogo />
-          <span className="truncate text-title-md text-on-surface">{title ?? "뽀득뽀득"}</span>
-        </Link>
-        {actions}
+    <header className={shell}>
+      <div className="flex h-header items-center justify-between px-4">
+        <button aria-label="이전 화면으로" className="flex h-11 w-11 shrink-0 items-center justify-center text-[26px] font-bold leading-[36px] text-sky-deep transition-opacity active:opacity-60" type="button" onClick={goBack}>
+          ‹
+        </button>
+        <span className="min-w-0 flex-1 truncate text-center text-bb-label text-sky-ink">{title}</span>
+        {right === undefined ? (
+          <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center text-bb-title text-sky-deep">
+            ⋯
+          </span>
+        ) : (
+          <div className="flex h-11 min-w-11 shrink-0 items-center justify-center">{right}</div>
+        )}
       </div>
     </header>
   );

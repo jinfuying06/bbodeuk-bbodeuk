@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { formatRecency, getActiveSpaces, getItem, isRecordedToday, spaceFade, todaysRecords, useRecords, type CleaningRecord } from "../data/cleaning";
 import { getSpaceTone } from "../data/spaceTones";
 
 const recommendations = [
@@ -23,12 +23,12 @@ const recommendations = [
     icon: "faucet",
   },
   {
-    id: "door-handle",
-    spaceKey: "living",
-    title: "문 손잡이",
-    meta: "최근 기록이 없는 곳이 있어요.",
+    id: "drain",
+    spaceKey: "bathroom",
+    title: "배수구",
+    meta: "숨은 관리 · 거름망만 헹궈도 좋아요",
     elapsedRatio: 0.95,
-    icon: "door_open",
+    icon: "object-drain",
   },
 ];
 
@@ -44,105 +44,29 @@ const spaceIcons: Record<string, string> = {
 type CanvasCard = {
   spaceKey: string;
   room: string;
-  /** Elapsed time ÷ recommended care cycle, averaged across the space's items. ~0 = just cared for, ≥1.1 = overdue floor. */
-  staleness: number;
+  /** Recency fade 0…1 from src/data/cleaning (avg of per-item policy fades). */
+  fade: number;
   layout: string;
 };
 
-const canvasCards: CanvasCard[] = [
-  {
-    spaceKey: "bathroom",
-    room: "욕실",
-    staleness: 0.9,
-    layout: "h-[88px]",
-  },
-  {
-    spaceKey: "entry",
-    room: "현관",
-    staleness: 1.2,
-    layout: "h-[58px]",
-  },
-  {
-    spaceKey: "kitchen",
-    room: "주방/식당",
-    staleness: 1.1,
-    layout: "h-[96px]",
-  },
-  {
-    spaceKey: "bedroom",
-    room: "침실",
-    staleness: 0.75,
-    layout: "h-[110px]",
-  },
-  {
-    spaceKey: "living",
-    room: "거실",
-    staleness: 0.2,
-    layout: "h-[120px] flex-1",
-  },
-  {
-    spaceKey: "terrace",
-    room: "테라스",
-    staleness: 1.15,
-    layout: "h-[70px]",
-  },
-];
-
-const recentRecords = [
-  { id: "bedding", spaceKey: "bedroom", title: "침구", lastText: "어제 저녁" },
-  { id: "toilet", spaceKey: "bathroom", title: "변기", lastText: "3일 전" },
-  { id: "sink", spaceKey: "kitchen", title: "싱크대 거름망", lastText: "4일 전" },
-  { id: "living-floor", spaceKey: "living", title: "바닥", lastText: "7일 전" },
-  { id: "basin", spaceKey: "bathroom", title: "세면대 수전 및 볼", lastText: "오늘" },
-];
-
-const itemHistoryNames: Record<string, string> = {
-  bedding: "침실 침구",
-  toilet: "변기",
-  sink: "싱크대 거름망",
-  "living-floor": "거실 바닥",
-  basin: "세면대 수전 및 볼",
+const canvasLayouts: Record<string, string> = {
+  bathroom: "h-[88px]",
+  kitchen: "h-[96px]",
+  bedroom: "h-[110px]",
+  living: "h-[120px] flex-1",
+  terrace: "h-[70px]",
 };
 
-type SessionRecord = {
-  id: string;
-  name: string;
-  icon: string;
-  desc: string;
-  meta?: string;
-  space?: string;
-};
-
-const setupSpaceMap: Record<string, string[]> = {
-  현관: ["entry"],
-  욕실: ["bathroom"],
-  주방: ["kitchen"],
-  거실: ["living"],
-  "침실 / 방": ["bedroom"],
-  "베란다 / 다용도실": ["terrace"],
-};
-
-/**
- * Figma recency policy: staleness (elapsed ÷ recommended cycle) 0/0.6/0.85/1.1+
- * maps to fade 100/72/48/28%, interpolated smoothly between stops and floored at 28%.
- */
-const getFadeTier = (staleness: number) => {
-  const stops: [number, number][] = [
-    [0, 1],
-    [0.6, 0.72],
-    [0.85, 0.48],
-    [1.1, 0.28],
-  ];
-  if (staleness <= stops[0][0]) return stops[0][1];
-  for (let i = 1; i < stops.length; i += 1) {
-    const [prevStaleness, prevFade] = stops[i - 1];
-    const [stopStaleness, stopFade] = stops[i];
-    if (staleness <= stopStaleness) {
-      const t = (staleness - prevStaleness) / (stopStaleness - prevStaleness);
-      return prevFade + (stopFade - prevFade) * t;
-    }
+/** The 5 most recently cared-for items (one row per item). */
+const getRecentRecords = (records: CleaningRecord[]) => {
+  const rows: Array<{ id: string; spaceKey: string; title: string; lastText: string }> = [];
+  for (const record of records) {
+    const item = getItem(record.itemId);
+    if (!item || rows.some((row) => row.id === item.id)) continue;
+    rows.push({ id: item.id, spaceKey: item.space, title: item.name, lastText: formatRecency(record.at) });
+    if (rows.length === 5) break;
   }
-  return stops[stops.length - 1][1];
+  return rows;
 };
 
 const getCanvasTone = (spaceKey: string, fade: number) => {
@@ -153,21 +77,20 @@ const getCanvasTone = (spaceKey: string, fade: number) => {
   };
 };
 
-const getSpaceStatusLabel = (staleness: number) => {
-  if (staleness >= 1.1) return "아직 기록 없음";
-  if (staleness >= 0.85) return "확인 필요";
-  if (staleness >= 0.6) return "슬슬 확인";
+const getSpaceStatusLabel = (fade: number) => {
+  if (fade <= 0.28) return "확인 필요";
+  if (fade <= 0.48) return "슬슬 확인";
   return "관리 중";
 };
 
 const getCanvasColumns = (cards: CanvasCard[]) => ({
   left: cards.filter((card) => ["bathroom", "bedroom", "terrace"].includes(card.spaceKey)),
-  right: cards.filter((card) => ["entry", "kitchen", "living"].includes(card.spaceKey)),
+  right: cards.filter((card) => ["kitchen", "living"].includes(card.spaceKey)),
 });
 
 const getHomeStatus = (cards: CanvasCard[], sessionRecordCount: number, target?: (typeof recommendations)[number]) => {
   const hasManagedItems = cards.length > 0;
-  const mostStaleSpace = [...cards].sort((a, b) => b.staleness - a.staleness)[0];
+  const mostStaleSpace = [...cards].sort((a, b) => a.fade - b.fade)[0];
 
   if (!hasManagedItems) {
     return {
@@ -205,59 +128,27 @@ const getHomeStatus = (cards: CanvasCard[], sessionRecordCount: number, target?:
 };
 
 export default function Home() {
-  const [completed] = useState<string[]>(() => {
-    try {
-      return JSON.parse(window.sessionStorage.getItem("bbodeuk.session.homeCompleted.v1") ?? "[]") as string[];
-    } catch {
-      return [];
-    }
-  });
-  const deepCleanRecent = (() => {
-    try {
-      return JSON.parse(window.sessionStorage.getItem("bbodeuk.session.deepClean.recent.v1") ?? "[]") as SessionRecord[];
-    } catch {
-      return [];
-    }
-  })();
-  const setup = (() => {
-    try {
-      return JSON.parse(window.localStorage.getItem("bbodeuk.setup.v1") ?? "{}") as { spaces?: string[]; roomName?: string };
-    } catch {
-      return {};
-    }
-  })();
-  const enabledSpaceKeys = new Set((setup.spaces ?? []).flatMap((space) => setupSpaceMap[space] ?? []));
-  const hasSetup = enabledSpaceKeys.size > 0;
-  const deepCleanSpaces = new Set(deepCleanRecent.map((item) => item.space).filter(Boolean));
-  const sessionRecentRecords = deepCleanRecent.map((item) => ({
-    id: item.id.replace(/^deep-/, ""),
-    spaceKey: item.space ?? "bathroom",
-    title: item.name,
-    lastText: item.meta ?? "방금",
+  const records = useRecords();
+  const activeSpaces = getActiveSpaces();
+  const enabledSpaceKeys = new Set<string>(activeSpaces.map((space) => space.key));
+  const effectiveCanvasCards: CanvasCard[] = activeSpaces.map((space) => ({
+    spaceKey: space.key,
+    room: space.label,
+    fade: spaceFade(space.key, records),
+    layout: canvasLayouts[space.key] ?? "h-[70px]",
   }));
-  const visibleCanvasCards = hasSetup ? canvasCards.filter((card) => enabledSpaceKeys.has(card.spaceKey)) : canvasCards;
-  const effectiveCanvasCards = visibleCanvasCards.map((card) => {
-    const completedCount = recommendations.filter((item) => completed.includes(item.id) && item.spaceKey === card.spaceKey).length;
-    const justRefreshed = completedCount > 0 || deepCleanSpaces.has(card.spaceKey);
-    return {
-      ...card,
-      room: card.spaceKey === "bedroom" ? setup.roomName?.trim() || "방" : card.room,
-      staleness: justRefreshed ? Math.min(card.staleness, 0.05) : card.staleness,
-    };
-  });
-  const baseRecentRecords = hasSetup ? recentRecords.filter((record) => enabledSpaceKeys.has(record.spaceKey)) : recentRecords;
-  const allRecentRecords = [...sessionRecentRecords, ...baseRecentRecords];
+  const allRecentRecords = getRecentRecords(records).filter((record) => enabledSpaceKeys.has(record.spaceKey));
   const maxRecentRecords = 4;
   const visibleRecentRecords = allRecentRecords.slice(0, maxRecentRecords);
-  const visibleRecommendations = hasSetup ? recommendations.filter((item) => enabledSpaceKeys.has(item.spaceKey)) : recommendations;
-  const activeRecommendations = visibleRecommendations.filter((item) => !completed.includes(item.id));
+  const visibleRecommendations = recommendations.filter((item) => enabledSpaceKeys.has(item.spaceKey));
+  const activeRecommendations = visibleRecommendations.filter((item) => !isRecordedToday(item.id, records));
   const heroTarget = [...activeRecommendations].sort((a, b) => b.elapsedRatio - a.elapsedRatio)[0];
-  const homeStatus = getHomeStatus(effectiveCanvasCards, completed.length + deepCleanRecent.length, heroTarget);
+  const homeStatus = getHomeStatus(effectiveCanvasCards, todaysRecords(records).length, heroTarget);
   const canvasColumns = getCanvasColumns(effectiveCanvasCards);
 
   return (
     <PageShell>
-      <AppHeader home />
+      <AppHeader title="뽀득뽀득" />
       <main className="flex flex-1 flex-col bg-sky-bg pb-[88px] pt-header">
         <div className="flex w-full flex-col gap-space-xl px-margin-screen pb-space-2xl">
           <Link className="relative block w-full overflow-hidden rounded-xl bg-sky-white p-space-lg shadow-sm transition-transform active:scale-[0.99]" to={`/quick-record?filter=space&space=${heroTarget?.spaceKey ?? effectiveCanvasCards[0]?.spaceKey ?? "bathroom"}`}>
@@ -284,13 +175,12 @@ export default function Home() {
                   <div key={index === 0 ? "left" : "right"} className={`${index === 0 ? "w-[43%]" : "flex-1"} flex min-w-0 flex-col gap-1.5`}>
                     {column.map((card) => {
                       const tone = getSpaceTone(card.spaceKey);
-                      const fade = getFadeTier(card.staleness);
-                      const style = getCanvasTone(card.spaceKey, fade);
+                      const style = getCanvasTone(card.spaceKey, card.fade);
 
                       return (
                         <Link
                           key={card.room}
-                          aria-label={`${card.room} 관리 상태 ${getSpaceStatusLabel(card.staleness)}`}
+                          aria-label={`${card.room} 관리 상태 ${getSpaceStatusLabel(card.fade)}`}
                           className={`flex min-h-[52px] items-center justify-center gap-1.5 rounded-lg border px-2 py-space-xs text-center transition-transform active:scale-[0.98] ${card.layout}`}
                           style={style}
                           to={`/quick-record?filter=space&space=${card.spaceKey}`}
@@ -330,7 +220,7 @@ export default function Home() {
               <>
                 <div className="grid grid-cols-2 gap-space-xs">
                   {visibleRecentRecords.map((record) => (
-                    <Link key={`${record.spaceKey}-${record.title}-${record.lastText}`} className="block rounded-xl bg-sky-white p-space-sm shadow-sm transition-transform active:scale-[0.99]" to={`/item-history?item=${encodeURIComponent(itemHistoryNames[record.id] ?? record.title)}`}>
+                    <Link key={`${record.spaceKey}-${record.title}-${record.lastText}`} className="block rounded-xl bg-sky-white p-space-sm shadow-sm transition-transform active:scale-[0.99]" to={`/item-history?item=${record.id}`}>
                       <div className="mb-space-xs flex items-center gap-space-xs">
                         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${getSpaceTone(record.spaceKey).fill} ${getSpaceTone(record.spaceKey).text}`}>
                           <Icon name={spaceIcons[record.spaceKey]} className="text-[18px]" />

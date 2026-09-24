@@ -83,7 +83,7 @@ export default function ItemAdd() {
 
   return (
     <PageShell>
-      <AppHeader title="항목 추가" />
+      <AppHeader title="항목 추가" back="/spaces" />
       <form id="item-add-form" className="flex flex-col gap-space-md bg-sky-bg px-margin-screen pb-[156px] pt-header" onSubmit={handleSubmit}>
         <section className="rounded-xl bg-sky-white p-space-lg text-center shadow-sm">
           <span className={`mx-auto mb-space-sm flex h-16 w-16 items-center justify-center rounded-xl ${currentSpace.fill} ${currentSpace.text}`}>

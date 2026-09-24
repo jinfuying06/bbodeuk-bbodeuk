@@ -11,7 +11,7 @@ export default function Settings() {
 
   return (
     <PageShell>
-      <AppHeader title="설정" />
+      <AppHeader title="설정" back />
       <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
         {!member ? (
           <Link className="flex items-center gap-space-xs rounded-xl bg-primary-fixed/50 px-space-md py-space-sm text-label-md text-primary" to="/signup">

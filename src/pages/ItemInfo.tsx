@@ -5,55 +5,10 @@ import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
 import Toast from "../components/Toast";
 import { hideItem, readOverrides, writeOverride } from "../data/itemStorage";
-import { spaceTones, type SpaceToneKey } from "../data/spaceTones";
+import { getItem, getSpace, isSpaceKey, SPACES, type Item, type SpaceKey } from "../data/cleaning";
+import { spaceTones } from "../data/spaceTones";
 
-type SpaceKey = Extract<SpaceToneKey, "bathroom" | "kitchen" | "bedroom" | "living" | "terrace">;
-
-type ItemData = {
-  id: string;
-  name: string;
-  space: SpaceKey;
-  spaceLabel: string;
-  icon: string;
-  intervalDays: number;
-};
-
-const spaceIcons: Record<SpaceKey, string> = {
-  bathroom: "bathtub",
-  kitchen: "countertops",
-  bedroom: "bed",
-  living: "chair",
-  terrace: "balcony",
-};
-
-const items: ItemData[] = [
-  { id: "basin", name: "세면대 수전 및 볼", space: "bathroom", spaceLabel: "욕실", icon: "wash", intervalDays: 7 },
-  { id: "toilet", name: "양변기 안팎", space: "bathroom", spaceLabel: "욕실", icon: "cleaning_services", intervalDays: 7 },
-  { id: "mirror", name: "욕실 유리거울", space: "bathroom", spaceLabel: "욕실", icon: "auto_awesome", intervalDays: 10 },
-  { id: "drain", name: "바닥 배수구 유가 거름망", space: "bathroom", spaceLabel: "욕실", icon: "water_drop", intervalDays: 7 },
-  { id: "sink", name: "싱크대 거름망", space: "kitchen", spaceLabel: "주방", icon: "faucet", intervalDays: 3 },
-  { id: "countertop", name: "인덕션 상판 및 조리대", space: "kitchen", spaceLabel: "주방", icon: "countertops", intervalDays: 5 },
-  { id: "hood", name: "레인지 후드 필터", space: "kitchen", spaceLabel: "주방", icon: "filter_alt", intervalDays: 21 },
-  { id: "bedding", name: "침실 침구", space: "bedroom", spaceLabel: "침실", icon: "bed", intervalDays: 7 },
-  { id: "pillow", name: "베개 커버", space: "bedroom", spaceLabel: "침실", icon: "hotel", intervalDays: 7 },
-  { id: "living-floor", name: "거실 바닥", space: "living", spaceLabel: "거실", icon: "mop", intervalDays: 7 },
-  { id: "air-filter", name: "공기청정기 프리필터", space: "living", spaceLabel: "거실", icon: "air", intervalDays: 30 },
-  { id: "door-handle", name: "문 손잡이", space: "living", spaceLabel: "거실", icon: "sensor_door", intervalDays: 14 },
-  { id: "terrace-floor", name: "테라스 바닥", space: "terrace", spaceLabel: "테라스", icon: "balcony", intervalDays: 14 },
-  { id: "rail", name: "난간", space: "terrace", spaceLabel: "테라스", icon: "fence", intervalDays: 21 },
-  { id: "laundry", name: "빨래 공간", space: "terrace", spaceLabel: "테라스", icon: "local_laundry_service", intervalDays: 14 },
-];
-
-const spaceOptions: Array<{ key: SpaceKey; label: string }> = [
-  { key: "bathroom", label: "욕실" },
-  { key: "kitchen", label: "주방" },
-  { key: "bedroom", label: "침실" },
-  { key: "living", label: "거실" },
-  { key: "terrace", label: "테라스" },
-];
-
-const isSpaceKey = (value: string): value is SpaceKey =>
-  value === "bathroom" || value === "kitchen" || value === "bedroom" || value === "living" || value === "terrace";
+const spaceOptions = SPACES.map((space) => ({ key: space.key, label: getSpace(space.key).label }));
 
 type DeleteConfirmDialogProps = {
   open: boolean;
@@ -114,13 +69,13 @@ function DeleteConfirmDialog({ open, onClose, onConfirm }: DeleteConfirmDialogPr
 
 export default function ItemInfo() {
   const [searchParams] = useSearchParams();
-  const item = items.find((entry) => entry.id === searchParams.get("item"));
+  const item = getItem(searchParams.get("item"));
   // Unknown id: don't edit (and save overrides for) some other item — go back to the space list.
   if (!item) return <Navigate to="/spaces" replace />;
   return <ItemInfoForm key={item.id} item={item} />;
 }
 
-function ItemInfoForm({ item }: { item: ItemData }) {
+function ItemInfoForm({ item }: { item: Item }) {
   const navigate = useNavigate();
   const override = readOverrides()[item.id];
   const [name, setName] = useState(override?.name ?? item.name);
@@ -131,7 +86,7 @@ function ItemInfoForm({ item }: { item: ItemData }) {
   const savedTimerRef = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(savedTimerRef.current), []);
   const tone = spaceTones[space];
-  const spaceLabel = spaceOptions.find((option) => option.key === space)?.label ?? item.spaceLabel;
+  const spaceLabel = getSpace(space).label;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -152,11 +107,11 @@ function ItemInfoForm({ item }: { item: ItemData }) {
 
   return (
     <PageShell>
-      <AppHeader title="아이템 상세 보기" />
+      <AppHeader title="항목 설정" back="/spaces" />
       <form id="item-info-form" className="flex flex-col gap-space-md bg-sky-bg px-margin-screen pb-[220px] pt-header" onSubmit={handleSubmit}>
         <section className="rounded-xl bg-sky-white p-space-lg text-center shadow-sm">
           <span className={`mx-auto mb-space-sm flex h-16 w-16 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
-            <Icon name={spaceIcons[space]} className="text-[32px]" />
+            <Icon name={getSpace(space).icon} className="text-[32px]" />
           </span>
           <h1 className="text-headline-lg text-sky-ink">{name || item.name}</h1>
           <p className="mt-1 text-body-md text-sky-muted">
@@ -216,7 +171,7 @@ function ItemInfoForm({ item }: { item: ItemData }) {
         </section>
 
         <div className="flex flex-col items-center gap-space-sm pt-space-xs">
-          <Link className="text-body-md text-sky-deep" to={`/item-history?item=${encodeURIComponent(item.name)}`}>
+          <Link className="text-body-md text-sky-deep" to={`/item-history?item=${item.id}`}>
             이 항목의 기록 보기
           </Link>
           <button className="text-body-md text-sky-muted" type="button" onClick={() => setShowDeleteConfirm(true)}>

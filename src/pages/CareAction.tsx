@@ -2,6 +2,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { formatRecency, lastRecord, useRecords } from "../data/cleaning";
 import { spaceTones, type SpaceToneKey } from "../data/spaceTones";
 
 type SpaceKey = Extract<SpaceToneKey, "bathroom" | "kitchen" | "living" | "entry">;
@@ -108,10 +109,12 @@ export default function CareAction() {
   const itemId = searchParams.get("item") ?? "basin";
   const guide = guides.find((item) => item.id === itemId) ?? guides[0];
   const tone = spaceTones[guide.space];
+  const records = useRecords();
+  const last = lastRecord(guide.id, records);
 
   return (
     <PageShell>
-      <AppHeader title="가이드 상세" />
+      <AppHeader title="가이드 상세" back="/care" />
       <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[156px] pt-header">
         <section className="rounded-xl bg-surface-container-lowest p-space-lg text-center shadow-sm">
           <span className={`mx-auto mb-space-sm flex h-16 w-16 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
@@ -122,7 +125,7 @@ export default function CareAction() {
             <span className={`rounded-full px-2.5 py-1 text-label-sm ${tone.fill} ${tone.text}`}>{guide.interval}</span>
           </div>
           <p className="mt-1 text-body-md text-on-surface-variant">{guide.description}</p>
-          <p className="mt-space-xs text-caption text-on-surface-variant">{guide.lastRecord}</p>
+          <p className="mt-space-xs text-caption text-on-surface-variant">{last ? formatRecency(last.at) : "최근 청소 기록이 없어요."}</p>
         </section>
 
         <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">

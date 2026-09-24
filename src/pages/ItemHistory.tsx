@@ -3,12 +3,11 @@ import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-import { spaceToneByLabel } from "../data/spaceTones";
+import { dayKey, formatTime, getItem, getSpace, recordsForItem, useRecords } from "../data/cleaning";
+import { spaceTones } from "../data/spaceTones";
 
 type CleaningRecord = {
   id: string;
-  item: string;
-  space: string;
   date: string;
   time: string;
 };
@@ -17,35 +16,6 @@ type HistoryView = "daily" | "monthly";
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
-
-const formatISODate = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-
-const daysAgo = (offset: number) => {
-  const date = new Date(today);
-  date.setDate(date.getDate() - offset);
-  return formatISODate(date);
-};
-
-const records: CleaningRecord[] = [
-  { id: "r1", item: "세면대 수전 및 볼", space: "욕실", date: daysAgo(0), time: "오후 08:30" },
-  { id: "r9", item: "세면대 수전 및 볼", space: "욕실", date: daysAgo(6), time: "오후 08:10" },
-  { id: "r10", item: "세면대 수전 및 볼", space: "욕실", date: daysAgo(17), time: "오후 07:50" },
-  { id: "r2", item: "싱크대 거름망", space: "주방", date: daysAgo(0), time: "오후 07:15" },
-  { id: "r5", item: "싱크대 거름망", space: "주방", date: daysAgo(5), time: "오후 08:40" },
-  { id: "r11", item: "싱크대 거름망", space: "주방", date: daysAgo(13), time: "오후 07:20" },
-  { id: "r3", item: "침실 침구", space: "침실", date: daysAgo(2), time: "오전 10:20" },
-  { id: "r4", item: "인덕션 상판 및 조리대", space: "주방", date: daysAgo(3), time: "오후 09:10" },
-  { id: "r6", item: "거실 바닥", space: "거실", date: daysAgo(11), time: "오후 06:30" },
-  { id: "r7", item: "공기청정기 프리필터", space: "거실", date: daysAgo(15), time: "오전 11:00" },
-  { id: "r8", item: "양변기 안팎", space: "욕실", date: daysAgo(17), time: "오후 09:25" },
-];
-
-const spaceIcons: Record<string, string> = {
-  욕실: "bathtub",
-  주방: "countertops",
-  침실: "bed",
-  거실: "chair",
-};
 
 const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
   year: "numeric",
@@ -84,10 +54,13 @@ const makeMonthCells = (target: Date) => {
 export default function ItemHistory() {
   const [searchParams] = useSearchParams();
   const [view, setView] = useState<HistoryView>("daily");
-  const selectedItem = searchParams.get("item") ?? "세면대 수전 및 볼";
-  const itemRecords = records.filter((record) => record.item === selectedItem).sort((a, b) => (a.date < b.date ? 1 : -1));
-  const fallbackRecord = records.find((record) => record.item === selectedItem) ?? records[0];
-  const tone = spaceToneByLabel[fallbackRecord.space] ?? { fill: "bg-surface-container-low", text: "text-on-surface-variant", dot: "bg-on-surface-variant", line: "bg-outline-variant" };
+  const allRecords = useRecords();
+  // ?item= takes an item id (legacy full names still resolve). Unknown → 세면대.
+  const item = getItem(searchParams.get("item")) ?? getItem("basin")!;
+  const selectedItem = item.fullName;
+  const space = getSpace(item.space);
+  const itemRecords: CleaningRecord[] = recordsForItem(item.id, allRecords).map((record) => ({ id: record.id, date: dayKey(record.at), time: formatTime(record.at) }));
+  const tone = spaceTones[item.space];
   const latestRecord = itemRecords[0];
   const currentWeekStart = getStartOfWeek(today);
   const currentWeekEnd = new Date(currentWeekStart);
@@ -113,11 +86,11 @@ export default function ItemHistory() {
 
   return (
     <PageShell>
-      <AppHeader title="상세 히스토리" />
+      <AppHeader title={`${selectedItem} 기록`} back="/history" />
       <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
         <section className="rounded-xl bg-surface-container-lowest p-space-lg text-center shadow-sm">
           <span className={`mx-auto mb-space-sm flex h-16 w-16 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
-            <Icon name={spaceIcons[fallbackRecord.space] ?? "task_alt"} className="text-[32px]" />
+            <Icon name={space.icon} className="text-[32px]" />
           </span>
           <h1 className="text-headline-lg">{selectedItem}</h1>
           <p className="mt-1 text-body-md text-on-surface-variant">

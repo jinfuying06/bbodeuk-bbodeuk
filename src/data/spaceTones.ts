@@ -16,7 +16,7 @@ export const spaceToneLabels: Record<SpaceToneKey, string> = {
   bathroom: "욕실",
   kitchen: "주방",
   living: "거실",
-  bedroom: "침실",
+  bedroom: "방",
   entry: "현관",
   terrace: "테라스",
 };
@@ -84,11 +84,12 @@ export const spaceTones: Record<SpaceToneKey, SpaceTone> = {
   },
 };
 
-/** Look up a tone by its Korean space label (욕실/주방/거실/침실/현관/테라스, or the "침실 / 방" setup variant). */
+/** Look up a tone by its Korean space label (욕실/주방/거실/방/현관/테라스, plus legacy "침실" / "침실 / 방"). */
 export const spaceToneByLabel: Record<string, SpaceTone> = Object.fromEntries(
   (Object.keys(spaceTones) as SpaceToneKey[]).map((key) => [spaceToneLabels[key], spaceTones[key]]),
 );
 spaceToneByLabel["침실 / 방"] = spaceTones.bedroom;
+spaceToneByLabel["침실"] = spaceTones.bedroom;
 
 const fallbackTone: SpaceTone = {
   fill: "bg-surface-container-low",

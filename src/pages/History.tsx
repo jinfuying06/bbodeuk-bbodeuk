@@ -3,12 +3,14 @@ import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { dayKey, formatTime, getItem, getSpace, useRecords, type CleaningRecord as StoredRecord } from "../data/cleaning";
 import { spaceToneByLabel } from "../data/spaceTones";
 
 type HistoryTab = "일자별 기록" | "공간별 기록" | "자주 돌본 곳";
 
 type CleaningRecord = {
   id: string;
+  itemId: string;
   item: string;
   space: string;
   date: string;
@@ -18,33 +20,24 @@ type CleaningRecord = {
 const tabs: HistoryTab[] = ["일자별 기록", "공간별 기록", "자주 돌본 곳"];
 
 const spaceIcons: Record<string, string> = {
-  욕실: "bathtub",
-  주방: "countertops",
-  침실: "bed",
-  거실: "chair",
+  욕실: "space-bath",
+  주방: "space-kitchen",
+  방: "space-bed",
+  거실: "space-living",
+  테라스: "space-terrace",
 };
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
-const formatISODate = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+const formatISODate = dayKey;
 
-const daysAgo = (offset: number) => {
-  const date = new Date(today);
-  date.setDate(date.getDate() - offset);
-  return formatISODate(date);
+/** Store record → display row (item/space names resolved from the shared catalog). */
+const toRow = (record: StoredRecord): CleaningRecord[] => {
+  const item = getItem(record.itemId);
+  if (!item) return [];
+  return [{ id: record.id, itemId: item.id, item: item.fullName, space: getSpace(item.space).label, date: dayKey(record.at), time: formatTime(record.at) }];
 };
-
-const records: CleaningRecord[] = [
-  { id: "r1", item: "세면대 수전 및 볼", space: "욕실", date: daysAgo(0), time: "오후 08:30" },
-  { id: "r2", item: "싱크대 거름망", space: "주방", date: daysAgo(0), time: "오후 07:15" },
-  { id: "r3", item: "침실 침구", space: "침실", date: daysAgo(2), time: "오전 10:20" },
-  { id: "r4", item: "인덕션 상판 및 조리대", space: "주방", date: daysAgo(3), time: "오후 09:10" },
-  { id: "r5", item: "싱크대 거름망", space: "주방", date: daysAgo(5), time: "오후 08:40" },
-  { id: "r6", item: "거실 바닥", space: "거실", date: daysAgo(11), time: "오후 06:30" },
-  { id: "r7", item: "공기청정기 프리필터", space: "거실", date: daysAgo(15), time: "오전 11:00" },
-  { id: "r8", item: "양변기 안팎", space: "욕실", date: daysAgo(17), time: "오후 09:25" },
-];
 
 const formatMonth = (date: Date) => `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
 
@@ -91,12 +84,14 @@ const countBy = <T,>(items: T[], getKey: (item: T) => string) =>
     return acc;
   }, {});
 
-const itemHistoryPath = (item: string) => `/item-history?item=${encodeURIComponent(item)}`;
+const itemHistoryPath = (itemId: string) => `/item-history?item=${encodeURIComponent(itemId)}`;
 
 export default function History() {
   const [selectedDate, setSelectedDate] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const [activeTab, setActiveTab] = useState<HistoryTab>("일자별 기록");
   const [openSpaces, setOpenSpaces] = useState<Record<string, boolean>>({ 주방: true });
+  const storedRecords = useRecords();
+  const records = useMemo(() => storedRecords.flatMap(toRow), [storedRecords]);
   const monthKey = getMonthKey(selectedDate);
   const previousMonthKey = getMonthKey(shiftMonth(selectedDate, -1));
   const monthRecords = records.filter((record) => getRecordMonthKey(record) === monthKey);
@@ -123,12 +118,13 @@ export default function History() {
   }, [monthRecords]);
 
   const frequentItems = useMemo(() => {
-    const grouped = monthRecords.reduce<Record<string, { count: number; latestDate: string; space: string }>>((acc, record) => {
-      const current = acc[record.item] ?? { count: 0, latestDate: record.date, space: record.space };
+    const grouped = monthRecords.reduce<Record<string, { count: number; latestDate: string; space: string; itemId: string }>>((acc, record) => {
+      const current = acc[record.item] ?? { count: 0, latestDate: record.date, space: record.space, itemId: record.itemId };
       acc[record.item] = {
         count: current.count + 1,
         latestDate: current.latestDate > record.date ? current.latestDate : record.date,
         space: record.space,
+        itemId: record.itemId,
       };
       return acc;
     }, {});
@@ -202,7 +198,7 @@ export default function History() {
                     const tone = spaceToneByLabel[record.space] ?? { fill: "bg-surface-container-low", text: "text-on-surface-variant", border: "border-outline-variant" };
 
                     return (
-                      <Link key={record.id} className="flex items-center gap-space-sm rounded-xl bg-surface-container-lowest p-space-md shadow-sm transition-transform active:scale-[0.99]" to={itemHistoryPath(record.item)}>
+                      <Link key={record.id} className="flex items-center gap-space-sm rounded-xl bg-surface-container-lowest p-space-md shadow-sm transition-transform active:scale-[0.99]" to={itemHistoryPath(record.itemId)}>
                         <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
                           <Icon name={spaceIcons[record.space] ?? "task_alt"} className="text-[22px]" />
                         </span>
@@ -242,7 +238,7 @@ export default function History() {
                   {open ? (
                     <div id={panelId} className="flex flex-col gap-space-xs px-space-md pb-space-md">
                       {spaceRecords.map((record) => (
-                        <Link key={record.id} className={`flex items-center gap-space-sm rounded-lg border bg-surface-container-low p-space-sm transition-transform active:scale-[0.99] ${tone.border}`} to={itemHistoryPath(record.item)}>
+                        <Link key={record.id} className={`flex items-center gap-space-sm rounded-lg border bg-surface-container-low p-space-sm transition-transform active:scale-[0.99] ${tone.border}`} to={itemHistoryPath(record.itemId)}>
                           <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone.fill} ${tone.text}`}>
                             <Icon name={spaceIcons[space] ?? "task_alt"} className="text-[20px]" />
                           </span>
@@ -264,7 +260,7 @@ export default function History() {
         {activeTab === "자주 돌본 곳" ? (
           <section className="flex flex-col gap-space-xs">
               {frequentItems.map(([item, info]) => (
-                <Link key={item} className="flex min-h-[72px] items-center justify-between rounded-xl bg-surface-container-lowest p-space-md shadow-sm transition-transform active:scale-[0.99]" to={itemHistoryPath(item)}>
+                <Link key={item} className="flex min-h-[72px] items-center justify-between rounded-xl bg-surface-container-lowest p-space-md shadow-sm transition-transform active:scale-[0.99]" to={itemHistoryPath(info.itemId)}>
                   <div className="flex min-w-0 items-center gap-space-sm">
                     <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${spaceToneByLabel[info.space]?.fill ?? "bg-surface-container-low"} ${spaceToneByLabel[info.space]?.text ?? "text-on-surface-variant"}`}>
                       <Icon name={spaceIcons[info.space] ?? "task_alt"} className="text-[22px]" />

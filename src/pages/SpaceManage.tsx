@@ -74,7 +74,7 @@ export default function SpaceManage() {
 
   return (
     <PageShell>
-      <AppHeader title="공간 관리" />
+      <AppHeader title="공간 관리" back="/spaces" />
       <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
         <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
           <h1 className="text-headline-md text-on-surface">내 공간</h1>

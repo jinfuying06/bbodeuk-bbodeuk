@@ -2,7 +2,6 @@ import { Link, useParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-import Pill from "../components/Pill";
 
 const stateCopy = {
   empty: {
@@ -38,7 +37,7 @@ const canvas = [
   ["욕실", "bathtub", "세면대 맑음", "bg-secondary-fixed/60 text-secondary"],
   ["주방", "restaurant", "싱크대 돌봄 전", "bg-primary-fixed/60 text-primary"],
   ["거실", "chair", "환기 완료 전", "bg-surface-container-high text-on-surface-variant"],
-  ["침실", "bed", "침구 정리 전", "bg-surface-container-high text-on-surface-variant"],
+  ["방", "bed", "침구 정리 전", "bg-surface-container-high text-on-surface-variant"],
 ];
 
 export default function HomeStateDemo() {
@@ -47,12 +46,12 @@ export default function HomeStateDemo() {
 
   return (
     <PageShell>
-      <AppHeader home />
+      <AppHeader title="뽀득뽀득" />
       <main className="flex flex-col bg-surface pb-[88px] pt-header">
         <div className="flex flex-col gap-space-lg px-margin-screen pb-space-2xl">
           <section className="relative mt-space-sm overflow-hidden rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
             <div className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-primary-fixed/40 blur-2xl" />
-            <Pill className="mb-space-sm bg-secondary-fixed text-secondary">{copy.label}</Pill>
+            <span className="inline-flex items-center rounded-full px-2.5 py-1 text-caption font-semibold mb-space-sm bg-secondary-fixed text-secondary">{copy.label}</span>
             <h1 className="max-w-[88%] text-headline-lg">{copy.title}</h1>
             <p className="mt-space-xs text-body-md text-on-surface-variant">{copy.body}</p>
             <Link className="mt-space-lg flex h-12 items-center justify-center gap-2 rounded-full bg-primary-container text-title-sm text-on-primary shadow-md" to="/quick-record">
@@ -72,7 +71,7 @@ export default function HomeStateDemo() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="truncate text-title-sm">{title}</span>
-                      <Pill className="bg-secondary-fixed text-on-secondary-fixed-variant">{badge}</Pill>
+                      <span className="inline-flex items-center rounded-full px-2.5 py-1 text-caption font-semibold bg-secondary-fixed text-on-secondary-fixed-variant">{badge}</span>
                     </div>
                     <span className="text-caption text-on-surface-variant">{meta}</span>
                   </div>

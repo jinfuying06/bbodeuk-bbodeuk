@@ -1,5 +1,5 @@
 import type { SVGProps } from "react";
-import { NavGuideIcon, NavHistoryIcon, NavHomeIcon, NavRecordIcon, NavSpacesIcon } from "./navIcons";
+import { AccountIcon, NavGuideIcon, NavHistoryIcon, NavHomeIcon, NavRecordIcon, NavSpacesIcon, SparkleIcon } from "./navIcons";
 import { SpaceBathIcon, SpaceBedIcon, SpaceKitchenIcon, SpaceLivingIcon, SpaceTerraceIcon } from "./spaceIcons";
 import { ObjectDrainIcon, ObjectFloorIcon, ObjectMirrorIcon, ObjectShowerIcon, ObjectSinkIcon, ObjectToiletIcon } from "./objectIcons";
 
@@ -10,6 +10,8 @@ export const svgIconRegistry = {
   "nav-record": NavRecordIcon,
   "nav-history": NavHistoryIcon,
   "nav-guide": NavGuideIcon,
+  account: AccountIcon,
+  sparkle: SparkleIcon,
   "space-bath": SpaceBathIcon,
   "space-kitchen": SpaceKitchenIcon,
   "space-living": SpaceLivingIcon,
