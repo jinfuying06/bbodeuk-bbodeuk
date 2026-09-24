@@ -3,278 +3,186 @@ import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-import { dayKey, formatTime, getItem, getSpace, useRecords, type CleaningRecord as StoredRecord } from "../data/cleaning";
-import { spaceToneByLabel } from "../data/spaceTones";
+import Pill from "../components/Pill";
+import { dayKey, formatDay, formatRecency, formatTime, getActiveSpaces, getItem, getItems, getSpace, lastRecord, useRecords } from "../data/cleaning";
 
-type HistoryTab = "일자별 기록" | "공간별 기록" | "자주 돌본 곳";
+type View = "date" | "space";
 
-type CleaningRecord = {
-  id: string;
-  itemId: string;
-  item: string;
-  space: string;
-  date: string;
-  time: string;
-};
-
-const tabs: HistoryTab[] = ["일자별 기록", "공간별 기록", "자주 돌본 곳"];
-
-const spaceIcons: Record<string, string> = {
-  욕실: "space-bath",
-  주방: "space-kitchen",
-  방: "space-bed",
-  거실: "space-living",
-  테라스: "space-terrace",
-};
-
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-
-const formatISODate = dayKey;
-
-/** Store record → display row (item/space names resolved from the shared catalog). */
-const toRow = (record: StoredRecord): CleaningRecord[] => {
-  const item = getItem(record.itemId);
-  if (!item) return [];
-  return [{ id: record.id, itemId: item.id, item: item.fullName, space: getSpace(item.space).label, date: dayKey(record.at), time: formatTime(record.at) }];
-};
-
-const formatMonth = (date: Date) => `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
-
-const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
-  month: "long",
-  day: "numeric",
-  weekday: "long",
-});
-
-const getMonthKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-
-const getRecordMonthKey = (record: CleaningRecord) => record.date.slice(0, 7);
-
-const getDateLabel = (dateText: string, selectedMonth: Date) => {
-  const date = new Date(`${dateText}T00:00:00`);
-  const selectedIsCurrentMonth = getMonthKey(selectedMonth) === getMonthKey(today);
-  const isToday = dateText === formatISODate(today);
-  const formatted = dateFormatter.format(date).replace(/\s/g, " ");
-
-  return selectedIsCurrentMonth && isToday ? `오늘 (${formatted})` : formatted;
-};
-
-const shiftMonth = (date: Date, amount: number) => new Date(date.getFullYear(), date.getMonth() + amount, 1);
-
-const getMonthlyFeedback = (monthRecords: CleaningRecord[], previousMonthRecords: CleaningRecord[]) => {
-  if (monthRecords.length === 0) return "이달에는 아직 청소 기록이 없어요.";
-
-  const currentBySpace = countBy(monthRecords, (record) => record.space);
-  const previousBySpace = countBy(previousMonthRecords, (record) => record.space);
-  const improvedSpace = Object.entries(currentBySpace)
-    .map(([space, count]) => ({ space, diff: count - (previousBySpace[space] ?? 0) }))
-    .filter((item) => item.diff > 0)
-    .sort((a, b) => b.diff - a.diff)[0];
-
-  if (improvedSpace) return `지난달보다 ${improvedSpace.space}을 ${improvedSpace.diff}번 더 챙겼어요.`;
-
-  return `이번 달에는 ${monthRecords.length}번의 청소 기록을 남겼어요.`;
-};
-
-const countBy = <T,>(items: T[], getKey: (item: T) => string) =>
-  items.reduce<Record<string, number>>((acc, item) => {
-    const key = getKey(item);
-    acc[key] = (acc[key] ?? 0) + 1;
-    return acc;
-  }, {});
+const WEEKDAYS = ["월", "화", "수", "목", "금", "토", "일"];
 
 const itemHistoryPath = (itemId: string) => `/item-history?item=${encodeURIComponent(itemId)}`;
+const monthIndex = (date: Date) => date.getFullYear() * 12 + date.getMonth();
+
+/** Month grid, week starts Monday. `null` = leading blank. */
+function monthWeeks(month: Date): Array<Array<Date | null>> {
+  const offset = (new Date(month.getFullYear(), month.getMonth(), 1).getDay() + 6) % 7;
+  const days = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+  const cells: Array<Date | null> = [...Array(offset).fill(null), ...Array.from({ length: days }, (_, i) => new Date(month.getFullYear(), month.getMonth(), i + 1))];
+  const weeks = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+  return weeks;
+}
+
+function ChevronRow({ title, sub, to, space }: { title: string; sub: string; to: string; space?: ReturnType<typeof getSpace> }) {
+  return (
+    <Link className="press flex h-16 items-center gap-3 rounded-[18px] bg-sky-white px-3" to={to}>
+      {space ? (
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]" style={{ backgroundColor: space.color, color: space.iconColor }}>
+          <Icon name={space.icon} className="text-[24px]" />
+        </span>
+      ) : null}
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-bb-label text-sky-ink">{title}</span>
+        <span className="block truncate text-bb-caption text-sky-muted">{sub}</span>
+      </span>
+      <span aria-hidden="true" className="flex w-11 justify-center text-bb-title text-sky-deep">
+        ›
+      </span>
+    </Link>
+  );
+}
 
 export default function History() {
-  const [selectedDate, setSelectedDate] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
-  const [activeTab, setActiveTab] = useState<HistoryTab>("일자별 기록");
-  const [openSpaces, setOpenSpaces] = useState<Record<string, boolean>>({ 주방: true });
-  const storedRecords = useRecords();
-  const records = useMemo(() => storedRecords.flatMap(toRow), [storedRecords]);
-  const monthKey = getMonthKey(selectedDate);
-  const previousMonthKey = getMonthKey(shiftMonth(selectedDate, -1));
-  const monthRecords = records.filter((record) => getRecordMonthKey(record) === monthKey);
-  const previousMonthRecords = records.filter((record) => getRecordMonthKey(record) === previousMonthKey);
-  const monthlyFeedback = getMonthlyFeedback(monthRecords, previousMonthRecords);
-  const spaceCounts = countBy(monthRecords, (record) => record.space);
+  const records = useRecords();
+  const [view, setView] = useState<View>("date");
+  const todayKey = dayKey(new Date());
+  const [selected, setSelected] = useState(todayKey);
+  const [month, setMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
 
-  const recordsByDate = useMemo(() => {
-    const grouped = monthRecords.reduce<Record<string, CleaningRecord[]>>((acc, record) => {
-      acc[record.date] = [...(acc[record.date] ?? []), record];
-      return acc;
-    }, {});
+  const recordedDays = useMemo(() => new Set(records.map((record) => dayKey(record.at))), [records]);
+  const dayRecords = records.filter((record) => dayKey(record.at) === selected);
 
-    return Object.entries(grouped).sort(([a], [b]) => (a < b ? 1 : -1));
-  }, [monthRecords]);
+  // Browsable range: earliest record month (at least last month) … next month.
+  const thisMonth = monthIndex(new Date());
+  const earliest = records.length ? monthIndex(new Date(records[records.length - 1].at)) : thisMonth;
+  const canPrev = monthIndex(month) > Math.min(earliest, thisMonth - 1);
+  const canNext = monthIndex(month) < thisMonth + 1;
+  const shift = (amount: number) => setMonth((current) => new Date(current.getFullYear(), current.getMonth() + amount, 1));
 
-  const recordsBySpace = useMemo(() => {
-    const grouped = monthRecords.reduce<Record<string, CleaningRecord[]>>((acc, record) => {
-      acc[record.space] = [...(acc[record.space] ?? []), record];
-      return acc;
-    }, {});
+  const goToday = () => {
+    const now = new Date();
+    setSelected(todayKey);
+    setMonth(new Date(now.getFullYear(), now.getMonth(), 1));
+  };
 
-    return Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b, "ko"));
-  }, [monthRecords]);
+  const chips = (
+    <div className="flex gap-2" role="group" aria-label="히스토리 보기">
+      <Pill className="flex-1" selected={view === "date"} onClick={() => setView("date")}>
+        날짜별
+      </Pill>
+      <Pill className="flex-1" selected={view === "space"} onClick={() => setView("space")}>
+        공간별
+      </Pill>
+    </div>
+  );
 
-  const frequentItems = useMemo(() => {
-    const grouped = monthRecords.reduce<Record<string, { count: number; latestDate: string; space: string; itemId: string }>>((acc, record) => {
-      const current = acc[record.item] ?? { count: 0, latestDate: record.date, space: record.space, itemId: record.itemId };
-      acc[record.item] = {
-        count: current.count + 1,
-        latestDate: current.latestDate > record.date ? current.latestDate : record.date,
-        space: record.space,
-        itemId: record.itemId,
-      };
-      return acc;
-    }, {});
-
-    return Object.entries(grouped).sort(([, a], [, b]) => b.count - a.count || (a.latestDate < b.latestDate ? 1 : -1));
-  }, [monthRecords]);
+  const arrow = (dir: -1 | 1, enabled: boolean) => (
+    <button
+      aria-label={dir < 0 ? "이전 달" : "다음 달"}
+      className={`flex h-8 w-11 items-center justify-center text-bb-title ${enabled ? "text-sky-muted" : "text-sky-line"}`}
+      disabled={!enabled}
+      type="button"
+      onClick={() => shift(dir)}
+    >
+      {dir < 0 ? "‹" : "›"}
+    </button>
+  );
 
   return (
     <PageShell>
       <AppHeader title="히스토리" />
-      <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
-        <section className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
-          <span className="text-label-sm text-secondary">{formatMonth(selectedDate)}</span>
-          <h1 className="mt-space-sm text-headline-lg">이번 달 총 {monthRecords.length}번 기록했어요</h1>
-          <p className="mt-1 text-body-md text-on-surface-variant">{monthlyFeedback}</p>
-          {monthRecords.length > 0 ? (
-            <p className="mt-space-md text-caption text-on-surface-variant">
-              {Object.entries(spaceCounts)
-                .map(([space, count]) => `${space} ${count}회`)
-                .join(" · ")}
-            </p>
-          ) : null}
-        </section>
+      <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
+        {view === "date" ? (
+          <>
+            <div className="flex h-[88px] flex-col gap-2">
+              <h1 className="text-bb-heading text-sky-ink">차곡차곡 쌓인 흔적</h1>
+              <p className="text-bb-body text-sky-muted">조금씩 돌본 내 공간을 돌아봐요.</p>
+            </div>
+            {chips}
 
-        <div className="flex items-center justify-between gap-space-sm">
-          <button className="flex min-h-11 items-center gap-2 text-title-md" type="button" onClick={() => setSelectedDate((current) => shiftMonth(current, -1))}>
-            <Icon name="chevron_left" className="text-[20px]" />
-            {formatMonth(selectedDate)}
-          </button>
-          <div className="flex items-center gap-space-xs">
-            <button className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-low text-on-surface-variant" type="button" onClick={() => setSelectedDate((current) => shiftMonth(current, 1))} aria-label="다음 달">
-              <Icon name="chevron_right" className="text-[20px]" />
-            </button>
-            {monthKey !== getMonthKey(today) ? (
-              <button className="min-h-11 rounded-full bg-surface-container-low px-3 text-label-sm text-on-surface-variant" type="button" onClick={() => setSelectedDate(new Date(today.getFullYear(), today.getMonth(), 1))}>
-                오늘로 이동
-              </button>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="hide-scrollbar -mx-margin-screen overflow-x-auto px-margin-screen">
-          <div className="flex min-w-max gap-space-xs">
-            {tabs.map((tab) => (
-              <button key={tab} aria-pressed={activeTab === tab} className={`min-h-11 rounded-full px-4 py-2 text-label-md ${activeTab === tab ? "bg-primary text-on-primary" : "bg-surface-container-lowest text-on-surface-variant shadow-sm"}`} type="button" onClick={() => setActiveTab(tab)}>
-                {tab}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {monthRecords.length === 0 ? (
-          <section className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
-            <p className="text-title-sm text-on-surface">이달에는 아직 청소 기록이 없어요.</p>
-            <p className="mt-1 text-body-md text-on-surface-variant">청소를 기록하면 여기에서 월별로 모아볼 수 있어요.</p>
-            <Link className="mt-space-md inline-flex min-h-11 items-center rounded-lg bg-primary-container px-space-md text-label-md font-semibold text-on-primary" to="/quick-record">
-              청소 기록하러 가기
-            </Link>
-          </section>
-        ) : null}
-
-        {activeTab === "일자별 기록"
-          ? recordsByDate.map(([date, dayRecords]) => (
-              <section key={date}>
-                <div className="mb-space-xs flex items-center justify-between">
-                  <h2 className="text-title-sm">{getDateLabel(date, selectedDate)}</h2>
-                  <span className="text-caption text-primary">{dayRecords.length}건 완료</span>
-                </div>
-                <div className="flex flex-col gap-space-xs">
-                  {dayRecords.map((record) => {
-                    const tone = spaceToneByLabel[record.space] ?? { fill: "bg-surface-container-low", text: "text-on-surface-variant", border: "border-outline-variant" };
-
+            <section aria-label={`${month.getMonth() + 1}월 달력`} className="flex flex-col gap-2 rounded-3xl bg-sky-white px-[17px] pb-[18px] pt-[14px]">
+              <div className="flex h-8 items-center justify-between">
+                {arrow(-1, canPrev)}
+                <h2 className="text-bb-title text-sky-ink">
+                  {month.getFullYear()}년 {month.getMonth() + 1}월
+                </h2>
+                {arrow(1, canNext)}
+              </div>
+              <div className="grid h-[22px] grid-cols-7 text-center text-bb-caption text-sky-muted">
+                {WEEKDAYS.map((day) => (
+                  <span key={day}>{day}</span>
+                ))}
+              </div>
+              {monthWeeks(month).map((week, row) => (
+                <div key={row} className="grid grid-cols-7">
+                  {week.map((date, col) => {
+                    if (!date) return <span key={col} />;
+                    const key = dayKey(date);
+                    const isSelected = key === selected;
                     return (
-                      <Link key={record.id} className="flex items-center gap-space-sm rounded-xl bg-surface-container-lowest p-space-md shadow-sm transition-transform active:scale-[0.99]" to={itemHistoryPath(record.itemId)}>
-                        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
-                          <Icon name={spaceIcons[record.space] ?? "task_alt"} className="text-[22px]" />
-                        </span>
-                        <div className="min-w-0">
-                          <h3 className="truncate text-title-sm">{record.item}</h3>
-                          <p className="mt-0.5 text-caption text-on-surface-variant">{record.time}</p>
-                        </div>
-                      </Link>
+                      <button
+                        key={key}
+                        aria-label={`${formatDay(date)}${recordedDays.has(key) ? ", 기록 있음" : ""}`}
+                        aria-pressed={isSelected}
+                        className={`flex h-[34px] flex-col items-center rounded-xl pt-[3px] text-bb-caption ${isSelected ? "bg-sky-tint text-sky-deep" : "text-sky-ink"}`}
+                        type="button"
+                        onClick={() => setSelected(key)}
+                      >
+                        {date.getDate()}
+                        {recordedDays.has(key) ? <span aria-hidden="true" className="-mt-1 h-2 text-[10px] font-medium leading-[8px] text-sky-deep">•</span> : null}
+                      </button>
                     );
                   })}
                 </div>
-              </section>
-            ))
-          : null}
+              ))}
+              <p className="text-center text-bb-caption text-sky-muted">●&nbsp;&nbsp;공간을 돌본 날</p>
+            </section>
 
-        {activeTab === "공간별 기록"
-          ? recordsBySpace.map(([space, spaceRecords]) => {
-              const tone = spaceToneByLabel[space] ?? { fill: "bg-surface-container-low", text: "text-on-surface-variant", border: "border-outline-variant" };
-              const open = Boolean(openSpaces[space]);
-
-              const panelId = `history-space-panel-${space}`;
-
+            <h2 className="text-bb-title text-sky-ink">{formatDay(`${selected}T00:00:00`)}</h2>
+            {dayRecords.length > 0 ? (
+              dayRecords.map((record) => {
+                const item = getItem(record.itemId);
+                if (!item) return null;
+                return <ChevronRow key={record.id} title={item.name} sub={`${getSpace(item.space).label} · ${formatTime(record.at)}`} to={itemHistoryPath(item.id)} />;
+              })
+            ) : (
+              <p className="text-bb-body text-sky-muted">
+                이 날은 남긴 기록이 없어요.
+                <br />빈 날도 괜찮아요.
+              </p>
+            )}
+            {selected !== todayKey ? (
+              <Pill className="w-full" onClick={goToday}>
+                오늘로 돌아가기
+              </Pill>
+            ) : null}
+          </>
+        ) : (
+          <>
+            <h1 className="text-bb-heading text-sky-ink">공간마다 쌓이는 기록</h1>
+            {chips}
+            <p className="text-bb-body text-sky-muted">최근 돌본 항목을 공간별로 살펴봐요.</p>
+            {getActiveSpaces().map((space) => {
+              // Most recently cared-for first (never-recorded last), top 3.
+              const items = getItems(space.key)
+                .map((item) => ({ item, at: lastRecord(item.id, records)?.at }))
+                .sort((a, b) => (b.at ?? "").localeCompare(a.at ?? ""))
+                .slice(0, 3);
+              if (items.length === 0) return null;
               return (
-                <section key={space} className="overflow-hidden rounded-xl bg-surface-container-lowest shadow-sm">
-                  <button aria-expanded={open} aria-controls={panelId} className="flex w-full items-center justify-between p-space-md text-left transition-colors active:bg-surface-container-low" type="button" onClick={() => setOpenSpaces((current) => ({ ...current, [space]: !current[space] }))}>
-                    <div className="flex min-w-0 items-center gap-space-sm">
-                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
-                        <Icon name={spaceIcons[space] ?? "grid_view"} className="text-[22px]" />
-                      </span>
-                      <div className="min-w-0">
-                        <h2 className="truncate text-title-sm">{space}</h2>
-                        <p className="text-caption text-on-surface-variant">{spaceRecords.length}건 기록</p>
-                      </div>
-                    </div>
-                    <Icon name="keyboard_arrow_down" className={`text-[22px] text-on-surface-variant transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
-                  </button>
-                  {open ? (
-                    <div id={panelId} className="flex flex-col gap-space-xs px-space-md pb-space-md">
-                      {spaceRecords.map((record) => (
-                        <Link key={record.id} className={`flex items-center gap-space-sm rounded-lg border bg-surface-container-low p-space-sm transition-transform active:scale-[0.99] ${tone.border}`} to={itemHistoryPath(record.itemId)}>
-                          <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone.fill} ${tone.text}`}>
-                            <Icon name={spaceIcons[space] ?? "task_alt"} className="text-[20px]" />
-                          </span>
-                          <div className="min-w-0">
-                            <h3 className="truncate text-body-md font-semibold">{record.item}</h3>
-                          <p className="mt-0.5 text-caption text-on-surface-variant">
-                            {getDateLabel(record.date, selectedDate)} · {record.time}
-                          </p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  ) : null}
+                <section key={space.key} className="flex flex-col gap-3">
+                  <h2 className="text-bb-title text-sky-ink">{space.label}</h2>
+                  {items.map(({ item, at }) => (
+                    <ChevronRow key={item.id} space={space} title={item.name} sub={formatRecency(at)} to={itemHistoryPath(item.id)} />
+                  ))}
                 </section>
               );
-            })
-          : null}
-
-        {activeTab === "자주 돌본 곳" ? (
-          <section className="flex flex-col gap-space-xs">
-              {frequentItems.map(([item, info]) => (
-                <Link key={item} className="flex min-h-[72px] items-center justify-between rounded-xl bg-surface-container-lowest p-space-md shadow-sm transition-transform active:scale-[0.99]" to={itemHistoryPath(info.itemId)}>
-                  <div className="flex min-w-0 items-center gap-space-sm">
-                    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${spaceToneByLabel[info.space]?.fill ?? "bg-surface-container-low"} ${spaceToneByLabel[info.space]?.text ?? "text-on-surface-variant"}`}>
-                      <Icon name={spaceIcons[info.space] ?? "task_alt"} className="text-[22px]" />
-                    </span>
-                    <div className="min-w-0">
-                      <h3 className="truncate text-title-sm">{item}</h3>
-                      <p className="mt-0.5 text-caption text-on-surface-variant">최근 청소 {info.latestDate.replace("2026-", "").replace("-", "월 ")}일</p>
-                    </div>
-                  </div>
-                  <span className={`ml-space-sm shrink-0 rounded-full px-2.5 py-1 text-label-sm ${spaceToneByLabel[info.space]?.fill ?? "bg-surface-container-low"} ${spaceToneByLabel[info.space]?.text ?? "text-primary"}`}>{info.count}회</span>
-                </Link>
-              ))}
-          </section>
-        ) : null}
+            })}
+          </>
+        )}
       </main>
     </PageShell>
   );
