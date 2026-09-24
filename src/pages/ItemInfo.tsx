@@ -1,12 +1,12 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
-import Icon from "../components/Icon";
+import GlassButton from "../components/GlassButton";
 import PageShell from "../components/PageShell";
-import Toast from "../components/Toast";
+import Toast, { useToast } from "../components/Toast";
 import { hideItem, readOverrides, writeOverride } from "../data/itemStorage";
 import { getItem, getSpace, isSpaceKey, SPACES, type Item, type SpaceKey } from "../data/cleaning";
-import { spaceTones } from "../data/spaceTones";
+import { fieldClass } from "./ItemAdd";
 
 const spaceOptions = SPACES.map((space) => ({ key: space.key, label: getSpace(space.key).label }));
 
@@ -37,29 +37,20 @@ function DeleteConfirmDialog({ open, onClose, onConfirm }: DeleteConfirmDialogPr
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-on-surface/40" role="presentation" onClick={onClose}>
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-scrim px-margin-screen" role="presentation" onClick={onClose}>
       <section
         aria-labelledby="delete-confirm-title"
         aria-modal="true"
-        className="w-full max-w-[430px] rounded-t-2xl bg-sky-white px-margin-screen pb-[calc(24px+env(safe-area-inset-bottom,0px))] pt-space-lg shadow-xl"
+        className="flex w-full max-w-[342px] flex-col gap-4 rounded-2xl bg-sky-white px-5 pb-[22px] pt-[22px]"
         role="dialog"
         onClick={(event) => event.stopPropagation()}
       >
-        <span aria-hidden="true" className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-tint text-sky-deep">
-          <Icon name="delete_outline" className="text-[22px]" />
-        </span>
-        <h2 id="delete-confirm-title" className="mt-space-md text-headline-md text-sky-ink">
+        <h2 id="delete-confirm-title" className="text-bb-title text-sky-ink">
           청소 항목을 삭제할까요?
         </h2>
-        <p className="mt-space-sm text-body-md text-sky-muted">목록에서 항목을 숨겨요. 이전 청소 기록은 히스토리에 남아 있어요.</p>
-        <button
-          className="mt-space-lg flex h-12 w-full items-center justify-center rounded-full bg-sky-brand text-title-sm text-onbrand transition-transform duration-[120ms] active:scale-[0.98]"
-          type="button"
-          onClick={onConfirm}
-        >
-          항목 삭제
-        </button>
-        <button ref={closeButtonRef} className="mt-space-sm flex h-12 w-full items-center justify-center rounded-full text-title-sm text-sky-muted" type="button" onClick={onClose}>
+        <p className="text-bb-body text-sky-muted">목록에서 항목을 숨겨요. 이전 청소 기록은 히스토리에 남아 있어요.</p>
+        <GlassButton onClick={onConfirm}>항목 삭제</GlassButton>
+        <button ref={closeButtonRef} className="flex h-11 w-full items-center justify-center text-bb-label text-sky-deep" type="button" onClick={onClose}>
           취소
         </button>
       </section>
@@ -76,118 +67,105 @@ export default function ItemInfo() {
 }
 
 function ItemInfoForm({ item }: { item: Item }) {
-  const navigate = useNavigate();
   const override = readOverrides()[item.id];
   const [name, setName] = useState(override?.name ?? item.name);
   const [space, setSpace] = useState<SpaceKey>(override && isSpaceKey(override.space) ? override.space : item.space);
   const [intervalDays, setIntervalDays] = useState(String(override?.intervalDays ?? item.intervalDays));
-  const [saved, setSaved] = useState(false);
+  const [savedName, setSavedName] = useState(override?.name ?? item.name);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const savedTimerRef = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(savedTimerRef.current), []);
-  const tone = spaceTones[space];
-  const spaceLabel = getSpace(space).label;
+  const [deleted, setDeleted] = useState(false);
+  const [toast, showToast] = useToast();
+  const valid = name.trim().length > 0 && Number(intervalDays) >= 1;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const trimmedName = name.trim();
-    const parsedInterval = Number(intervalDays);
-    if (!trimmedName || !intervalDays.trim() || !Number.isFinite(parsedInterval) || parsedInterval < 1) return;
-    writeOverride(item.id, { name: trimmedName, space, intervalDays: parsedInterval });
-    setSaved(true);
-    window.clearTimeout(savedTimerRef.current);
-    savedTimerRef.current = window.setTimeout(() => setSaved(false), 1200);
+    if (!valid) return;
+    writeOverride(item.id, { name: name.trim(), space, intervalDays: Math.round(Number(intervalDays)) });
+    setSavedName(name.trim());
+    showToast("변경사항을 저장했어요");
   };
 
   const handleDelete = () => {
     hideItem(item.id);
     setShowDeleteConfirm(false);
-    navigate("/spaces", { replace: true });
+    setDeleted(true);
   };
+
+  if (deleted) {
+    // Figma 64:4930 항목 삭제 완료 — no bottom nav, no More slot.
+    return (
+      <PageShell bottomNav={false}>
+        <AppHeader title="항목 삭제 완료" back="/spaces" right={null} />
+        <main className="flex flex-col gap-3 px-margin-screen py-5 pt-[calc(54px+20px+env(safe-area-inset-top,0px))]">
+          <h1 className="text-bb-heading text-sky-ink">항목을 목록에서 숨겼어요</h1>
+          <p className="text-bb-body text-sky-muted">이전에 남긴 청소 기록은 히스토리에 보관돼요.</p>
+          <GlassButton size={52} to="/history">
+            히스토리 보기
+          </GlassButton>
+          <GlassButton size={52} to="/spaces" variant="secondary">
+            내 공간으로
+          </GlassButton>
+        </main>
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell>
       <AppHeader title="항목 설정" back="/spaces" />
-      <form id="item-info-form" className="flex flex-col gap-space-md bg-sky-bg px-margin-screen pb-[220px] pt-header" onSubmit={handleSubmit}>
-        <section className="rounded-xl bg-sky-white p-space-lg text-center shadow-sm">
-          <span className={`mx-auto mb-space-sm flex h-16 w-16 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
-            <Icon name={getSpace(space).icon} className="text-[32px]" />
-          </span>
-          <h1 className="text-headline-lg text-sky-ink">{name || item.name}</h1>
-          <p className="mt-1 text-body-md text-sky-muted">
-            {spaceLabel} · {intervalDays || item.intervalDays}일에 한번
-          </p>
+      <form className="flex flex-col gap-3 px-margin-screen pb-nav pt-header" onSubmit={handleSubmit}>
+        <section className="flex min-h-[88px] flex-col gap-2">
+          <h1 className="text-bb-heading text-sky-ink">{savedName}</h1>
+          <p className="text-bb-body text-sky-muted">이름과 기록 주기를 편하게 바꿔요.</p>
         </section>
 
-        <section className="rounded-xl bg-sky-white p-space-md shadow-sm">
-          <label className="block text-label-md text-sky-muted" htmlFor="item-name">
-            명칭
-          </label>
-          <input
-            id="item-name"
-            required
-            className="mt-space-xs h-12 w-full rounded-xl border border-art-line bg-sky-white px-space-sm text-body-md text-sky-ink outline-none transition-colors focus:border-sky-deep"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-        </section>
+        <label className="flex flex-col gap-1.5 text-bb-label text-sky-ink">
+          항목 이름
+          <input className={fieldClass} maxLength={40} required value={name} onChange={(event) => setName(event.target.value)} />
+        </label>
 
-        <section className="rounded-xl bg-sky-white p-space-md shadow-sm">
-          <label className="block text-label-md text-sky-muted" htmlFor="item-space">
-            공간 분류
-          </label>
-          <select
-            id="item-space"
-            required
-            className="mt-space-xs h-12 w-full rounded-xl border border-art-line bg-sky-white px-space-sm text-body-md text-sky-ink outline-none transition-colors focus:border-sky-deep"
-            value={space}
-            onChange={(event) => isSpaceKey(event.target.value) && setSpace(event.target.value)}
-          >
+        <label className="flex flex-col gap-1.5 text-bb-label text-sky-ink">
+          공간
+          <select className={`${fieldClass} appearance-none`} value={space} onChange={(event) => isSpaceKey(event.target.value) && setSpace(event.target.value)}>
             {spaceOptions.map((option) => (
               <option key={option.key} value={option.key}>
                 {option.label}
               </option>
             ))}
           </select>
-        </section>
+        </label>
 
-        <section className="rounded-xl bg-sky-white p-space-md shadow-sm">
-          <label className="block text-label-md text-sky-muted" htmlFor="item-interval">
-            설정된 청소주기
-          </label>
-          <div className="mt-space-xs flex items-center gap-space-xs">
+        <label className="flex flex-col gap-1.5 text-bb-label text-sky-ink">
+          청소 주기
+          <span className={`${fieldClass} flex items-center focus-within:border-sky-brand`}>
             <input
-              id="item-interval"
-              required
-              min={1}
+              aria-label="청소 주기 (일)"
+              className="bg-transparent text-bb-body text-sky-ink outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
               inputMode="numeric"
+              max={365}
+              min={1}
+              required
+              style={{ width: `${Math.max(intervalDays.length, 1) + 0.6}ch` }}
               type="number"
-              className="h-12 min-w-0 flex-1 rounded-xl border border-art-line bg-sky-white px-space-sm text-body-md text-sky-ink outline-none transition-colors focus:border-sky-deep"
               value={intervalDays}
               onChange={(event) => setIntervalDays(event.target.value)}
             />
-            <span className="shrink-0 text-body-md text-sky-muted">일에 한번</span>
-          </div>
-        </section>
+            <span className="text-bb-body text-sky-ink">일에 한 번</span>
+          </span>
+        </label>
 
-        <div className="flex flex-col items-center gap-space-sm pt-space-xs">
-          <Link className="text-body-md text-sky-deep" to={`/item-history?item=${item.id}`}>
-            이 항목의 기록 보기
-          </Link>
-          <button className="text-body-md text-sky-muted" type="button" onClick={() => setShowDeleteConfirm(true)}>
-            항목 삭제
-          </button>
-        </div>
+        <GlassButton disabled={!valid} type="submit">
+          변경 내용 저장
+        </GlassButton>
+        <Link className="flex h-11 items-center justify-center text-bb-label text-sky-deep" to={`/item-history?item=${item.id}`}>
+          이 항목의 기록 보기
+        </Link>
+        <button className="flex h-11 items-center justify-center text-bb-label text-sky-deep" type="button" onClick={() => setShowDeleteConfirm(true)}>
+          항목 삭제
+        </button>
       </form>
 
-      <div className="fixed bottom-16 left-1/2 z-40 w-full max-w-[430px] -translate-x-1/2 bg-sky-bg/90 px-margin-screen py-space-sm backdrop-blur-xl">
-        <button className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-sky-brand text-title-sm font-semibold text-onbrand shadow-md transition-transform duration-[120ms] active:scale-[0.98]" type="submit" form="item-info-form">
-          <Icon name="save" className="text-[20px]" />
-          {saved ? "저장했어요" : "저장"}
-        </button>
-      </div>
-
-      <Toast message="변경사항을 저장했어요" visible={saved} pill />
+      <Toast message={toast} visible={Boolean(toast)} pill />
       <DeleteConfirmDialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} onConfirm={handleDelete} />
     </PageShell>
   );
