@@ -152,7 +152,7 @@ export default function Home() {
             </Link>
           </div>
           {recent.length === 0 ? (
-            <Link className="press flex flex-col gap-2 rounded-2xl bg-sky-white p-[18px]" to="/quick-record">
+            <Link className="press flex min-h-[120px] flex-col gap-2 rounded-2xl bg-sky-white p-[18px]" to="/quick-record">
               <span className="text-[16px] font-bold leading-[22px] text-sky-ink">아직 남긴 청소 기록이 없어요</span>
               <span className="text-[13px] leading-[19px] text-sky-muted">공간 카드를 보며 첫 청소를 가볍게 시작해보세요.</span>
               <span className="text-[13px] font-bold leading-[19px] text-sky-deep">첫 청소 기록하기&nbsp;&nbsp;→</span>

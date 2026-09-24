@@ -139,12 +139,23 @@ export default function CareAction() {
         </ul>
 
         <ol className="flex flex-col gap-3">
-          {guide.steps.map(([stepTitle, desc], index) => (
-            <li key={stepTitle} className="flex min-h-[94px] flex-col gap-2 rounded-3xl bg-sky-white px-5 pb-4 pt-4">
-              <h2 className="whitespace-pre text-bb-title text-sky-ink">{`0${index + 1}  ${stepTitle}`}</h2>
-              <p className="text-bb-body text-sky-muted">{desc}</p>
-            </li>
-          ))}
+          {guide.steps.map(([stepTitle, desc], index) =>
+            // 15 세면대 keeps its own (older) 78px step card; 40/41/42 use the 94px one.
+            guide.id === "basin" ? (
+              <li key={stepTitle} className="flex min-h-[78px] items-center gap-3 rounded-[18px] bg-sky-white py-[10px] pl-4 pr-4">
+                <span className="text-bb-title text-sky-deep">{`0${index + 1}`}</span>
+                <span className="flex min-w-0 flex-col gap-1 self-start">
+                  <h2 className="text-bb-label text-sky-ink">{stepTitle}</h2>
+                  <span className="text-bb-caption text-sky-muted">{desc}</span>
+                </span>
+              </li>
+            ) : (
+              <li key={stepTitle} className="flex min-h-[94px] flex-col gap-2 rounded-3xl bg-sky-white px-5 pb-4 pt-4">
+                <h2 className="whitespace-pre text-bb-title text-sky-ink">{`0${index + 1}  ${stepTitle}`}</h2>
+                <p className="text-bb-body text-sky-muted">{desc}</p>
+              </li>
+            ),
+          )}
         </ol>
 
         <GlassButton onClick={record}>청소했어요 · 기록하기</GlassButton>

@@ -47,7 +47,7 @@ export default function Login() {
             {error ? "이메일 또는 비밀번호가 맞지 않아요. 다시 확인해 주세요." : "오늘의 작은 청소를 이어가요."}
           </p>
 
-          <div className="flex flex-col gap-1.5">
+          <div className="flex min-h-[84px] flex-col gap-1.5">
             <label className="text-bb-label text-sky-ink" htmlFor="login-email">
               이메일 주소
             </label>
@@ -63,7 +63,7 @@ export default function Login() {
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
+          <div className="flex min-h-[84px] flex-col gap-1.5">
             <label className="text-bb-label text-sky-ink" htmlFor="login-password">
               비밀번호
             </label>

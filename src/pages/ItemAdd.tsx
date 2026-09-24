@@ -76,7 +76,7 @@ export default function ItemAdd() {
           <p className="text-bb-body text-sky-muted">나에게 맞는 이름과 주기를 정해요.</p>
         </section>
 
-        <label className="flex flex-col gap-1.5 text-bb-label text-sky-ink">
+        <label className="flex min-h-[84px] flex-col gap-1.5 text-bb-label text-sky-ink">
           항목 이름
           <input className={fieldClass} maxLength={40} placeholder="예: 욕실 유리거울" required value={name} onChange={(event) => setName(event.target.value)} />
         </label>
@@ -102,7 +102,7 @@ export default function ItemAdd() {
         </div>
         {spaceHint ? <p className="text-bb-caption text-sky-muted">AI 추천: {getSpace(spaceHint).label} (확실하지 않아 직접 선택해주세요)</p> : null}
 
-        <label className="flex flex-col gap-1.5 text-bb-label text-sky-ink">
+        <label className="flex min-h-[84px] flex-col gap-1.5 text-bb-label text-sky-ink">
           청소 주기
           <span className={`${fieldClass} flex items-center focus-within:border-sky-brand`}>
             <input
@@ -121,7 +121,7 @@ export default function ItemAdd() {
           </span>
         </label>
 
-        <section className="flex flex-col gap-2 rounded-3xl bg-sky-tint px-5 pb-4 pt-4">
+        <section className="flex min-h-[112px] flex-col gap-2 rounded-3xl bg-sky-tint px-5 pb-4 pt-4">
           <h2 className="text-bb-title text-sky-ink">주기는 가벼운 참고예요</h2>
           <p className="text-bb-body text-sky-muted">
             때가 됐다고 반드시 해야 하는 건 아니에요.

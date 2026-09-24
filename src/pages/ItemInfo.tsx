@@ -120,12 +120,12 @@ function ItemInfoForm({ item }: { item: Item }) {
           <p className="text-bb-body text-sky-muted">이름과 기록 주기를 편하게 바꿔요.</p>
         </section>
 
-        <label className="flex flex-col gap-1.5 text-bb-label text-sky-ink">
+        <label className="flex min-h-[84px] flex-col gap-1.5 text-bb-label text-sky-ink">
           항목 이름
           <input className={fieldClass} maxLength={40} required value={name} onChange={(event) => setName(event.target.value)} />
         </label>
 
-        <label className="flex flex-col gap-1.5 text-bb-label text-sky-ink">
+        <label className="flex min-h-[84px] flex-col gap-1.5 text-bb-label text-sky-ink">
           공간
           <select className={`${fieldClass} appearance-none`} value={space} onChange={(event) => isSpaceKey(event.target.value) && setSpace(event.target.value)}>
             {spaceOptions.map((option) => (
@@ -136,7 +136,7 @@ function ItemInfoForm({ item }: { item: Item }) {
           </select>
         </label>
 
-        <label className="flex flex-col gap-1.5 text-bb-label text-sky-ink">
+        <label className="flex min-h-[84px] flex-col gap-1.5 text-bb-label text-sky-ink">
           청소 주기
           <span className={`${fieldClass} flex items-center focus-within:border-sky-brand`}>
             <input

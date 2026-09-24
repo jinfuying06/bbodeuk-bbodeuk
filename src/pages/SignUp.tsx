@@ -18,7 +18,7 @@ type TermKey = (typeof TERMS)[number]["key"];
 
 function Field({ id, label, children, help }: { id: string; label: string; children: React.ReactNode; help?: string }) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex min-h-[84px] flex-col gap-1.5">
       <label className="text-bb-label text-sky-ink" htmlFor={id}>
         {label}
       </label>
