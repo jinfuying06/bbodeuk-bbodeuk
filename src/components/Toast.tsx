@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 type ToastProps = {
   message: string | null;
@@ -60,4 +61,18 @@ export function useToast(duration = 2000) {
     [duration],
   );
   return [message, show] as const;
+}
+
+/** Toast handed over via router state (`navigate(to, { state: { toast } })`); cleared so a refresh doesn't replay it. */
+export function useRouteToast() {
+  const [toast, showToast] = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const message = (location.state as { toast?: string } | null)?.toast;
+    if (!message) return;
+    showToast(message);
+    navigate(`${location.pathname}${location.search}`, { replace: true, state: null });
+  }, [location, navigate, showToast]);
+  return [toast, showToast] as const;
 }

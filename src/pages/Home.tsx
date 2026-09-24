@@ -3,6 +3,7 @@ import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import Toast, { useRouteToast } from "../components/Toast";
 import {
   formatRecency,
   getActiveSpaces,
@@ -63,6 +64,7 @@ function SpaceTile({ space }: { space: SpaceKey }) {
 
 export default function Home() {
   const allRecords = useRecords();
+  const [toast] = useRouteToast();
   // `?state=empty` previews Figma 31:791 (첫 기록 전 홈) from 44/상태 미리보기 without touching real records.
   const [params] = useSearchParams();
   const records = params.get("state") === "empty" ? [] : allRecords;
@@ -193,6 +195,7 @@ export default function Home() {
           </GlassButton>
         </section>
       </main>
+      <Toast message={toast} visible={Boolean(toast)} />
     </PageShell>
   );
 }

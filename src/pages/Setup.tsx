@@ -5,15 +5,11 @@ import GlassButton from "../components/GlassButton";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
 import { AX_ONBOARDING_ENABLED } from "../features/ax-onboarding";
-import { writeSetup } from "../data/setup";
+import { DEFAULT_SPACES, writeSetup } from "../data/setup";
 
 // Stored keys stay as before ("침실 / 방" is the internal key; SPACES[].setupKeys maps it). Figma order.
-const BASIC_SPACES = [
-  { key: "욕실", label: "욕실" },
-  { key: "주방", label: "주방" },
-  { key: "거실", label: "거실" },
-  { key: "침실 / 방", label: "방" },
-];
+// 욕실/주방 are required (same rule as 공간 관리), so they show locked-on here instead of being silently re-added later.
+const BASIC_SPACES = ["욕실", "주방", "거실", "침실 / 방"].map((key) => DEFAULT_SPACES.find((space) => space.key === key)!);
 
 const aiCardClass =
   "press flex h-16 w-full items-center justify-between rounded-[16px] border border-sky-brand bg-sky-white px-[14px] text-left shadow-[0_3px_5px_rgba(0,0,0,0.08)]";
@@ -44,6 +40,7 @@ export default function Setup() {
   const [toast, showToast] = useToast();
 
   const toggle = (key: string) =>
+    !BASIC_SPACES.find((space) => space.key === key)?.required &&
     setSelected((current) => (current.includes(key) ? current.filter((space) => space !== key) : [...current, key]));
 
   const complete = () => {
@@ -76,17 +73,25 @@ export default function Setup() {
         )}
 
         <h2 className="text-bb-label text-sky-deep">기본 공간 4개는 무료예요</h2>
-        {BASIC_SPACES.map(({ key, label }) => {
+        {BASIC_SPACES.map(({ key, label, required }) => {
           const on = selected.includes(key);
           return (
-            <button key={key} aria-pressed={on} className="flex h-12 items-center gap-3 rounded-2xl bg-sky-white pl-3 text-left" type="button" onClick={() => toggle(key)}>
+            <button
+              key={key}
+              aria-disabled={required}
+              aria-pressed={on}
+              className="flex h-12 items-center gap-3 rounded-2xl bg-sky-white pl-3 pr-4 text-left"
+              type="button"
+              onClick={() => toggle(key)}
+            >
               <span
                 aria-hidden="true"
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-xl text-bb-label transition-colors ${on ? "bg-sky-brand text-onbrand" : "bg-sky-line"}`}
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-xl text-bb-label transition-colors ${required ? "bg-sky-tint text-sky-deep" : on ? "bg-sky-brand text-onbrand" : "bg-sky-line"}`}
               >
                 {on ? "✓" : null}
               </span>
-              <span className="text-bb-label text-sky-ink">{label}</span>
+              <span className="flex-1 text-bb-label text-sky-ink">{label}</span>
+              {required ? <span className="text-bb-caption text-sky-muted">기본 관리 공간</span> : null}
             </button>
           );
         })}

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import BottomNavigation from "../components/BottomNavigation";
 import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import Pill from "../components/Pill";
-import Toast, { useToast } from "../components/Toast";
+import Toast, { useRouteToast } from "../components/Toast";
 import { formatRecency, getActiveSpaces, getItems, getSpace, isRecordedToday, isSpaceKey, lastRecord, spaceColor, toggleTodayRecord, useRecords, type Item, type SpaceKey } from "../data/cleaning";
 
 type Filter = "recent" | "fav" | "space";
@@ -63,7 +63,6 @@ const sweepGradient = "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(199,2
 
 export default function QuickRecord() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const records = useRecords();
   const activeSpaces = useMemo(() => getActiveSpaces(), []);
@@ -74,19 +73,11 @@ export default function QuickRecord() {
   const currentSpace: SpaceKey = activeSpaces.find((space) => space.key === paramSpace)?.key ?? activeSpaces[0]?.key ?? "bathroom";
   // Keyed per tap so the sweep/sparkle overlays remount and replay.
   const [shine, setShine] = useState<{ id: string; n: number } | null>(null);
-  const [toast, showToast] = useToast();
+  // Also shows the toast handed over from 기록 완료 → "기록 취소".
+  const [toast, showToast] = useRouteToast();
   const doneTimer = useRef<number | undefined>(undefined);
 
   useEffect(() => () => window.clearTimeout(doneTimer.current), []);
-
-  // Toast handed over from 기록 완료 → "기록 취소".
-  useEffect(() => {
-    const message = (location.state as { toast?: string } | null)?.toast;
-    if (message) {
-      showToast(message);
-      navigate(`${location.pathname}${location.search}`, { replace: true, state: null });
-    }
-  }, [location, navigate, showToast]);
 
   const items = useMemo(() => {
     if (filter === "recent") {
@@ -118,7 +109,7 @@ export default function QuickRecord() {
     window.clearTimeout(doneTimer.current);
     if (toggleTodayRecord(item.id) === "removed") {
       setShine(null);
-      showToast("공간 기록이 취소되었어요");
+      showToast("청소 기록을 취소했어요");
       return;
     }
     setShine((prev) => ({ id: item.id, n: (prev?.n ?? 0) + 1 }));

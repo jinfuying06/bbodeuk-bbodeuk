@@ -16,7 +16,7 @@ const PREVIEW_ROWS = [
   ["연결 오류와 재시도", "다시 불러오기 → 로딩 → 기록", "/home/error"],
   ["로그인 입력 오류", "잘못된 이메일 형식 안내", "/login"],
   ["가벼운 추천 홈", "지나간 기록을 다시 살펴보기", "/home"],
-  ["터치와 유리광", "컴포넌트의 상태 전환 체험", "/quick-record"],
+  ["터치와 유리광", "컴포넌트의 상태 전환 체험", "/welcome"],
 ] as const;
 
 const PREVIEW_LINKS = [

@@ -109,7 +109,7 @@ export default function CareAction() {
     if (!recordId) return;
     removeRecord(recordId);
     setRecordId(null);
-    showToast("공간 기록이 취소되었어요");
+    showToast("청소 기록을 취소했어요");
   };
 
   return (
@@ -160,12 +160,12 @@ export default function CareAction() {
 
         <GlassButton onClick={record}>청소했어요 · 기록하기</GlassButton>
         <button
-          className="flex h-11 items-center justify-center text-[13px] font-medium leading-[19px] text-sky-deep"
+          className={`flex h-11 items-center justify-center text-[13px] font-medium leading-[19px] transition-colors ${recordId ? "text-sky-deep" : "text-sky-muted"}`}
           aria-disabled={!recordId}
           type="button"
           onClick={undo}
         >
-          기록 취소하기
+          기록 취소
         </button>
         {guide.id === "basin" ? (
           <Link className="flex h-11 items-center justify-center text-bb-label text-sky-deep" to="/care">

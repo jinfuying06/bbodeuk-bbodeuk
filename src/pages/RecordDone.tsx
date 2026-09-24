@@ -41,7 +41,7 @@ export default function RecordDone() {
 
   const undo = () => {
     if (isRecordedToday(item.id, records)) toggleTodayRecord(item.id);
-    navigate(backToRecord, { replace: true, state: { toast: "공간 기록이 취소되었어요" } });
+    navigate(backToRecord, { replace: true, state: { toast: "청소 기록을 취소했어요" } });
   };
 
   return (

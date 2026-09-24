@@ -38,7 +38,8 @@ export default function WeekendBigClean() {
 
   const finish = () => {
     checked.forEach((id) => addRecord(id));
-    navigate("/home");
+    // Same confirmation as every other record path; ending without checks is fine and silent.
+    navigate("/home", checked.size > 0 ? { state: { toast: "청소 기록이 저장됐어요" } } : undefined);
   };
 
   return (
