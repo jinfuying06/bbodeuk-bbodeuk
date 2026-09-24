@@ -1,147 +1,123 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Icon from "../components/Icon";
+import AppHeader from "../components/AppHeader";
+import GlassButton from "../components/GlassButton";
 import PageShell from "../components/PageShell";
-import Toast from "../components/Toast";
+import Toast, { useToast } from "../components/Toast";
 import { markMember, resetToGuest } from "../data/points";
-import { spaceTones } from "../data/spaceTones";
 
+const inputClass =
+  "h-[52px] w-full rounded-xl border border-sky-line bg-sky-white pl-4 pr-4 text-bb-body text-sky-ink outline-none transition-colors placeholder:text-sky-muted focus:border-sky-brand";
+const linkClass = "flex h-11 w-full items-center justify-center text-bb-label text-sky-deep";
+
+/** Flow / 로그인 (27:247) + 로그인 확인 (32:1427). Visual only: no real auth in the MVP. */
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const toastTimerRef = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(toastTimerRef.current), []);
+  const [error, setError] = useState(false);
+  const [toast, showToast] = useToast();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const submit = (event: React.FormEvent) => {
     event.preventDefault();
+    if (error) {
+      // 다시 입력하기
+      setError(false);
+      setPassword("");
+      return;
+    }
+    // ponytail: mock check only (valid-looking email + non-empty password); no backend in the MVP.
+    if (!/^\S+@\S+\.\S+$/.test(email) || !password) {
+      setError(true);
+      return;
+    }
     markMember();
     navigate("/home");
   };
 
-  const showComingSoon = (provider: string) => {
-    setToastMessage(`${provider} 로그인은 준비 중이에요`);
-    window.clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = window.setTimeout(() => setToastMessage(""), 2400);
-  };
+  const comingSoon = () => showToast("아직 준비 중인 기능이에요");
 
   return (
     <PageShell bottomNav={false}>
-      <main className="flex min-h-[100dvh] flex-col">
-        <div className="flex flex-col gap-space-xl pt-space-2xl">
-          <section className="relative flex flex-col items-center text-center">
-            <div className="pointer-events-none absolute left-1/2 top-2 h-64 w-64 -translate-x-1/2 rounded-full bg-sky-brand/25 blur-3xl" />
-
-            <div className="relative flex items-center gap-1.5">
-              <span className={`flex h-6 w-6 items-center justify-center rounded-full ${spaceTones.bathroom.fill}`}>
-                <Icon name="water_drop" className={`text-[12px] ${spaceTones.bathroom.text}`} fill />
-              </span>
-              <span className={`text-body-md font-bold ${spaceTones.bathroom.text}`}>뽀득뽀득</span>
-            </div>
-
-            <div className="relative mt-space-lg flex flex-col items-center gap-space-sm px-margin-screen">
-              <h1 className="whitespace-pre-line text-headline-lg text-sky-ink">
-                {"한 곳만 칠해도,\n오늘 청소는 성공."}
-              </h1>
-              <p className="whitespace-pre-line text-body-md text-sky-muted">
-                {"해야 할 일을 쌓아두는 체크리스트 대신,\n내가 돌본 집의 흔적을 맑은 색으로 채워보세요."}
-              </p>
-            </div>
-          </section>
-
-          <form className="flex flex-col gap-space-md px-margin-screen" onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-label-md text-sky-muted" htmlFor="login-email">
-                아이디
-              </label>
-              <input
-                id="login-email"
-                type="email"
-                required
-                className="h-12 w-full rounded-xl border border-art-line bg-sky-white px-space-md text-body-lg text-sky-ink outline-none transition-colors placeholder:text-sky-muted focus:border-sky-deep"
-                placeholder="이메일주소를 입력해주세요"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-label-md text-sky-muted" htmlFor="login-password">
-                비밀번호
-              </label>
-              <div className="flex h-12 items-center gap-space-xs rounded-xl border border-art-line bg-sky-white px-space-md transition-colors focus-within:border-sky-deep">
-                <input
-                  id="login-password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  className="h-full min-w-0 flex-1 bg-transparent text-body-lg text-sky-ink outline-none placeholder:text-sky-muted"
-                  placeholder="비밀번호를 입력해주세요"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                />
-                <button
-                  type="button"
-                  aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
-                  className="flex h-[18px] w-[18px] shrink-0 items-center justify-center text-sky-muted"
-                  onClick={() => setShowPassword((current) => !current)}
-                >
-                  <Icon name={showPassword ? "visibility" : "visibility_off"} className="text-[18px]" />
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="mt-1 flex h-14 items-center justify-center rounded-full bg-sky-brand text-title-sm text-onbrand shadow-md transition-transform duration-[120ms] active:scale-[0.98]"
-            >
-              로그인하기
-            </button>
-
-            <div className="flex items-center gap-space-sm py-1">
-              <span className="h-px flex-1 bg-sky-line" />
-              <span className="text-label-sm text-sky-muted">또는</span>
-              <span className="h-px flex-1 bg-sky-line" />
-            </div>
-
-            <div className="flex flex-col gap-space-sm pt-1">
-              <button
-                type="button"
-                className="flex items-center justify-center gap-space-sm rounded-full bg-[#fee500] px-space-lg py-space-sm shadow-sm transition-transform duration-[120ms] active:scale-[0.98]"
-                onClick={() => showComingSoon("카카오")}
-              >
-                <img src={`${import.meta.env.BASE_URL}assets/kakao_icon.svg`} alt="" className="h-5 w-5" />
-                <span className="text-label-md text-[#191919]">카카오로 시작하기</span>
-              </button>
-              <button
-                type="button"
-                className="flex items-center justify-center gap-space-sm rounded-full border border-sky-line bg-sky-white px-space-lg py-space-sm shadow-sm transition-transform duration-[120ms] active:scale-[0.98]"
-                onClick={() => showComingSoon("Google")}
-              >
-                <img src={`${import.meta.env.BASE_URL}assets/google_icon.svg`} alt="" className="h-5 w-5" />
-                <span className="text-label-md text-sky-ink">Google로 계속하기</span>
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div className="flex-1" />
-
-        <div className="flex flex-col items-center gap-space-sm px-margin-screen pb-space-xl pt-space-lg">
-          <Link to="/signup" className={`text-body-md font-bold ${spaceTones.bathroom.text}`}>
-            이메일로 회원가입
-          </Link>
-          <Link to="/setup" className="py-2 text-label-md text-sky-muted underline decoration-sky-line" onClick={() => resetToGuest()}>
-            로그인 없이 둘러보기
-          </Link>
-          <p className="max-w-[320px] text-center text-caption text-sky-muted">
-            시작하면 뽀득뽀득의 <span className="text-sky-deep">이용약관</span> 및{" "}
-            <span className="text-sky-deep">개인정보처리방침</span>에 동의하게 됩니다.
+      <AppHeader back="/welcome" right={null} title={error ? "로그인 확인" : "로그인"} />
+      <main className="pt-header">
+        <form className="flex flex-col gap-3 px-margin-screen py-5" noValidate onSubmit={submit}>
+          <h1 className="text-bb-heading text-sky-ink">{error ? "입력한 정보를 확인해 주세요" : "다시 만나 반가워요"}</h1>
+          <p className="text-bb-body text-sky-muted">
+            {error ? "이메일 또는 비밀번호가 맞지 않아요. 다시 확인해 주세요." : "오늘의 작은 청소를 이어가요."}
           </p>
-        </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-bb-label text-sky-ink" htmlFor="login-email">
+              이메일 주소
+            </label>
+            <input
+              autoComplete="email"
+              className={inputClass}
+              id="login-email"
+              inputMode="email"
+              placeholder="이메일을 입력해 주세요"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-bb-label text-sky-ink" htmlFor="login-password">
+              비밀번호
+            </label>
+            <input
+              aria-describedby={error ? "login-password-help" : undefined}
+              autoComplete="current-password"
+              className={inputClass}
+              id="login-password"
+              placeholder="비밀번호를 입력해 주세요"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+            {error ? (
+              <p className="text-bb-caption text-sky-muted" id="login-password-help">
+                비밀번호를 다시 확인해 주세요.
+              </p>
+            ) : null}
+          </div>
+
+          {error ? (
+            <>
+              <GlassButton size={52} type="submit">
+                다시 입력하기
+              </GlassButton>
+              <button className={linkClass} type="button" onClick={comingSoon}>
+                비밀번호 찾기
+              </button>
+            </>
+          ) : (
+            <>
+              <button className={linkClass} type="button" onClick={comingSoon}>
+                비밀번호를 잊으셨나요?
+              </button>
+              <GlassButton size={52} type="submit">
+                로그인하기
+              </GlassButton>
+              <GlassButton size={52} variant="secondary" onClick={comingSoon}>
+                Google로 계속하기
+              </GlassButton>
+              <GlassButton size={52} variant="secondary" onClick={comingSoon}>
+                카카오로 계속하기
+              </GlassButton>
+              <Link className={linkClass} to="/signup">
+                이메일로 회원가입
+              </Link>
+              <Link className={linkClass} to="/setup" onClick={() => resetToGuest()}>
+                먼저 둘러보기
+              </Link>
+            </>
+          )}
+        </form>
       </main>
-      <Toast message={toastMessage} visible={Boolean(toastMessage)} pill />
+      <Toast message={toast} visible={Boolean(toast)} pill />
     </PageShell>
   );
 }

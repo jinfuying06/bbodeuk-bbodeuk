@@ -1,133 +1,131 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import BrandLogo from "../components/BrandLogo";
-import PageShell from "../components/PageShell";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
+import PageShell from "../components/PageShell";
+import { getSpace, type SpaceKey } from "../data/cleaning";
 import { resetToGuest } from "../data/points";
-import { spaceToneLabels, spaceTones, type SpaceToneKey } from "../data/spaceTones";
 
+const BATH = getSpace("bathroom");
+
+// Figma 33:2296 — bath policy fill ladder (space colour mixed toward white).
 const FADE_TIERS = [
   { pct: 100, label: "방금 돌본 공간", desc: "청소한 항목 비율이 충분해요" },
   { pct: 72, label: "관리 상태가 좋아요", desc: "관리 주기에 맞춰 조금 옅어져요" },
-  { pct: 48, label: "슬슬 청소해볼까요?", desc: "지난 기록을 다시 확인할 때에요" },
+  { pct: 48, label: "슬슬 청소해볼까요?", desc: "지난 기록을 다시 확인할 때예요" },
   { pct: 28, label: "청소가 필요해요", desc: "다시 돌볼 시점을 알려줘요" },
 ];
 
-const START_SPACE_KEYS: { toneKey: SpaceToneKey; iconKey: string; label: string }[] = [
-  { toneKey: "bathroom", iconKey: "bath", label: spaceToneLabels.bathroom },
-  { toneKey: "kitchen", iconKey: "kitchen", label: spaceToneLabels.kitchen },
-  { toneKey: "living", iconKey: "living", label: spaceToneLabels.living },
-  // Setup.tsx displays this tone's "침실" key as "방" to the user — match that convention.
-  { toneKey: "bedroom", iconKey: "bed", label: "방" },
-];
+const START_SPACES: SpaceKey[] = ["bathroom", "kitchen", "living", "bedroom"];
 
-const STEP_TITLES = ["톡 닦아보기", "공간 색 변화", "시작 방식 선택"];
+const mix = (hex: string, pct: number) => `color-mix(in srgb, ${hex} ${pct}%, white)`;
 
-/** Replays a short enter transition whenever its `key` (the step index) changes. */
-function StepFade({ children }: { children: ReactNode }) {
-  const [entered, setEntered] = useState(false);
-
-  useEffect(() => {
-    // Plain effect, not requestAnimationFrame: rAF is paused by browsers on
-    // hidden/background tabs, which left this permanently un-transitioned.
-    setEntered(true);
-  }, []);
-
-  return (
-    <div
-      className={`flex flex-1 flex-col transition-all duration-[220ms] ease-out ${
-        entered ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-      }`}
-    >
-      {children}
-    </div>
-  );
-}
-
-/** Tap-to-record demo: press shows a light sweep, settles into a "recorded" state, tap again cancels. */
+/** Sky / Cleaning Card demo (27:700): tap → 120ms press → 480ms glass sweep + sparkle → stays coloured. Re-tap cancels. */
 function DemoCard() {
   const [recorded, setRecorded] = useState(false);
-  const [sweeping, setSweeping] = useState(false);
-  const [sweepKey, setSweepKey] = useState(0);
+  const [shine, setShine] = useState(0);
+  const [moving, setMoving] = useState(false);
 
-  const handleTap = () => {
+  useEffect(() => {
+    if (!shine) return;
+    setMoving(false);
+    // Plain timeouts (not rAF): rAF pauses on background tabs.
+    const start = window.setTimeout(() => setMoving(true), 20);
+    const end = window.setTimeout(() => setMoving(false), 1200);
+    return () => {
+      window.clearTimeout(start);
+      window.clearTimeout(end);
+    };
+  }, [shine]);
+
+  const tap = () => {
     if (recorded) {
       setRecorded(false);
+      setMoving(false);
       return;
     }
     setRecorded(true);
-    setSweepKey((key) => key + 1);
-    setSweeping(false);
-    window.setTimeout(() => setSweeping(true), 10);
+    setShine((n) => n + 1);
   };
 
   return (
     <button
       aria-pressed={recorded}
-      className={`relative flex h-40 w-40 flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border shadow-sm transition-colors duration-300 active:scale-[0.97] ${
-        recorded ? "border-sky-brand bg-sky-tint" : "border-sky-line bg-sky-white"
-      }`}
+      className="press relative flex h-[210px] w-[250px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-sky-line pl-[14px] pt-2 transition-[background-color,transform] duration-300"
+      style={{ backgroundColor: recorded ? BATH.color : "#ffffff" }}
       type="button"
-      onClick={handleTap}
+      onClick={tap}
     >
-      {recorded ? (
-        <span
-          key={sweepKey}
-          aria-hidden="true"
-          className={`pointer-events-none absolute inset-y-0 left-0 w-1/2 -skew-x-12 bg-white/70 blur-sm transition-transform duration-[480ms] ease-out ${
-            sweeping ? "translate-x-[260%]" : "-translate-x-full"
-          }`}
-        />
-      ) : null}
-      <Icon className="relative text-[56px]" name="object-sink" />
-      <span className={`relative text-label-md font-semibold ${recorded ? "text-sky-deep" : "text-sky-muted"}`}>
-        {recorded ? "기록 완료" : "세면대"}
+      <span className="flex h-[62px] w-[76px] items-center justify-center">
+        <Icon className="text-[43px]" name="object-sink" />
       </span>
+      <span className="text-bb-label text-sky-ink">세면대</span>
+      <span className="text-bb-caption text-sky-muted">{recorded ? "방금 기록했어요" : "여기를 톡 눌러보세요"}</span>
+      {shine ? (
+        <>
+          <span
+            key={`sweep-${shine}`}
+            aria-hidden="true"
+            className={`pointer-events-none absolute -top-[5px] left-[-174px] h-[220px] w-[118px] mix-blend-screen motion-reduce:hidden ${
+              moving ? "translate-x-[440px] opacity-100 transition-transform duration-[480ms] ease-[cubic-bezier(.2,.7,.2,1)]" : "opacity-0"
+            }`}
+            style={{
+              rotate: "10deg",
+              background:
+                "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(199,255,250,.22) 32%, rgba(255,255,255,.88) 50%, rgba(199,255,250,.22) 68%, rgba(255,255,255,0) 100%)",
+            }}
+          />
+          <Icon
+            className={`pointer-events-none absolute right-[40px] top-[14px] text-[28px] text-white transition-[opacity,transform] duration-300 motion-reduce:hidden ${
+              moving ? "scale-100 opacity-100" : "scale-50 opacity-0"
+            }`}
+            name="sparkle"
+          />
+        </>
+      ) : null}
     </button>
   );
 }
 
-/** A fade-tier swatch: outer ring always visible (so low tiers don't vanish into the card),
- *  inner fill at the tier's opacity, icon always full-opacity per the Figma rule that
- *  only the background fades while icon/name linework stays legible. */
-function FadeSwatch({ pct }: { pct: number }) {
+function StepHead({ label, title, body, size = 28 }: { label: string; title: [string, string]; body: [string, string?]; size?: 26 | 28 }) {
+  const ref = useRef<HTMLHeadingElement>(null);
+  useEffect(() => ref.current?.focus(), []);
   return (
-    <span
-      aria-hidden="true"
-      className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-sky-line bg-sky-white"
-    >
-      <span className="absolute inset-0 bg-sky-brand" style={{ opacity: pct / 100 }} />
-      <Icon className="relative text-[18px] text-sky-deep" name="auto_awesome" />
-    </span>
+    <>
+      <p className="whitespace-pre text-[12px] leading-[22px] text-sky-muted">{label}</p>
+      <h1
+        ref={ref}
+        className={`${size === 28 ? "text-[28px]" : "text-[26px]"} font-bold leading-[38px] text-sky-ink outline-none`}
+        tabIndex={-1}
+      >
+        {title[0]}
+        <br />
+        {title[1]}
+      </h1>
+      <p className="text-bb-body text-sky-muted">
+        {body[0]}
+        {body[1] ? (
+          <>
+            <br />
+            {body[1]}
+          </>
+        ) : null}
+      </p>
+    </>
   );
 }
 
-function StepProgress({ step }: { step: number }) {
-  return (
-    <div className="mb-space-lg flex items-center justify-center gap-1.5">
-      <div aria-hidden="true" className="flex items-center gap-1.5">
-        {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            className={`h-1.5 rounded-full transition-all duration-200 ${i === step ? "w-6 bg-sky-brand" : "w-1.5 bg-sky-line"}`}
-          />
-        ))}
-      </div>
-      <span aria-live="polite" className="sr-only">
-        {step + 1}/3 단계: {STEP_TITLES[step]}
-      </span>
-    </div>
-  );
-}
+const Caption = ({ lines }: { lines: [string, string] }) => (
+  <p className="text-[12px] leading-[22px] text-sky-muted">
+    {lines[0]}
+    <br />
+    {lines[1]}
+  </p>
+);
 
 export default function Welcome() {
   const [step, setStep] = useState(0);
   const navigate = useNavigate();
-  const headingRef = useRef<HTMLHeadingElement>(null);
-
-  useEffect(() => {
-    headingRef.current?.focus();
-  }, [step]);
 
   const goSetup = () => {
     resetToGuest();
@@ -136,123 +134,109 @@ export default function Welcome() {
 
   return (
     <PageShell bottomNav={false}>
-      <main className="flex min-h-[100dvh] flex-col px-margin-screen pb-space-2xl pt-space-xl">
-        <StepProgress step={step} />
-        <StepFade key={step}>
-          {step === 0 ? (
-            <section className="flex flex-1 flex-col items-center pt-space-lg text-center">
-              <h1 ref={headingRef} className="mb-space-xs text-headline-lg text-sky-ink" tabIndex={-1}>
-                톡 닦아보기
-              </h1>
-              <p className="mb-space-2xl text-body-md text-sky-muted">
-                세면대를 닦았다고 생각하고 아래 카드를 눌러보세요.
-              </p>
+      {/* Brand / header, sub-page variant with empty Back/More slots (27:700). */}
+      <header className="pt-safe">
+        <div className="flex h-header items-center justify-center px-4">
+          <span className="text-bb-label text-sky-ink">뽀득뽀득</span>
+        </div>
+      </header>
+
+      <main key={step} className="flex flex-col gap-4 px-margin-screen pb-7 pt-4">
+        {step === 0 ? (
+          <>
+            <StepHead
+              body={["세면대를 닦았다고 생각하고", "아래 카드를 눌러보세요."]}
+              label="처음 만나는 뽀득뽀득  ·  1 / 3"
+              title={["한 번 톡,", "오늘의 청소가 반짝."]}
+            />
+            <div className="flex h-[210px] justify-center">
               <DemoCard />
-              <p className="mt-space-md text-caption text-sky-muted">빛이 스치면 기록 끝. 다시 누르면 취소돼요.</p>
-              <div className="mt-auto w-full pb-[72px]">
-                <button
-                  className="flex h-14 w-full items-center justify-center rounded-full bg-sky-brand text-title-sm text-onbrand shadow-md transition-transform duration-[120ms] active:scale-[0.98]"
-                  type="button"
-                  onClick={() => setStep(1)}
-                >
-                  다음 · 색의 변화 알아보기
-                </button>
-                <button
-                  className="mt-space-sm flex h-11 w-full items-center justify-center text-label-md text-sky-muted"
-                  type="button"
-                  onClick={() => setStep(2)}
-                >
-                  체험 건너뛰기
-                </button>
-              </div>
-            </section>
-          ) : null}
+            </div>
+            <Caption lines={["빛이 스치면 기록 끝. 다시 누르면 취소돼요.", "체험한 내용은 실제 기록에 남지 않아요."]} />
+            <GlassButton size={52} onClick={() => setStep(1)}>
+              다음 · 색의 변화 알아보기
+            </GlassButton>
+            <GlassButton size={52} variant="secondary" onClick={() => setStep(2)}>
+              체험 건너뛰기
+            </GlassButton>
+          </>
+        ) : null}
 
-          {step === 1 ? (
-            <section className="flex flex-1 flex-col pt-space-lg text-center">
-              <h1 ref={headingRef} className="mb-space-2xl text-headline-lg text-sky-ink" tabIndex={-1}>
-                공간 색 변화
-              </h1>
-              <div className="space-y-space-xs text-left">
-                {FADE_TIERS.map((tier) => (
-                  <div
-                    key={tier.pct}
-                    className="flex items-center gap-space-sm rounded-2xl border border-sky-line bg-sky-white px-space-md py-space-sm"
-                  >
-                    <FadeSwatch pct={tier.pct} />
-                    <div className="min-w-0">
-                      <p className="text-label-md font-semibold text-sky-ink">
-                        {tier.label} · {tier.pct}%
-                      </p>
-                      <p className="text-caption text-sky-muted">{tier.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-space-lg text-body-md leading-relaxed text-sky-muted">
-                항목을 기록하면 공간의 완료 비율이 바뀌고, 시간이 지나면 관리 주기에 맞춰 색이 옅어져요.
-              </p>
-              <div className="mt-auto w-full pb-[72px] pt-space-xl">
-                <button
-                  className="flex h-14 w-full items-center justify-center rounded-full bg-sky-brand text-title-sm text-onbrand shadow-md transition-transform duration-[120ms] active:scale-[0.98]"
-                  type="button"
-                  onClick={() => setStep(2)}
+        {step === 1 ? (
+          <>
+            <StepHead
+              body={["공간 색은 청소한 항목의 비율과 관리 주기를 함께 보여줘요."]}
+              label="공간의 색 변화  ·  2 / 3"
+              size={26}
+              title={["돌본 비율만큼 채워지고,", "필요할 때 천천히 옅어져요."]}
+            />
+            <ul aria-label="공간 색상 단계" className="mt-[22px] flex flex-col gap-2">
+              {FADE_TIERS.map((tier) => (
+                <li
+                  key={tier.pct}
+                  className="flex h-14 items-center gap-[10px] rounded-[14px] px-3"
+                  style={{ backgroundColor: mix(BATH.color, tier.pct) }}
                 >
-                  이제 시작하기
-                </button>
-              </div>
-            </section>
-          ) : null}
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-sky-bath">
+                    <Icon className="text-[24px] text-space-bath-icon" name="space-bath" />
+                  </span>
+                  <span className="flex min-w-0 flex-col gap-px">
+                    <span className="text-[16px] font-bold leading-[22px] text-sky-ink">
+                      {tier.label} · {tier.pct}%
+                    </span>
+                    <span className="text-bb-caption text-sky-muted">{tier.desc}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <Caption lines={["항목을 기록하면 공간의 완료 비율이 바뀌고,", "시간이 지나면 관리 주기에 맞춰 색이 옅어져요."]} />
+            <GlassButton size={52} onClick={() => setStep(2)}>
+              이제 시작하기
+            </GlassButton>
+          </>
+        ) : null}
 
-          {step === 2 ? (
-            <section className="relative flex flex-1 flex-col items-center pt-space-lg text-center">
-              <div className="pointer-events-none absolute top-2 h-64 w-64 rounded-full bg-sky-brand/25 blur-3xl" />
-              <div className="relative mb-space-xs flex h-24 w-24 items-center justify-center rounded-full bg-sky-white p-2 shadow-sm">
-                <div className="absolute inset-0 scale-110 rounded-full bg-sky-tint blur-md" />
-                <BrandLogo className="relative h-full w-full rounded-xl" />
-              </div>
-              <span className="mb-space-2xl text-label-md font-semibold text-sky-deep">뽀득뽀득</span>
-              <h1 ref={headingRef} className="mb-space-lg text-headline-lg text-sky-ink" tabIndex={-1}>
-                네 가지 기본 공간은 무료예요
-              </h1>
-              <div className="mb-space-2xl flex justify-center gap-space-md">
-                {START_SPACE_KEYS.map(({ toneKey, iconKey, label }) => {
-                  const tone = spaceTones[toneKey];
+        {step === 2 ? (
+          <>
+            <StepHead
+              body={["로그인하거나, 가입 없이 먼저 시작해보세요."]}
+              label="나에게 맞는 시작  ·  3 / 3"
+              title={["이제, 내 공간을", "가볍게 돌봐요."]}
+            />
+            <section className="flex h-[184px] flex-col gap-3 rounded-2xl bg-sky-white p-5">
+              <h2 className="text-[16px] font-bold leading-[22px] text-sky-ink">네 가지 기본 공간은 무료예요</h2>
+              <ul className="flex justify-between">
+                {START_SPACES.map((key) => {
+                  const space = getSpace(key);
                   return (
-                    <div key={toneKey} className="flex flex-col items-center gap-space-xxs">
-                      <span className={`flex h-14 w-14 items-center justify-center rounded-2xl ${tone.fill} ${tone.text}`}>
-                        <Icon className="text-[26px]" name={`space-${iconKey}`} />
+                    <li key={key} className="flex w-[60px] flex-col items-center gap-1">
+                      {/* Figma draws 욕실 at full colour (r14) and the rest at 28% (r12). */}
+                      <span
+                        className={`flex h-10 w-10 items-center justify-center ${key === "bathroom" ? "rounded-[14px]" : "rounded-xl"}`}
+                        style={{ backgroundColor: key === "bathroom" ? space.color : mix(space.color, 28), color: space.iconColor }}
+                      >
+                        <Icon className="text-[24px]" name={space.icon} />
                       </span>
-                      <span className="text-caption text-sky-muted">{label}</span>
-                    </div>
+                      <span className="text-[12px] leading-[22px] text-sky-ink">
+                        {key === "bedroom" ? "방" : space.label}
+                      </span>
+                    </li>
                   );
                 })}
-              </div>
-              <div className="mt-auto w-full pb-[72px]">
-                <Link
-                  className="flex h-14 items-center justify-center rounded-full bg-sky-brand text-title-sm text-onbrand shadow-md transition-transform duration-[120ms] active:scale-[0.98]"
-                  to="/login"
-                >
-                  로그인하기
-                </Link>
-                <button
-                  className="mt-space-sm flex h-14 w-full items-center justify-center rounded-full bg-sky-tint text-title-sm text-sky-deep transition-transform duration-[120ms] active:scale-[0.98]"
-                  type="button"
-                  onClick={goSetup}
-                >
-                  게스트 모드로 시작하기
-                </button>
-                <button
-                  className="mt-space-sm flex h-11 w-full items-center justify-center text-label-md text-sky-muted"
-                  type="button"
-                  onClick={() => setStep(0)}
-                >
-                  체험 다시 보기
-                </button>
-              </div>
+              </ul>
             </section>
-          ) : null}
-        </StepFade>
+            <GlassButton size={52} to="/login">
+              로그인하기
+            </GlassButton>
+            <GlassButton size={52} variant="secondary" onClick={goSetup}>
+              게스트 모드로 시작하기
+            </GlassButton>
+            <Caption lines={["게스트도 공간을 고르고 청소를 기록할 수 있어요.", "기본 공간 사용에 포인트는 필요하지 않아요."]} />
+            <GlassButton size={52} variant="secondary" onClick={() => setStep(0)}>
+              체험 다시 보기
+            </GlassButton>
+          </>
+        ) : null}
       </main>
     </PageShell>
   );
