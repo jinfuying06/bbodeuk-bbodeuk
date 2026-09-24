@@ -34,22 +34,22 @@ export default function PhotoSlot({ label, photos, maxPhotos, requiredPhotos, on
   return (
     <div
       className={`flex flex-col gap-space-xs rounded-xl border p-space-sm shadow-sm ${
-        filled ? "border-primary/40 bg-primary-fixed/20" : "border-outline-variant/50 bg-surface-container-lowest"
+        filled ? "border-sky-brand/40 bg-sky-tint/20" : "border-sky-line/50 bg-sky-white"
       }`}
     >
       <div className="flex items-center justify-between">
-        <span className="text-title-sm text-on-surface">{label}</span>
-        <span className={`text-caption ${filled ? "text-primary" : "text-on-surface-variant"}`}>{filled ? "완료" : "필수 1장"}</span>
+        <span className="text-title-sm text-sky-ink">{label}</span>
+        <span className={`text-caption ${filled ? "text-sky-deep" : "text-sky-muted"}`}>{filled ? "완료" : "필수 1장"}</span>
       </div>
 
       <div className="grid grid-cols-3 gap-space-xxs">
         {previewUrls.map((url, index) => (
-          <div key={url} className="relative aspect-square overflow-hidden rounded-lg bg-surface-container">
+          <div key={url} className="relative aspect-square overflow-hidden rounded-lg bg-sky-bg">
             <img src={url} alt={`${label} 사진 ${index + 1}`} className="h-full w-full object-cover" />
             <button
               type="button"
               aria-label="사진 삭제"
-              className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-inverse-surface/80 text-inverse-on-surface"
+              className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-sky-ink/80 text-sky-white"
               onClick={() => onRemove(index)}
             >
               <Icon name="close" className="text-[14px]" />
@@ -58,7 +58,7 @@ export default function PhotoSlot({ label, photos, maxPhotos, requiredPhotos, on
         ))}
 
         {canAddMore ? (
-          <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-outline-variant text-on-surface-variant transition-colors active:bg-surface-container-low">
+          <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-sky-line text-sky-muted transition-colors active:bg-sky-bg">
             <Icon name="add_a_photo" className="text-[22px]" />
             <span className="text-caption">{photos.length === 0 ? "촬영" : "추가"}</span>
             <input

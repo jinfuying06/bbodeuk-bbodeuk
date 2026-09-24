@@ -108,7 +108,7 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
         <div className="mb-space-lg flex items-center">
           {onBack ? (
             <button
-              className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-low text-on-surface"
+              className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full bg-sky-bg text-sky-ink"
               type="button"
               aria-label="이전 화면으로"
               onClick={onBack}
@@ -120,7 +120,7 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
 
         <section className="mb-space-lg">
           <h1 className="text-headline-lg">공간 사진으로 맞춤 설정하기</h1>
-          <p className="mt-2 text-body-md text-on-surface-variant">
+          <p className="mt-2 text-body-md text-sky-muted">
             사진에 보이는 물건을 기준으로 아이템을 추천해드려요. 공간마다 1장은 꼭 필요하고, 2장은 선택으로 더 찍을 수 있어요.
           </p>
         </section>
@@ -140,13 +140,13 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
         </section>
 
         {status === "error" ? (
-          <section className="mb-space-lg rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-            <p className="text-body-md text-on-surface">사진 인식에 실패했어요. 다시 시도하거나 수동으로 설정할 수 있어요.</p>
+          <section className="mb-space-lg rounded-xl bg-sky-white p-space-md shadow-sm">
+            <p className="text-body-md text-sky-ink">사진 인식에 실패했어요. 다시 시도하거나 수동으로 설정할 수 있어요.</p>
             <div className="mt-space-sm flex gap-space-sm">
-              <button className="text-label-md text-primary" type="button" onClick={submit}>
+              <button className="text-label-md text-sky-deep" type="button" onClick={submit}>
                 다시 시도하기
               </button>
-              <button className="text-label-md text-secondary" type="button" onClick={onSkip}>
+              <button className="text-label-md text-sky-muted" type="button" onClick={onSkip}>
                 수동으로 계속하기
               </button>
             </div>
@@ -154,7 +154,7 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
         ) : null}
 
         <button
-          className="mt-auto flex h-14 items-center justify-center rounded-full bg-primary-container text-title-sm text-on-primary shadow-md disabled:opacity-50"
+          className="mt-auto flex h-14 items-center justify-center rounded-full bg-sky-brand text-title-sm text-onbrand shadow-md disabled:opacity-50"
           type="button"
           onClick={submit}
           disabled={!canSubmit}
@@ -162,7 +162,7 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
           {status === "loading" ? "사진을 확인하고 있어요..." : "사진으로 시작하기"}
         </button>
         <button
-          className="mt-space-sm w-full py-2 text-center text-label-md text-secondary transition-colors active:opacity-75"
+          className="mt-space-sm w-full py-2 text-center text-label-md text-sky-muted transition-colors active:opacity-75"
           type="button"
           onClick={onSkip}
           disabled={status === "loading"}
