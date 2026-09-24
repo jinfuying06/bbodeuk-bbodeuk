@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
@@ -62,7 +62,10 @@ function SpaceTile({ space }: { space: SpaceKey }) {
 }
 
 export default function Home() {
-  const records = useRecords();
+  const allRecords = useRecords();
+  // `?state=empty` previews Figma 31:791 (첫 기록 전 홈) from 44/상태 미리보기 without touching real records.
+  const [params] = useSearchParams();
+  const records = params.get("state") === "empty" ? [] : allRecords;
   const spaces = getActiveSpaces();
   const spaceKeys = new Set<string>(spaces.map((space) => space.key));
   const hasRecords = records.some((record) => spaceKeys.has(getItem(record.itemId)?.space ?? ""));
