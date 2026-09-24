@@ -34,11 +34,37 @@ export default {
         "surface-container": "#eaeef3",
         "surface-container-low": "#f0f4f9",
         "surface-container-high": "#e4e9ee",
+
+        // Sky/BB palette — from Figma design system (2026-09-17 UI upgrade, see AGENTS.md §6).
+        // Names mirror the Figma variables (--bb-*) as-is; replaces the MD3 blue palette above
+        // screen by screen during the upgrade loop rather than in one bulk swap.
+        "sky-brand": "#56d9d2",
+        "sky-deep": "#146b63",
+        "sky-tint": "#e5f8f5",
+        "sky-ink": "#23282b",
+        "sky-muted": "#60676b",
+        "sky-line": "#e3e6e8",
+        "sky-white": "#ffffff",
+        "sky-bg": "#f6f7f8",
+        "sky-bath": "#dceefe",
+        "sky-sky": "#8de3db",
+        "sky-kitchen": "#fbe8d4",
+        "sky-living": "#e9e1fa",
+        "sky-bed": "#e2efda",
+        onbrand: "#123c36",
+        "literal-white": "#ffffff",
+        porcelain: "#ffffff",
+        "art-line": "#64807a",
+        "space-bath-icon": "#41758e",
+        "space-kitchen-icon": "#95613c",
+        "space-living-icon": "#766095",
+        "space-bed-icon": "#5e7d4f",
       },
       borderRadius: {
         DEFAULT: "0.25rem",
         lg: "0.5rem",
         xl: "0.75rem",
+        "2xl": "1.25rem",
         full: "9999px",
       },
       spacing: {
@@ -52,7 +78,16 @@ export default {
         "margin-screen": "1.25rem",
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', "system-ui", "sans-serif"],
+        sans: [
+          '"Pretendard Variable"',
+          "Pretendard",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          '"Malgun Gothic"',
+          '"Apple SD Gothic Neo"',
+          "system-ui",
+          "sans-serif",
+        ],
       },
       fontSize: {
         "headline-md": ["20px", { lineHeight: "28px", letterSpacing: "0", fontWeight: "700" }],

@@ -64,24 +64,24 @@ export default function SpaceExpansionDialog({ open, onClose }: SpaceExpansionDi
       <section
         aria-labelledby="space-expansion-title"
         aria-modal="true"
-        className="w-full max-w-[430px] rounded-t-xl bg-surface-container-lowest px-margin-screen pb-[calc(24px+env(safe-area-inset-bottom,0px))] pt-space-lg shadow-xl"
+        className="w-full max-w-[430px] rounded-t-2xl bg-sky-white px-margin-screen pb-[calc(24px+env(safe-area-inset-bottom,0px))] pt-space-lg shadow-xl"
         role="dialog"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-space-md">
-          <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-fixed text-primary">
+          <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-sky-tint text-sky-deep">
             <Icon name="add_home" className="text-[22px]" />
           </span>
           <button ref={closeButtonRef} aria-label="닫기" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-container-low" type="button" onClick={onClose}>
             <Icon name="close" className="text-[22px]" />
           </button>
         </div>
-        <h2 id="space-expansion-title" className="mt-space-md text-headline-md">{content.title}</h2>
-        <p className="mt-space-sm text-body-md text-on-surface-variant">{content.body}</p>
-        <button className="mt-space-lg flex h-12 w-full items-center justify-center rounded-full bg-primary-container text-title-sm text-on-primary" type="button" onClick={content.onPrimary}>
+        <h2 id="space-expansion-title" className="mt-space-md text-headline-md text-sky-ink">{content.title}</h2>
+        <p className="mt-space-sm text-body-md text-sky-muted">{content.body}</p>
+        <button className="mt-space-lg flex h-12 w-full items-center justify-center rounded-full bg-sky-brand text-title-sm text-onbrand transition-transform duration-[120ms] active:scale-[0.98]" type="button" onClick={content.onPrimary}>
           {content.primaryLabel}
         </button>
-        <button className="mt-space-sm flex h-12 w-full items-center justify-center rounded-full text-title-sm text-on-surface-variant" type="button" onClick={onClose}>
+        <button className="mt-space-sm flex h-12 w-full items-center justify-center rounded-full text-title-sm text-sky-muted" type="button" onClick={onClose}>
           기본 공간으로 계속하기
         </button>
       </section>

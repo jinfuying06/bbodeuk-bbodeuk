@@ -22,7 +22,15 @@
     overscroll-behavior-y: none;
     background: #dfe3e8;
     color: #171c20;
-    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    font-family:
+      "Pretendard Variable",
+      Pretendard,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Malgun Gothic",
+      "Apple SD Gothic Neo",
+      system-ui,
+      sans-serif;
     -webkit-tap-highlight-color: transparent;
   }
 

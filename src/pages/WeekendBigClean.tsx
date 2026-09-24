@@ -172,11 +172,16 @@ export default function WeekendBigClean() {
           space: space.key,
         })),
     );
-    window.sessionStorage.setItem("bbodeuk.session.deepClean.recent.v1", JSON.stringify(selectedItems));
+    // Nothing selected: keep earlier records instead of wiping them.
     if (selectedItems.length > 0) {
-      const savedPaintedItems = JSON.parse(window.sessionStorage.getItem("bbodeuk.session.recordPainted.v1") ?? "[]") as string[];
-      const nextPaintedItems = Array.from(new Set([...savedPaintedItems, ...selectedItems.map((item) => item.id)]));
-      window.sessionStorage.setItem("bbodeuk.session.recordPainted.v1", JSON.stringify(nextPaintedItems));
+      try {
+        window.sessionStorage.setItem("bbodeuk.session.deepClean.recent.v1", JSON.stringify(selectedItems));
+        const savedPaintedItems = JSON.parse(window.sessionStorage.getItem("bbodeuk.session.recordPainted.v1") ?? "[]") as string[];
+        const nextPaintedItems = Array.from(new Set([...savedPaintedItems, ...selectedItems.map((item) => item.id)]));
+        window.sessionStorage.setItem("bbodeuk.session.recordPainted.v1", JSON.stringify(nextPaintedItems));
+      } catch {
+        // no-op: storage unavailable or corrupted, still continue to Home
+      }
     }
 
     navigate("/home");

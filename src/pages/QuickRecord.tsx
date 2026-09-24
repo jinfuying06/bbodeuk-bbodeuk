@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import BottomNavigation from "../components/BottomNavigation";
@@ -27,12 +27,12 @@ const spaceLabels: Record<Space, string> = {
 };
 
 const spaceTabs: Array<{ key: Space; label: string; icon: string }> = [
-  { key: "bathroom", label: "욕실", icon: "bathtub" },
-  { key: "kitchen", label: "주방", icon: "countertops" },
-  { key: "living", label: "거실", icon: "chair" },
-  { key: "bedroom", label: "침실", icon: "bed" },
+  { key: "bathroom", label: "욕실", icon: "space-bath" },
+  { key: "kitchen", label: "주방", icon: "space-kitchen" },
+  { key: "living", label: "거실", icon: "space-living" },
+  { key: "bedroom", label: "침실", icon: "space-bed" },
   { key: "entry", label: "현관", icon: "door_front" },
-  { key: "terrace", label: "테라스", icon: "balcony" },
+  { key: "terrace", label: "테라스", icon: "space-terrace" },
 ];
 
 const setupSpaceMap: Record<string, Space[]> = {
@@ -46,12 +46,12 @@ const setupSpaceMap: Record<string, Space[]> = {
 
 const spaceItems: Record<Space, RecordItem[]> = {
   bathroom: [
-    { id: "basin", name: "세면대", icon: "wash", desc: "물때 및 수도꼭지 마감", meta: "오늘" },
-    { id: "toilet", name: "변기", icon: "cleaning_services", desc: "소독 및 안쪽 관리", meta: "1일 전" },
-    { id: "shower", name: "샤워부스", icon: "shower", desc: "유리벽 스퀴지 작업" },
-    { id: "mirror", name: "거울", icon: "auto_awesome", desc: "손자국 및 비누방울 닦기", meta: "8일 전" },
-    { id: "bath-floor", name: "바닥", icon: "mop", desc: "타일 솔질 및 물기 정리" },
-    { id: "drain", name: "배수구", icon: "water_drop", desc: "유가 및 거름망 헹굼" },
+    { id: "basin", name: "세면대", icon: "object-sink", desc: "물때 및 수도꼭지 마감", meta: "오늘" },
+    { id: "toilet", name: "변기", icon: "object-toilet", desc: "소독 및 안쪽 관리", meta: "1일 전" },
+    { id: "shower", name: "샤워부스", icon: "object-shower", desc: "유리벽 스퀴지 작업" },
+    { id: "mirror", name: "거울", icon: "object-mirror", desc: "손자국 및 비누방울 닦기", meta: "8일 전" },
+    { id: "bath-floor", name: "바닥", icon: "object-floor", desc: "타일 솔질 및 물기 정리" },
+    { id: "drain", name: "배수구", icon: "object-drain", desc: "유가 및 거름망 헹굼" },
   ],
   kitchen: [
     { id: "sink", name: "싱크대", icon: "faucet", desc: "배수망 헹굼 & 거름망", meta: "4일 전" },
@@ -153,9 +153,23 @@ export default function QuickRecord() {
     }
   });
   const [flashCard, setFlashCard] = useState<string | null>(null);
+  const [sweepingId, setSweepingId] = useState<string | null>(null);
+  const [sweepKey, setSweepKey] = useState(0);
   const currentSpace = availableSpaces.includes(space) ? space : availableSpaces[0] ?? "bathroom";
   const availableSpaceTabs = spaceTabs.filter((item) => availableSpaces.includes(item.key));
   const selectedItemId = searchParams.get("item");
+
+  // Per-item paint-cycle counter, so a stale timeout from an earlier tap can't
+  // clobber a newer one's flash feedback on rapid untap->retap of the same item.
+  const paintCycleRef = useRef<Record<string, number>>({});
+  const pendingTimeoutIdsRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    return () => {
+      pendingTimeoutIdsRef.current.forEach((id) => window.clearTimeout(id));
+      pendingTimeoutIdsRef.current = [];
+    };
+  }, []);
 
   useEffect(() => {
     const nextFilter = searchParams.get("filter");
@@ -167,7 +181,7 @@ export default function QuickRecord() {
   useEffect(() => {
     if (space === currentSpace) return;
     setSpace(currentSpace);
-    if (filter === "space") setSearchParams({ filter: "space", space: currentSpace });
+    if (filter === "space") setSearchParams({ filter: "space", space: currentSpace }, { replace: true });
   }, [currentSpace, filter, setSearchParams, space]);
 
   const activeItems = useMemo(() => {
@@ -195,44 +209,60 @@ export default function QuickRecord() {
 
   const selectedItem = filter === "space" ? activeItems.find((item) => item.id === selectedItemId) : undefined;
 
+  const savePainted = (next: string[]) => {
+    setPaintedItems(next);
+    try {
+      window.sessionStorage.setItem("bbodeuk.session.recordPainted.v1", JSON.stringify(next));
+      // Home reads plain item ids (basin, sink, door-handle…); recent-/fav- list entries map to the same item.
+      const homeIds = Array.from(new Set(next.map((id) => id.replace(/^(recent|fav)-/, ""))));
+      window.sessionStorage.setItem("bbodeuk.session.homeCompleted.v1", JSON.stringify(homeIds));
+    } catch {
+      // no-op: storage unavailable, in-memory state still updates
+    }
+  };
+
   const paintItem = (item: RecordItem) => {
     if (paintedItems.includes(item.id)) {
-      setPaintedItems((current) => {
-        const next = current.filter((id) => id !== item.id);
-        window.sessionStorage.setItem("bbodeuk.session.recordPainted.v1", JSON.stringify(next));
-        return next;
-      });
+      savePainted(paintedItems.filter((id) => id !== item.id));
       setFlashCard(null);
+      setSweepingId(null);
       return;
     }
 
-    setPaintedItems((current) => {
-      const next = [...current, item.id];
-      window.sessionStorage.setItem("bbodeuk.session.recordPainted.v1", JSON.stringify(next));
-      return next;
-    });
+    savePainted([...paintedItems, item.id]);
     setFlashCard(item.id);
-    window.setTimeout(() => setFlashCard((current) => (current === item.id ? null : current)), 1200);
+    // Glass-sweep feedback (Figma spec: 480ms sweep, ~1.2s total settle).
+    // Deferred by one tick so the transform actually transitions from its
+    // resting -translate-x-full instead of mounting already-translated.
+    setSweepingId(null);
+    setSweepKey((key) => key + 1);
+    const cycle = (paintCycleRef.current[item.id] ?? 0) + 1;
+    paintCycleRef.current[item.id] = cycle;
+    const sweepTimeoutId = window.setTimeout(() => setSweepingId(item.id), 10);
+    const clearTimeoutId = window.setTimeout(() => {
+      setFlashCard((current) => (current === item.id && paintCycleRef.current[item.id] === cycle ? null : current));
+    }, 1200);
+    pendingTimeoutIdsRef.current.push(sweepTimeoutId, clearTimeoutId);
   };
 
   return (
-    <div className="phone-shell bg-surface text-on-surface">
+    <div className="phone-shell bg-sky-bg text-sky-ink">
       <AppHeader
         title={filter === "space" ? currentSpace === "bedroom" ? setup.roomName?.trim() || "방" : spaceLabels[currentSpace] : "기록"}
       />
-      <main className="flex flex-col bg-surface pb-24 pt-header">
+      <main className="flex flex-col bg-sky-bg pb-24 pt-header">
         <section className="px-margin-screen pb-space-sm pt-space-md">
-          <h1 className="text-headline-lg text-on-surface">{selectedItem ? `${selectedItem.name} 청소를 기록할까요?` : "어디를 청소했나요?"}</h1>
+          <h1 className="text-headline-lg text-sky-ink">{selectedItem ? `${selectedItem.name} 청소를 기록할까요?` : "어디를 청소했나요?"}</h1>
         </section>
 
         <section className="px-margin-screen py-space-xs">
-          <div className="flex w-full items-center gap-space-xs rounded-full bg-surface-container p-space-xxs">
+          <div className="flex w-full items-center gap-space-xs rounded-full bg-sky-bg p-space-xxs">
             {filters.map((item) => (
               <button
                 key={item.key}
                 aria-pressed={filter === item.key}
                 className={`flex flex-1 items-center justify-center gap-1 rounded-full px-space-xs py-space-xs text-label-md transition-all duration-200 ${
-                  filter === item.key ? "bg-surface-container-lowest text-primary shadow-sm" : "text-on-surface-variant"
+                  filter === item.key ? "bg-sky-white text-sky-deep shadow-sm" : "text-sky-muted"
                 }`}
                 type="button"
                 onClick={() => updateFilter(item.key)}
@@ -253,7 +283,7 @@ export default function QuickRecord() {
                     key={item.key}
                     aria-pressed={currentSpace === item.key}
                     className={`flex items-center gap-1.5 rounded-full border px-space-md py-space-xs text-label-md transition-colors duration-150 ${
-                      currentSpace === item.key ? `${spaceTones[item.key].fill} ${spaceTones[item.key].border} ${spaceTones[item.key].text}` : "border-transparent bg-surface-container text-on-surface-variant"
+                      currentSpace === item.key ? `${spaceTones[item.key].fill} ${spaceTones[item.key].border} ${spaceTones[item.key].text}` : "border-art-line bg-sky-white text-sky-muted"
                     }`}
                     type="button"
                     onClick={() => updateSpace(item.key)}
@@ -274,6 +304,7 @@ export default function QuickRecord() {
                 const flashed = flashCard === item.id;
                 const painted = paintedItems.includes(item.id);
                 const selected = selectedItemId === item.id;
+                const sweeping = sweepingId === item.id;
                 const tone = spaceTones[currentSpace];
 
                 return (
@@ -281,17 +312,27 @@ export default function QuickRecord() {
                     key={item.id}
                     aria-pressed={painted}
                     className={`relative flex aspect-square flex-col items-center justify-center gap-space-xs overflow-hidden rounded-lg border p-space-xs text-center transition-all active:scale-95 ${
-                      painted || selected ? `${tone.border} ${tone.fill} ${tone.text} shadow-sm` : "border-outline-variant/60 bg-surface-container-lowest text-on-surface"
+                      painted || selected ? `${tone.border} ${tone.fill} ${tone.text} shadow-sm` : "border-art-line bg-sky-white text-sky-ink"
                     }`}
                     type="button"
                     onClick={() => paintItem(item)}
                     >
-                    {selected ? <span className="absolute right-2 top-2 rounded-full bg-surface-container-lowest px-2 py-0.5 text-caption font-semibold">선택됨</span> : null}
+                    {selected ? <span className="absolute right-2 top-2 rounded-full bg-sky-white px-2 py-0.5 text-caption font-semibold">선택됨</span> : null}
+                    <Icon name={item.icon} className="text-[32px]" />
                     <span className="text-label-sm font-semibold">{item.name}</span>
-                    <span className="text-caption text-on-surface-variant">{painted ? "최근 청소 오늘" : item.meta ? `최근 청소 ${item.meta}` : "최근 기록 없음"}</span>
+                    <span className="text-caption text-sky-muted">{painted ? "최근 청소 오늘" : item.meta ? `최근 청소 ${item.meta}` : "최근 기록 없음"}</span>
+                    {painted ? (
+                      <span
+                        key={`${item.id}-${sweepKey}`}
+                        aria-hidden="true"
+                        className={`pointer-events-none absolute inset-y-0 left-0 w-1/2 -skew-x-12 bg-white/70 blur-sm transition-transform duration-[480ms] ease-out ${
+                          sweeping ? "translate-x-[260%]" : "-translate-x-full"
+                        }`}
+                      />
+                    ) : null}
                     <div role="status" aria-live="polite" className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
                       {flashed ? (
-                        <span className={`rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
+                        <span className={`rounded-full bg-sky-white px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
                           이제 깨끗해요!
                         </span>
                       ) : null}
@@ -299,7 +340,7 @@ export default function QuickRecord() {
                   </button>
                 );
               })}
-              <Link className="flex aspect-square flex-col items-center justify-center gap-space-xs rounded-lg border border-dashed border-outline-variant/60 bg-surface-container-lowest text-on-surface-variant" to={`/item-add?space=${currentSpace}`}>
+              <Link className="flex aspect-square flex-col items-center justify-center gap-space-xs rounded-lg border border-dashed border-art-line bg-sky-white text-sky-muted" to={`/item-add?space=${currentSpace}`}>
                 <Icon name="add" className="text-[24px]" />
                 <span className="text-label-sm">항목 추가</span>
               </Link>
@@ -309,6 +350,7 @@ export default function QuickRecord() {
               {activeItems.map((item) => {
                 const flashed = flashCard === item.id;
                 const painted = paintedItems.includes(item.id);
+                const sweeping = sweepingId === item.id;
                 const itemSpace = item.space ?? "bathroom";
                 const tone = spaceTones[itemSpace];
                 const spaceIcon = spaceTabs.find((tab) => tab.key === itemSpace)?.icon ?? "grid_view";
@@ -318,7 +360,7 @@ export default function QuickRecord() {
                     key={item.id}
                     aria-pressed={painted}
                     className={`relative flex items-center overflow-hidden rounded-xl border p-space-sm text-left transition-all duration-200 active:scale-[0.99] ${
-                      painted ? `${tone.border} ${tone.fill} shadow-sm` : "border-transparent bg-surface-container-lowest"
+                      painted ? `${tone.border} ${tone.fill} shadow-sm` : "border-transparent bg-sky-white"
                     }`}
                     type="button"
                     onClick={() => paintItem(item)}
@@ -328,13 +370,22 @@ export default function QuickRecord() {
                         <Icon name={spaceIcon} className="text-[22px]" />
                       </span>
                       <div className="flex min-w-0 flex-col">
-                        <span className={`text-title-sm ${painted ? tone.text : "text-on-surface"}`}>{item.name}</span>
-                        <span className="truncate text-caption text-on-surface-variant">{painted ? "최근 청소 오늘" : item.meta ? `최근 청소 ${item.meta}` : "최근 기록 없음"}</span>
+                        <span className={`text-title-sm ${painted ? tone.text : "text-sky-ink"}`}>{item.name}</span>
+                        <span className="truncate text-caption text-sky-muted">{painted ? "최근 청소 오늘" : item.meta ? `최근 청소 ${item.meta}` : "최근 기록 없음"}</span>
                       </div>
                     </div>
+                    {painted ? (
+                      <span
+                        key={`${item.id}-${sweepKey}`}
+                        aria-hidden="true"
+                        className={`pointer-events-none absolute inset-y-0 left-0 w-1/3 -skew-x-12 bg-white/70 blur-sm transition-transform duration-[480ms] ease-out ${
+                          sweeping ? "translate-x-[420%]" : "-translate-x-full"
+                        }`}
+                      />
+                    ) : null}
                     <div role="status" aria-live="polite" className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
                       {flashed ? (
-                        <span className={`rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
+                        <span className={`rounded-full bg-sky-white px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
                           이제 깨끗해요!
                         </span>
                       ) : null}

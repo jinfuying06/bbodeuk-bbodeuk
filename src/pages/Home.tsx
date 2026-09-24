@@ -33,19 +33,19 @@ const recommendations = [
 ];
 
 const spaceIcons: Record<string, string> = {
-  bathroom: "bathtub",
-  kitchen: "countertops",
-  living: "chair",
-  bedroom: "bed",
+  bathroom: "space-bath",
+  kitchen: "space-kitchen",
+  living: "space-living",
+  bedroom: "space-bed",
   entry: "door_front",
-  terrace: "balcony",
+  terrace: "space-terrace",
 };
 
 type CanvasCard = {
   spaceKey: string;
   room: string;
-  managedItems: number;
-  healthyItems: number;
+  /** Elapsed time ÷ recommended care cycle, averaged across the space's items. ~0 = just cared for, ≥1.1 = overdue floor. */
+  staleness: number;
   layout: string;
 };
 
@@ -53,43 +53,37 @@ const canvasCards: CanvasCard[] = [
   {
     spaceKey: "bathroom",
     room: "욕실",
-    managedItems: 6,
-    healthyItems: 1,
+    staleness: 0.9,
     layout: "h-[88px]",
   },
   {
     spaceKey: "entry",
     room: "현관",
-    managedItems: 2,
-    healthyItems: 0,
+    staleness: 1.2,
     layout: "h-[58px]",
   },
   {
     spaceKey: "kitchen",
     room: "주방/식당",
-    managedItems: 12,
-    healthyItems: 1,
+    staleness: 1.1,
     layout: "h-[96px]",
   },
   {
     spaceKey: "bedroom",
     room: "침실",
-    managedItems: 6,
-    healthyItems: 2,
+    staleness: 0.75,
     layout: "h-[110px]",
   },
   {
     spaceKey: "living",
     room: "거실",
-    managedItems: 6,
-    healthyItems: 4,
+    staleness: 0.2,
     layout: "h-[120px] flex-1",
   },
   {
     spaceKey: "terrace",
     room: "테라스",
-    managedItems: 2,
-    healthyItems: 0,
+    staleness: 1.15,
     layout: "h-[70px]",
   },
 ];
@@ -128,24 +122,41 @@ const setupSpaceMap: Record<string, string[]> = {
   "베란다 / 다용도실": ["terrace"],
 };
 
-const getManagementRatio = (card: CanvasCard) => {
-  if (card.managedItems <= 0) return 0;
-  return Math.min(1, card.healthyItems / card.managedItems);
+/**
+ * Figma recency policy: staleness (elapsed ÷ recommended cycle) 0/0.6/0.85/1.1+
+ * maps to fade 100/72/48/28%, interpolated smoothly between stops and floored at 28%.
+ */
+const getFadeTier = (staleness: number) => {
+  const stops: [number, number][] = [
+    [0, 1],
+    [0.6, 0.72],
+    [0.85, 0.48],
+    [1.1, 0.28],
+  ];
+  if (staleness <= stops[0][0]) return stops[0][1];
+  for (let i = 1; i < stops.length; i += 1) {
+    const [prevStaleness, prevFade] = stops[i - 1];
+    const [stopStaleness, stopFade] = stops[i];
+    if (staleness <= stopStaleness) {
+      const t = (staleness - prevStaleness) / (stopStaleness - prevStaleness);
+      return prevFade + (stopFade - prevFade) * t;
+    }
+  }
+  return stops[stops.length - 1][1];
 };
 
-const getCanvasTone = (spaceKey: string, ratio: number) => {
+const getCanvasTone = (spaceKey: string, fade: number) => {
   const [r, g, b] = getSpaceTone(spaceKey).rgb;
-  const alpha = ratio <= 0 ? 0.24 : ratio < 0.45 ? 0.38 : ratio < 0.75 ? 0.58 : 0.82;
   return {
-    backgroundColor: `rgba(${r}, ${g}, ${b}, ${alpha})`,
-    borderColor: `rgba(${r}, ${g}, ${b}, ${Math.min(alpha + 0.12, 0.9)})`,
+    backgroundColor: `rgba(${r}, ${g}, ${b}, ${fade})`,
+    borderColor: `rgba(${r}, ${g}, ${b}, ${Math.min(fade + 0.12, 0.95)})`,
   };
 };
 
-const getSpaceStatusLabel = (ratio: number) => {
-  if (ratio <= 0) return "아직 기록 없음";
-  if (ratio < 0.45) return "확인 필요";
-  if (ratio < 0.75) return "슬슬 확인";
+const getSpaceStatusLabel = (staleness: number) => {
+  if (staleness >= 1.1) return "아직 기록 없음";
+  if (staleness >= 0.85) return "확인 필요";
+  if (staleness >= 0.6) return "슬슬 확인";
   return "관리 중";
 };
 
@@ -155,15 +166,15 @@ const getCanvasColumns = (cards: CanvasCard[]) => ({
 });
 
 const getHomeStatus = (cards: CanvasCard[], sessionRecordCount: number, target?: (typeof recommendations)[number]) => {
-  const hasManagedItems = cards.some((card) => card.managedItems > 0);
-  const lowestSpace = [...cards].sort((a, b) => getManagementRatio(a) - getManagementRatio(b))[0];
+  const hasManagedItems = cards.length > 0;
+  const mostStaleSpace = [...cards].sort((a, b) => b.staleness - a.staleness)[0];
 
   if (!hasManagedItems) {
     return {
       icon: "info",
       title: "최근 기록이 없는 곳이 있어요",
       description: "청소를 기록하면 공간 상태가 조금씩 채워져요.",
-      tone: "bg-surface-container-low",
+      tone: "bg-sky-line",
     };
   }
 
@@ -171,8 +182,8 @@ const getHomeStatus = (cards: CanvasCard[], sessionRecordCount: number, target?:
     return {
       icon: "check_circle",
       title: `오늘 ${sessionRecordCount}곳을 관리했어요`,
-      description: lowestSpace ? `${lowestSpace.room} 상태도 함께 확인해보세요.` : "방금 관리한 공간이 캔버스에 반영됐어요.",
-      tone: "bg-tertiary-fixed/40",
+      description: mostStaleSpace ? `${mostStaleSpace.room} 상태도 함께 확인해보세요.` : "방금 관리한 공간이 캔버스에 반영됐어요.",
+      tone: "bg-sky-tint",
     };
   }
 
@@ -181,7 +192,7 @@ const getHomeStatus = (cards: CanvasCard[], sessionRecordCount: number, target?:
       icon: "manage_search",
       title: `${target.title} 청소는 어때요?`,
       description: target.meta,
-      tone: "bg-primary-fixed/55",
+      tone: "bg-sky-brand/25",
     };
   }
 
@@ -189,7 +200,7 @@ const getHomeStatus = (cards: CanvasCard[], sessionRecordCount: number, target?:
     icon: "check_circle",
     title: "최근 자주 관리한 곳이에요",
     description: "공간 상태가 전반적으로 안정적으로 유지되고 있어요.",
-    tone: "bg-tertiary-fixed/40",
+    tone: "bg-sky-tint",
   };
 };
 
@@ -227,11 +238,11 @@ export default function Home() {
   const visibleCanvasCards = hasSetup ? canvasCards.filter((card) => enabledSpaceKeys.has(card.spaceKey)) : canvasCards;
   const effectiveCanvasCards = visibleCanvasCards.map((card) => {
     const completedCount = recommendations.filter((item) => completed.includes(item.id) && item.spaceKey === card.spaceKey).length;
-    const sessionBoost = deepCleanSpaces.has(card.spaceKey) ? 1 : 0;
+    const justRefreshed = completedCount > 0 || deepCleanSpaces.has(card.spaceKey);
     return {
       ...card,
       room: card.spaceKey === "bedroom" ? setup.roomName?.trim() || "방" : card.room,
-      healthyItems: Math.min(card.managedItems, card.healthyItems + completedCount + sessionBoost),
+      staleness: justRefreshed ? Math.min(card.staleness, 0.05) : card.staleness,
     };
   });
   const baseRecentRecords = hasSetup ? recentRecords.filter((record) => enabledSpaceKeys.has(record.spaceKey)) : recentRecords;
@@ -247,45 +258,45 @@ export default function Home() {
   return (
     <PageShell>
       <AppHeader home />
-      <main className="flex flex-1 flex-col bg-surface pb-[88px] pt-header">
+      <main className="flex flex-1 flex-col bg-sky-bg pb-[88px] pt-header">
         <div className="flex w-full flex-col gap-space-xl px-margin-screen pb-space-2xl">
-          <Link className="relative block w-full overflow-hidden rounded-xl bg-surface-container-lowest p-space-lg shadow-sm transition-transform active:scale-[0.99]" to={`/quick-record?filter=space&space=${heroTarget?.spaceKey ?? effectiveCanvasCards[0]?.spaceKey ?? "bathroom"}`}>
+          <Link className="relative block w-full overflow-hidden rounded-xl bg-sky-white p-space-lg shadow-sm transition-transform active:scale-[0.99]" to={`/quick-record?filter=space&space=${heroTarget?.spaceKey ?? effectiveCanvasCards[0]?.spaceKey ?? "bathroom"}`}>
             <div className="flex items-start justify-between">
               <div className="relative z-10 flex max-w-[78%] flex-col gap-space-xxs">
-                <h1 className="text-headline-lg text-on-surface">{homeStatus.title}</h1>
-                <p className="text-body-md text-on-surface-variant">{homeStatus.description}</p>
+                <h1 className="text-headline-lg text-sky-ink">{homeStatus.title}</h1>
+                <p className="text-body-md text-sky-muted">{homeStatus.description}</p>
               </div>
-              <div className={`relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${homeStatus.tone} text-[24px] leading-none shadow-sm`} aria-hidden="true">
-                <span className="translate-y-[1px] leading-none">{homeStatus.icon === "check_circle" ? "🙂" : homeStatus.icon === "info" ? "🫧" : "🧽"}</span>
+              <div className={`relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${homeStatus.tone} shadow-sm`} aria-hidden="true">
+                <Icon name={homeStatus.icon} className="text-[24px] text-sky-deep" />
               </div>
             </div>
           </Link>
 
           <section className="flex flex-col gap-space-sm">
             <div className="flex items-center gap-1.5">
-              <Icon name="bubble_chart" className="text-[18px] text-primary" />
-              <span className="text-title-sm text-on-surface">청소 캔버스</span>
+              <Icon name="bubble_chart" className="text-[18px] text-sky-deep" />
+              <span className="text-title-sm text-sky-ink">청소 캔버스</span>
             </div>
-            <div className="relative overflow-hidden rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-              <p className="mb-space-sm text-caption text-on-surface-variant">각 공간을 누르면 공간별 기록으로 이동해요.</p>
-              <div className="flex h-[304px] gap-1.5 rounded-lg bg-surface-container-low p-1.5">
+            <div className="relative overflow-hidden rounded-xl bg-sky-white p-space-md shadow-sm">
+              <p className="mb-space-sm text-caption text-sky-muted">각 공간을 누르면 공간별 기록으로 이동해요.</p>
+              <div className="flex h-[304px] gap-1.5 rounded-lg bg-sky-bg p-1.5">
                 {[canvasColumns.left, canvasColumns.right].map((column, index) => (
                   <div key={index === 0 ? "left" : "right"} className={`${index === 0 ? "w-[43%]" : "flex-1"} flex min-w-0 flex-col gap-1.5`}>
                     {column.map((card) => {
-                      const ratio = getManagementRatio(card);
                       const tone = getSpaceTone(card.spaceKey);
-                      const style = getCanvasTone(card.spaceKey, ratio);
+                      const fade = getFadeTier(card.staleness);
+                      const style = getCanvasTone(card.spaceKey, fade);
 
                       return (
                         <Link
                           key={card.room}
-                          aria-label={`${card.room} 관리 상태 ${getSpaceStatusLabel(ratio)}`}
+                          aria-label={`${card.room} 관리 상태 ${getSpaceStatusLabel(card.staleness)}`}
                           className={`flex min-h-[52px] items-center justify-center gap-1.5 rounded-lg border px-2 py-space-xs text-center transition-transform active:scale-[0.98] ${card.layout}`}
                           style={style}
                           to={`/quick-record?filter=space&space=${card.spaceKey}`}
                         >
                           <Icon name={spaceIcons[card.spaceKey]} className={`shrink-0 text-[17px] ${tone.text}`} />
-                          <span className="block max-w-full truncate text-label-md font-bold text-on-surface">{card.room}</span>
+                          <span className="block max-w-full truncate text-label-md font-bold text-sky-ink">{card.room}</span>
                         </Link>
                       );
                     })}
@@ -293,7 +304,7 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <Link className="flex min-h-11 items-center justify-center gap-space-xs rounded-xl border border-dashed border-outline-variant/70 bg-surface-container-lowest px-space-md text-label-md text-primary" to="/space-manage">
+            <Link className="flex min-h-11 items-center justify-center gap-space-xs rounded-xl border border-dashed border-art-line bg-sky-white px-space-md text-label-md text-sky-deep" to="/space-manage">
               <Icon name="add" className="text-[20px]" />
               공간을 추가하고 싶나요?
             </Link>
@@ -301,14 +312,17 @@ export default function Home() {
 
           <section className="flex flex-col gap-space-sm">
             <div className="flex items-center gap-1.5">
-              <Icon name="check_circle" className="text-[18px] text-tertiary" />
-              <span className="text-title-sm text-on-surface">최근 관리 흔적</span>
+              <Icon name="check_circle" className="text-[18px] text-sky-deep" />
+              <span className="text-title-sm text-sky-ink">최근 관리 흔적</span>
             </div>
             {visibleRecentRecords.length <= 1 ? (
-              <div className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
-                <p className="text-title-sm text-on-surface">아직 최근 청소 기록이 많지 않아요.</p>
-                <p className="mt-1 text-body-md text-on-surface-variant">작은 청소부터 하나씩 기록해보세요.</p>
-                <Link className="mt-space-md inline-flex min-h-11 items-center rounded-lg bg-primary-container px-space-md text-label-md font-semibold text-on-primary" to="/quick-record">
+              <div className="rounded-xl bg-sky-white p-space-lg shadow-sm">
+                <p className="text-title-sm text-sky-ink">아직 최근 청소 기록이 많지 않아요.</p>
+                <p className="mt-1 text-body-md text-sky-muted">작은 청소부터 하나씩 기록해보세요.</p>
+                <Link
+                  className="mt-space-md inline-flex min-h-11 items-center rounded-lg bg-sky-brand px-space-md text-label-md font-semibold text-onbrand transition-transform duration-[120ms] active:scale-[0.98]"
+                  to="/quick-record"
+                >
                   청소 기록하기
                 </Link>
               </div>
@@ -316,25 +330,25 @@ export default function Home() {
               <>
                 <div className="grid grid-cols-2 gap-space-xs">
                   {visibleRecentRecords.map((record) => (
-                    <Link key={`${record.spaceKey}-${record.title}-${record.lastText}`} className="block rounded-xl bg-surface-container-lowest p-space-sm shadow-sm transition-transform active:scale-[0.99]" to={`/item-history?item=${encodeURIComponent(itemHistoryNames[record.id] ?? record.title)}`}>
+                    <Link key={`${record.spaceKey}-${record.title}-${record.lastText}`} className="block rounded-xl bg-sky-white p-space-sm shadow-sm transition-transform active:scale-[0.99]" to={`/item-history?item=${encodeURIComponent(itemHistoryNames[record.id] ?? record.title)}`}>
                       <div className="mb-space-xs flex items-center gap-space-xs">
                         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${getSpaceTone(record.spaceKey).fill} ${getSpaceTone(record.spaceKey).text}`}>
                           <Icon name={spaceIcons[record.spaceKey]} className="text-[18px]" />
                         </span>
-                        <span className="min-w-0 truncate text-body-md font-semibold text-on-surface">{record.title}</span>
+                        <span className="min-w-0 truncate text-body-md font-semibold text-sky-ink">{record.title}</span>
                       </div>
-                      <p className="text-caption text-on-surface-variant">최근 관리 {record.lastText}</p>
+                      <p className="text-caption text-sky-muted">최근 관리 {record.lastText}</p>
                     </Link>
                   ))}
                   {visibleRecentRecords.length > 1 && visibleRecentRecords.length < maxRecentRecords ? (
-                    <Link className="flex min-h-[92px] flex-col justify-between rounded-xl bg-surface-container-lowest p-space-sm shadow-sm transition-transform active:scale-[0.99]" to="/care">
-                      <span className="text-body-md font-semibold text-on-surface">다음에 관리할 곳을 찾아보세요</span>
-                      <span className="text-caption font-semibold text-primary">청소가이드 보기</span>
+                    <Link className="flex min-h-[92px] flex-col justify-between rounded-xl bg-sky-white p-space-sm shadow-sm transition-transform active:scale-[0.99]" to="/care">
+                      <span className="text-body-md font-semibold text-sky-ink">다음에 관리할 곳을 찾아보세요</span>
+                      <span className="text-caption font-semibold text-sky-deep">청소가이드 보기</span>
                     </Link>
                   ) : null}
                 </div>
                 {allRecentRecords.length > maxRecentRecords ? (
-                  <Link className="self-center px-space-sm py-space-xs text-label-md text-primary transition-opacity active:opacity-70" to="/history">
+                  <Link className="self-center px-space-sm py-space-xs text-label-md text-sky-deep transition-opacity active:opacity-70" to="/history">
                     청소 기록 더보기
                   </Link>
                 ) : null}
@@ -345,8 +359,8 @@ export default function Home() {
           {activeRecommendations.length > 0 ? (
             <section className="flex flex-col gap-space-sm">
               <div className="flex items-center gap-1.5">
-                <Icon name="lightbulb" className="text-[18px] text-primary" />
-                <span className="text-title-sm text-on-surface">여기 청소는 어때요?</span>
+                <Icon name="lightbulb" className="text-[18px] text-sky-deep" />
+                <span className="text-title-sm text-sky-ink">여기 청소는 어때요?</span>
               </div>
               <div className="flex flex-col gap-space-sm">
                 {activeRecommendations.map((item) => {
@@ -355,7 +369,7 @@ export default function Home() {
                   return (
                     <Link
                       key={item.id}
-                      className="relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-surface-container-lowest p-space-md text-left shadow-sm transition-transform active:scale-[0.99]"
+                      className="relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-sky-white p-space-md text-left shadow-sm transition-transform active:scale-[0.99]"
                       to={`/quick-record?filter=space&space=${item.spaceKey}`}
                     >
                       <div className="flex items-center justify-between gap-space-sm">
@@ -364,11 +378,11 @@ export default function Home() {
                             <Icon name={spaceIcons[item.spaceKey]} className="text-[22px]" />
                           </div>
                           <div className="flex min-w-0 flex-col">
-                            <span className="truncate text-title-sm text-on-surface">{item.title}</span>
-                            <span className="mt-0.5 text-caption text-on-surface-variant">{item.meta}</span>
+                            <span className="truncate text-title-sm text-sky-ink">{item.title}</span>
+                            <span className="mt-0.5 text-caption text-sky-muted">{item.meta}</span>
                           </div>
                         </div>
-                        <Icon name="chevron_right" className="ml-space-sm shrink-0 text-[20px] text-outline-variant" />
+                        <Icon name="chevron_right" className="ml-space-sm shrink-0 text-[20px] text-sky-muted" />
                       </div>
                     </Link>
                   );
@@ -378,19 +392,19 @@ export default function Home() {
           ) : null}
 
           <Link
-            className="relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-surface-container-lowest p-space-md shadow-sm transition-transform active:scale-[0.99]"
+            className="relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-sky-white p-space-md shadow-sm transition-transform active:scale-[0.99]"
             to="/deep-clean"
           >
             <div className="flex min-w-0 items-center gap-space-sm">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-container text-primary">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-tint text-sky-deep">
                 <Icon name="cleaning_services" className="text-[20px]" />
               </div>
               <div className="flex min-w-0 flex-col">
-                <span className="truncate text-title-sm text-on-surface">대청소 어떠세요?</span>
-                <span className="truncate text-caption text-on-surface-variant">오래 안 한 곳과 숨은 관리까지 훑어봐요.</span>
+                <span className="truncate text-title-sm text-sky-ink">대청소 어떠세요?</span>
+                <span className="truncate text-caption text-sky-muted">오래 안 한 곳과 숨은 관리까지 훑어봐요.</span>
               </div>
             </div>
-            <Icon name="chevron_right" className="ml-2 shrink-0 text-[20px] text-on-surface-variant" />
+            <Icon name="chevron_right" className="ml-2 shrink-0 text-[20px] text-sky-muted" />
           </Link>
         </div>
       </main>

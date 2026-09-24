@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import { readHiddenItems, readOverrides } from "../data/itemStorage";
 import { spaceTones as sharedSpaceTones } from "../data/spaceTones";
 
 type CareStatus = "확인 필요" | "슬슬 확인" | "관리 중" | "아직 기록 없음";
@@ -28,7 +29,7 @@ const spaces: Space[] = [
   {
     key: "bathroom",
     title: "욕실",
-    icon: "bathtub",
+    icon: "space-bath",
     tone: sharedSpaceTones.bathroom.fill,
     iconTone: sharedSpaceTones.bathroom.text,
     items: [
@@ -41,7 +42,7 @@ const spaces: Space[] = [
   {
     key: "kitchen",
     title: "주방",
-    icon: "countertops",
+    icon: "space-kitchen",
     tone: sharedSpaceTones.kitchen.fill,
     iconTone: sharedSpaceTones.kitchen.text,
     items: [
@@ -53,7 +54,7 @@ const spaces: Space[] = [
   {
     key: "bedroom",
     title: "침실",
-    icon: "bed",
+    icon: "space-bed",
     tone: sharedSpaceTones.bedroom.fill,
     iconTone: sharedSpaceTones.bedroom.text,
     items: [
@@ -64,7 +65,7 @@ const spaces: Space[] = [
   {
     key: "living",
     title: "거실",
-    icon: "chair",
+    icon: "space-living",
     tone: sharedSpaceTones.living.fill,
     iconTone: sharedSpaceTones.living.text,
     items: [
@@ -76,7 +77,7 @@ const spaces: Space[] = [
   {
     key: "terrace",
     title: "테라스",
-    icon: "balcony",
+    icon: "space-terrace",
     tone: sharedSpaceTones.terrace.fill,
     iconTone: sharedSpaceTones.terrace.text,
     items: [
@@ -96,10 +97,10 @@ const setupSpaceMap: Record<string, string> = {
 };
 
 const statusTone: Record<CareStatus, string> = {
-  "확인 필요": "bg-secondary-fixed text-on-secondary-fixed-variant",
-  "슬슬 확인": "bg-primary-fixed text-on-primary-fixed-variant",
-  "관리 중": "bg-tertiary-fixed/60 text-on-tertiary-fixed-variant",
-  "아직 기록 없음": "bg-surface-container-high text-on-surface-variant",
+  "확인 필요": "bg-sky-white text-sky-ink border border-sky-brand",
+  "슬슬 확인": "bg-sky-bg text-sky-ink border border-art-line",
+  "관리 중": "bg-sky-tint text-sky-deep",
+  "아직 기록 없음": "bg-sky-white text-sky-muted border border-art-line",
 };
 
 const getSummary = (items: CareItem[]) => {
@@ -131,7 +132,18 @@ export default function Spaces() {
     }
   })();
   const selectedKeys = new Set((setup.spaces ?? []).map((name) => setupSpaceMap[name]).filter(Boolean));
-  const availableSpaces = selectedKeys.size > 0 ? spaces.filter((space) => selectedKeys.has(space.key)) : spaces;
+  // Reflect ItemInfo edits: hide deleted items, show renamed titles / changed intervals.
+  const hiddenItems = readHiddenItems();
+  const overrides = readOverrides();
+  const availableSpaces = (selectedKeys.size > 0 ? spaces.filter((space) => selectedKeys.has(space.key)) : spaces).map((space) => ({
+    ...space,
+    items: space.items
+      .filter((item) => !hiddenItems.includes(item.id))
+      .map((item) => {
+        const override = overrides[item.id];
+        return override ? { ...item, title: override.name, intervalDays: override.intervalDays } : item;
+      }),
+  }));
   const tabs = [{ key: "전체 보기", label: "전체 보기" }, ...availableSpaces.map((space) => ({
     key: space.key,
     label: space.key === "bedroom" ? setup.roomName?.trim() || "방" : space.title,
@@ -148,7 +160,7 @@ export default function Spaces() {
               {tabs.map(({ key, label }) => {
                 const active = selectedTab === key;
                 return (
-                  <button key={key} aria-pressed={active} className={`min-h-11 rounded-full px-4 py-2 text-label-md ${active ? "bg-primary text-on-primary shadow-sm" : "bg-surface-container-low text-on-surface-variant"}`} type="button" onClick={() => setSelectedTab(key)}>
+                  <button key={key} aria-pressed={active} className={`min-h-11 rounded-full px-4 py-2 text-label-md ${active ? "bg-sky-brand text-onbrand shadow-sm" : "border border-art-line bg-sky-white text-sky-muted"}`} type="button" onClick={() => setSelectedTab(key)}>
                     {label}
                   </button>
                 );
@@ -157,32 +169,32 @@ export default function Spaces() {
           </div>
 
           {visibleSpaces.map((space) => (
-            <section key={space.key} className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
+            <section key={space.key} className="rounded-xl bg-sky-white p-space-md shadow-sm">
               <div className="mb-space-md flex items-start justify-between gap-space-sm">
                 <div className="flex min-w-0 items-center gap-space-xs">
                   <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${space.tone} ${space.iconTone}`}>
                     <Icon name={space.icon} className="text-[22px]" />
                   </span>
                   <div className="min-w-0">
-                    <h2 className="truncate text-title-md">{space.key === "bedroom" ? setup.roomName?.trim() || "방" : space.title}</h2>
-                    <p className="text-caption text-on-surface-variant">{getSummary(space.items)}</p>
+                    <h2 className="truncate text-title-md text-sky-ink">{space.key === "bedroom" ? setup.roomName?.trim() || "방" : space.title}</h2>
+                    <p className="text-caption text-sky-muted">{getSummary(space.items)}</p>
                   </div>
                 </div>
               </div>
               <div className="flex flex-col gap-space-xs">
                 {space.items.map((item) => (
-                  <Link key={item.id} className="flex min-h-[68px] items-center justify-between rounded-xl bg-surface-container-low p-3 transition-transform active:scale-[0.99]" to={`/item-info?space=${space.key}&item=${item.id}`}>
+                  <Link key={item.id} className="flex min-h-[68px] items-center justify-between rounded-xl bg-sky-bg p-3 transition-transform active:scale-[0.99]" to={`/item-info?space=${space.key}&item=${item.id}`}>
                     <div className="min-w-0">
-                      <span className="block truncate text-title-sm">{item.title}</span>
-                      <p className="mt-0.5 truncate text-caption text-on-surface-variant">{item.lastRecord}</p>
+                      <span className="block truncate text-title-sm text-sky-ink">{item.title}</span>
+                      <p className="mt-0.5 truncate text-caption text-sky-muted">{item.lastRecord}</p>
                     </div>
                     <div className="ml-space-sm flex shrink-0 items-center gap-space-xs">
                       <span className={`rounded-full px-2.5 py-1 text-label-sm ${statusTone[item.status]}`}>{item.status}</span>
-                      <Icon name="chevron_right" className="text-[20px] text-outline-variant" />
+                      <Icon name="chevron_right" className="text-[20px] text-sky-muted" />
                     </div>
                   </Link>
                 ))}
-                <Link className="flex min-h-[60px] items-center justify-center gap-space-xs rounded-xl border border-dashed border-outline-variant/70 bg-surface-container-lowest text-label-md text-on-surface-variant transition-transform active:scale-[0.99]" to={`/item-add?space=${space.key}`}>
+                <Link className="flex min-h-[60px] items-center justify-center gap-space-xs rounded-xl border border-dashed border-art-line bg-sky-white text-label-md text-sky-muted transition-transform active:scale-[0.99]" to={`/item-add?space=${space.key}`}>
                   <Icon name="add" className="text-[20px]" />
                   항목 추가
                 </Link>
@@ -190,19 +202,19 @@ export default function Spaces() {
             </section>
           ))}
 
-          <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-            <h2 className="text-title-sm">우리 집에 다른 공간도 있나요?</h2>
-            <p className="mt-1 text-body-md text-on-surface-variant">베란다, 드레스룸처럼 필요한 공간은 1개당 300P로 확장할 수 있어요.</p>
-            <Link className="mt-space-sm flex min-h-11 w-full items-center justify-center gap-space-xs rounded-lg border border-dashed border-outline-variant text-label-md text-primary" to="/space-manage">
+          <section className="rounded-xl bg-sky-tint p-space-md shadow-sm">
+            <h2 className="text-title-sm text-sky-ink">우리 집에 다른 공간도 있나요?</h2>
+            <p className="mt-1 text-body-md text-sky-muted">베란다, 드레스룸처럼 필요한 공간은 1개당 300P로 확장할 수 있어요.</p>
+            <Link className="mt-space-sm flex min-h-11 w-full items-center justify-center gap-space-xs rounded-lg border border-sky-brand bg-sky-white px-space-sm text-label-md text-sky-deep transition-transform duration-[120ms] active:scale-[0.98]" to="/space-manage">
               <Icon name="add" className="text-[20px]" />
               공간 추가 · 300P
             </Link>
           </section>
 
           {visibleSpaces.length === 0 ? (
-            <section className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
-              <p className="text-title-sm text-on-surface">이 공간에는 아직 관리 항목이 없어요.</p>
-              <p className="mt-1 text-body-md text-on-surface-variant">관리할 곳을 추가하면 이 화면에서 모아볼 수 있어요.</p>
+            <section className="rounded-xl bg-sky-white p-space-lg shadow-sm">
+              <p className="text-title-sm text-sky-ink">이 공간에는 아직 관리 항목이 없어요.</p>
+              <p className="mt-1 text-body-md text-sky-muted">관리할 곳을 추가하면 이 화면에서 모아볼 수 있어요.</p>
             </section>
           ) : null}
         </div>

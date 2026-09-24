@@ -3,7 +3,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 
 import { itemLibrary, spaceLabels, type SpaceKey } from "../../src/features/ax-onboarding/itemLibrary";
-import { MAX_PHOTOS_PER_SPACE, type AXRecognitionResponse, type AXRecognizeRequest } from "../../src/features/ax-onboarding/types";
+import { MAX_PHOTOS_PER_SPACE, type AXRecognitionResponse } from "../../src/features/ax-onboarding/types";
 
 /**
  * PRD_v3.0 SECTION 19 (AX 온보딩) 백엔드 프록시 핵심 로직.
@@ -30,6 +30,42 @@ const RecognitionSchema = z.object({
   results: z.array(SpaceResultSchema),
 });
 
+// 신뢰 경계: 클라이언트 요청 본문. 이미지 1장당 base64 약 1.5MB(원본 ~1.1MB) 상한.
+const RequestSchema = z.object({
+  spaces: z
+    .array(
+      z.object({
+        spaceKey: z.enum(SPACE_KEYS),
+        images: z
+          .array(
+            z.object({
+              mediaType: z.enum(["image/png", "image/jpeg", "image/webp"]),
+              data: z.string().min(1).max(1_500_000),
+            }),
+          )
+          .min(1)
+          .max(MAX_PHOTOS_PER_SPACE),
+      }),
+    )
+    .min(1)
+    .max(SPACE_KEYS.length)
+    .refine((spaces) => new Set(spaces.map((space) => space.spaceKey)).size === spaces.length),
+});
+
+type ValidRequest = z.infer<typeof RequestSchema>;
+
+/** 어댑터가 status를 그대로 HTTP 응답 코드로 쓰고, message만 클라이언트에 노출하는 에러. */
+export class HttpError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
+const MODEL_ERROR_MESSAGE = "사진 인식에 실패했어요";
+
 let cachedClient: Anthropic | null = null;
 function getClient(): Anthropic {
   // 지연 생성: ANTHROPIC_API_KEY가 없는 환경(로컬 타입체크 등)에서 모듈 로드 자체는 실패하지 않게 한다.
@@ -37,7 +73,7 @@ function getClient(): Anthropic {
   return cachedClient;
 }
 
-function buildPrompt(request: AXRecognizeRequest): Anthropic.Messages.ContentBlockParam[] {
+function buildPrompt(request: ValidRequest): Anthropic.Messages.ContentBlockParam[] {
   const sectionLines: string[] = [];
   const imageBlocks: Anthropic.Messages.ContentBlockParam[] = [];
 
@@ -74,31 +110,31 @@ function buildPrompt(request: AXRecognizeRequest): Anthropic.Messages.ContentBlo
   return [instructions, ...imageBlocks];
 }
 
-export async function handleAXRecognize(request: AXRecognizeRequest): Promise<AXRecognitionResponse> {
-  if (!request.spaces || request.spaces.length === 0) {
-    throw new Error("spaces가 비어 있습니다");
+export async function handleAXRecognize(body: unknown): Promise<AXRecognitionResponse> {
+  const parsed = RequestSchema.safeParse(body);
+  if (!parsed.success) {
+    throw new HttpError(400, "요청 형식이 올바르지 않아요");
   }
-  for (const space of request.spaces) {
-    if (space.images.length === 0 || space.images.length > MAX_PHOTOS_PER_SPACE) {
-      throw new Error(`"${space.spaceKey}" 공간의 사진 수가 허용 범위(1~${MAX_PHOTOS_PER_SPACE}장)를 벗어났습니다`);
-    }
-  }
+  const request = parsed.data;
 
   const content = buildPrompt(request);
 
-  const response = await getClient().messages.parse({
-    model: "claude-opus-5",
-    max_tokens: 4096,
-    messages: [{ role: "user", content }],
-    output_config: { format: zodOutputFormat(RecognitionSchema) },
-  });
-
-  if (!response.parsed_output) {
-    throw new Error("AI 응답을 구조화된 형식으로 해석하지 못했습니다");
+  let response;
+  try {
+    response = await getClient().messages.parse({
+      model: "claude-opus-5",
+      max_tokens: 4096,
+      messages: [{ role: "user", content }],
+      output_config: { format: zodOutputFormat(RecognitionSchema) },
+    });
+  } catch (error) {
+    console.error("AX 인식 모델 호출 실패", error);
+    throw new HttpError(502, MODEL_ERROR_MESSAGE);
   }
 
-  if (response.parsed_output.results.length !== request.spaces.length) {
-    throw new Error("응답 결과 개수가 요청한 공간 수와 일치하지 않습니다");
+  if (!response.parsed_output || response.parsed_output.results.length !== request.spaces.length) {
+    console.error("AX 인식 응답 형식 오류", response.parsed_output);
+    throw new HttpError(502, MODEL_ERROR_MESSAGE);
   }
 
   return response.parsed_output;

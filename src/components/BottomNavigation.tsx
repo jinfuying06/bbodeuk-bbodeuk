@@ -2,11 +2,11 @@ import { Link, useLocation } from "react-router-dom";
 import Icon from "./Icon";
 
 const tabs = [
-  { label: "홈", icon: "cottage", to: "/home" },
-  { label: "공간", icon: "grid_view", to: "/spaces" },
-  { label: "기록", icon: "add", to: "/quick-record", center: true },
-  { label: "히스토리", icon: "calendar_month", to: "/history" },
-  { label: "청소가이드", icon: "menu_book", to: "/care" },
+  { label: "홈", icon: "nav-home", to: "/home" },
+  { label: "공간", icon: "nav-spaces", to: "/spaces" },
+  { label: "기록", icon: "nav-record", to: "/quick-record", center: true },
+  { label: "히스토리", icon: "nav-history", to: "/history" },
+  { label: "청소가이드", icon: "nav-guide", to: "/care" },
 ];
 
 export default function BottomNavigation() {
@@ -21,10 +21,10 @@ export default function BottomNavigation() {
           if (tab.center) {
             return (
               <Link key={tab.label} aria-current={active ? "page" : undefined} className="flex flex-1 -mt-4 min-h-[44px] flex-col items-center justify-center" to={tab.to}>
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-container text-on-primary shadow-[0_4px_12px_rgba(0,161,255,0.3)] transition-transform active:scale-95">
-                  <Icon name={tab.icon} className="text-[26px]" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-brand text-onbrand shadow-[0_4px_12px_rgba(86,217,210,0.4)] transition-transform duration-[120ms] active:scale-95">
+                  <Icon name={tab.icon} className="text-[24px]" />
                 </div>
-                <span className="mt-1 text-label-sm text-primary">{tab.label}</span>
+                <span className="mt-1 text-label-sm text-sky-deep">{tab.label}</span>
               </Link>
             );
           }
@@ -33,12 +33,18 @@ export default function BottomNavigation() {
             <Link
               key={tab.label}
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 transition-colors ${
-                active ? "font-semibold text-primary" : "text-on-surface-variant"
+              className={`relative flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 transition-colors ${
+                active ? "font-semibold text-sky-deep" : "text-sky-muted"
               }`}
               to={tab.to}
             >
-              <Icon name={tab.icon} className="text-[24px]" fill={active} />
+              <span
+                aria-hidden="true"
+                className={`absolute top-0 h-[3px] w-6 rounded-full bg-sky-deep transition-opacity duration-150 ${
+                  active ? "opacity-100" : "opacity-0"
+                }`}
+              />
+              <Icon name={tab.icon} className="text-[22px]" />
               <span className="whitespace-nowrap text-[11px] leading-4">{tab.label}</span>
             </Link>
           );

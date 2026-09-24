@@ -13,13 +13,13 @@ type AppHeaderProps = {
 export default function AppHeader({ title, home = false, right, onBack }: AppHeaderProps) {
   const actions = right ?? (
     <div className="flex items-center gap-space-xxs">
-      <button aria-label="알림" className="flex h-11 w-11 items-center justify-center text-on-surface-variant transition-colors active:text-primary">
+      <button aria-label="알림" className="flex h-11 w-11 items-center justify-center text-sky-muted transition-colors active:text-sky-deep">
         <Icon name="notifications" className="text-[24px]" />
       </button>
-      <Link aria-label="포인트 구매" className="flex h-11 w-11 items-center justify-center text-on-surface-variant transition-colors active:text-primary" to="/points">
+      <Link aria-label="포인트 구매" className="flex h-11 w-11 items-center justify-center text-sky-muted transition-colors active:text-sky-deep" to="/points">
         <Icon name="toll" className="text-[24px]" />
       </Link>
-      <Link aria-label="설정" className="flex h-11 w-11 items-center justify-center text-on-surface-variant transition-colors active:text-primary" to="/settings">
+      <Link aria-label="설정" className="flex h-11 w-11 items-center justify-center text-sky-muted transition-colors active:text-sky-deep" to="/settings">
         <Icon name="settings" className="text-[24px]" />
       </Link>
     </div>

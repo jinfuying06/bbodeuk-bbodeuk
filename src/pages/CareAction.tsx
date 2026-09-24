@@ -140,8 +140,10 @@ export default function CareAction() {
         <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
           <h2 className="text-title-sm">함께 관리하면 좋아요</h2>
           <div className="mt-space-sm flex flex-col gap-space-xs">
-            {guide.related.map((item) => (
-              <Link key={item.title} className="flex min-h-[64px] items-center justify-between rounded-lg bg-surface-container-low p-space-sm transition-transform active:scale-[0.99]" to="/care-action">
+            {guide.related.map((item) => {
+              // Only link related items that have their own guide here; others render as plain rows.
+              const target = guides.find((entry) => entry.title === item.title);
+              const content = (
                 <div className="flex min-w-0 items-center gap-space-sm">
                   <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${tone.fill} ${tone.text}`}>
                     <Icon name={spaceIcons[guide.space]} className="text-[20px]" />
@@ -151,9 +153,18 @@ export default function CareAction() {
                     <p className="mt-0.5 truncate text-caption text-on-surface-variant">{item.description}</p>
                   </div>
                 </div>
-                <Icon name="chevron_right" className="ml-space-sm shrink-0 text-[20px] text-outline-variant" />
-              </Link>
-            ))}
+              );
+              return target ? (
+                <Link key={item.title} className="flex min-h-[64px] items-center justify-between rounded-lg bg-surface-container-low p-space-sm transition-transform active:scale-[0.99]" to={`/care-action?item=${target.id}&space=${target.space}`}>
+                  {content}
+                  <Icon name="chevron_right" className="ml-space-sm shrink-0 text-[20px] text-outline-variant" />
+                </Link>
+              ) : (
+                <div key={item.title} className="flex min-h-[64px] items-center justify-between rounded-lg bg-surface-container-low p-space-sm">
+                  {content}
+                </div>
+              );
+            })}
           </div>
         </section>
       </main>

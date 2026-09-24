@@ -87,7 +87,7 @@ export default function ItemHistory() {
   const selectedItem = searchParams.get("item") ?? "세면대 수전 및 볼";
   const itemRecords = records.filter((record) => record.item === selectedItem).sort((a, b) => (a.date < b.date ? 1 : -1));
   const fallbackRecord = records.find((record) => record.item === selectedItem) ?? records[0];
-  const tone = spaceToneByLabel[fallbackRecord.space] ?? { fill: "bg-surface-container-low", text: "text-on-surface-variant", border: "border-outline-variant" };
+  const tone = spaceToneByLabel[fallbackRecord.space] ?? { fill: "bg-surface-container-low", text: "text-on-surface-variant", dot: "bg-on-surface-variant", line: "bg-outline-variant" };
   const latestRecord = itemRecords[0];
   const currentWeekStart = getStartOfWeek(today);
   const currentWeekEnd = new Date(currentWeekStart);
@@ -172,8 +172,8 @@ export default function ItemHistory() {
                     return (
                       <li key={record.id} className="flex gap-space-sm">
                         <div className="flex flex-col items-center">
-                          <span aria-hidden="true" className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${tone.text.replace("text-", "bg-")}`} />
-                          {!isLast ? <span aria-hidden="true" className={`w-px flex-1 ${tone.border.replace("border-", "bg-")}`} /> : null}
+                          <span aria-hidden="true" className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${tone.dot}`} />
+                          {!isLast ? <span aria-hidden="true" className={`w-px flex-1 ${tone.line}`} /> : null}
                         </div>
                         <div className={`min-w-0 flex-1 ${isLast ? "pb-0.5" : "pb-space-md"}`}>
                           <h2 className="text-title-sm text-on-surface">{formatDate(record.date)}</h2>

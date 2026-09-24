@@ -40,6 +40,8 @@ export default function Points() {
   const [showSignupConfirm, setShowSignupConfirm] = useState(false);
   const purchaseSection = useRef<HTMLElement>(null);
   const signupConfirmButtonRef = useRef<HTMLButtonElement>(null);
+  const toastTimerRef = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(toastTimerRef.current), []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -66,7 +68,8 @@ export default function Points() {
 
   const showComingSoon = () => {
     setShowToast(true);
-    window.setTimeout(() => setShowToast(false), 2400);
+    window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setShowToast(false), 2400);
   };
 
   return (

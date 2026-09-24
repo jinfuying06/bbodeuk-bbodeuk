@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
 import Toast from "../components/Toast";
 import { isMember, readPoints, spendPoints } from "../data/points";
-import { DEFAULT_SPACES, EXPANSION_CATALOG, readSetup, writeSetup, type SetupData } from "../data/setup";
+import { DEFAULT_SPACES, EXPANSION_CATALOG, hasCompletedSetup, readSetup, writeSetup, type SetupData } from "../data/setup";
 
 function withRequiredSpaces(setup: SetupData): SetupData {
   const requiredKeys = DEFAULT_SPACES.filter((space) => space.required).map((space) => space.key);
@@ -18,17 +18,23 @@ function withRequiredSpaces(setup: SetupData): SetupData {
 
 export default function SpaceManage() {
   const navigate = useNavigate();
-  const [setup, setSetup] = useState(() => withRequiredSpaces(readSetup()));
+  // Only normalize (and persist) an existing setup; before Setup is completed, show the defaults without writing.
+  const [setup, setSetup] = useState<SetupData>(() =>
+    hasCompletedSetup() ? withRequiredSpaces(readSetup()) : { spaces: DEFAULT_SPACES.map((space) => space.key), roomName: "방" },
+  );
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
+  const toastTimerRef = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(toastTimerRef.current), []);
   const member = isMember();
   const balance = readPoints();
 
   const notify = (message: string) => {
     setToastMessage(message);
     setShowToast(true);
-    window.setTimeout(() => setShowToast(false), 2400);
+    window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setShowToast(false), 2400);
   };
 
   const toggleSpace = (key: string, required: boolean) => {

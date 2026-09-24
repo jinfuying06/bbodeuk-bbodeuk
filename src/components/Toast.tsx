@@ -26,12 +26,12 @@ export default function Toast({ message, visible, actionLabel, onAction, pill = 
           }`}
         >
           <div className="flex min-w-0 items-center gap-space-xs">
-            <Icon name={pill ? "task_alt" : "auto_awesome"} className="text-[20px] text-tertiary-fixed" />
+            <Icon name={pill ? "task_alt" : "auto_awesome"} className="text-[20px] text-sky-brand" />
             <span className="truncate text-body-md font-medium">{message}</span>
           </div>
           {actionLabel && onAction ? (
             <button
-              className="ml-2 min-h-[32px] shrink-0 px-2 py-1 text-label-md text-primary-fixed transition-colors active:opacity-75"
+              className="ml-2 min-h-[32px] shrink-0 px-2 py-1 text-label-md text-sky-sky transition-colors active:opacity-75"
               type="button"
               onClick={onAction}
             >

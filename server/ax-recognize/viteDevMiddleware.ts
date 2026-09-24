@@ -1,5 +1,8 @@
 import type { Plugin } from "vite";
-import { handleAXRecognize } from "./handler";
+import { HttpError, handleAXRecognize } from "./handler";
+
+const MAX_BODY_BYTES = 8 * 1024 * 1024; // 8MB
+const LOCAL_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 
 /**
  * `npm run dev`에서만 켜지는 로컬 브릿지. 프로덕션 빌드(GitHub Pages 정적 배포)에는
@@ -12,28 +15,58 @@ export function axRecognizeDevPlugin(): Plugin {
     apply: "serve",
     configureServer(server) {
       server.middlewares.use("/api/ax/recognize", (req, res) => {
-        if (req.method !== "POST") {
-          res.statusCode = 405;
+        const send = (status: number, payload: unknown) => {
+          res.statusCode = status;
           res.setHeader("Content-Type", "application/json");
-          res.end(JSON.stringify({ error: "POST만 지원합니다" }));
+          res.end(JSON.stringify(payload));
+        };
+
+        if (req.method !== "POST") {
+          send(405, { error: "POST만 지원합니다" });
+          return;
+        }
+        if (!req.headers["content-type"]?.startsWith("application/json")) {
+          send(415, { error: "application/json만 지원합니다" });
+          return;
+        }
+        const origin = req.headers.origin;
+        if (origin !== undefined && !LOCAL_ORIGIN.test(origin)) {
+          send(403, { error: "허용되지 않은 요청입니다" });
           return;
         }
 
-        let body = "";
-        req.on("data", (chunk) => {
-          body += chunk;
+        const chunks: Buffer[] = [];
+        let size = 0;
+        let aborted = false;
+        req.on("data", (chunk: Buffer) => {
+          if (aborted) return;
+          size += chunk.length;
+          if (size > MAX_BODY_BYTES) {
+            aborted = true;
+            res.setHeader("Connection", "close");
+            send(413, { error: "요청이 너무 커요" });
+            return;
+          }
+          chunks.push(chunk);
         });
         req.on("end", () => {
+          if (aborted) return;
           void (async () => {
             try {
-              const result = await handleAXRecognize(JSON.parse(body));
-              res.statusCode = 200;
-              res.setHeader("Content-Type", "application/json");
-              res.end(JSON.stringify(result));
+              let parsed: unknown;
+              try {
+                parsed = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+              } catch {
+                throw new HttpError(400, "요청 형식이 올바르지 않아요");
+              }
+              send(200, await handleAXRecognize(parsed));
             } catch (error) {
-              res.statusCode = 500;
-              res.setHeader("Content-Type", "application/json");
-              res.end(JSON.stringify({ error: error instanceof Error ? error.message : "알 수 없는 오류" }));
+              if (error instanceof HttpError) {
+                send(error.status, { error: error.message });
+                return;
+              }
+              console.error(error);
+              send(500, { error: "사진 인식 중 문제가 생겼어요" });
             }
           })();
         });

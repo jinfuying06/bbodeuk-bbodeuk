@@ -4,6 +4,7 @@ import PhotoSetupScreen from "./PhotoSetupScreen";
 import DraftReviewScreen from "./DraftReviewScreen";
 import type { AXSpaceDraft } from "./types";
 import type { SpaceKey } from "./itemLibrary";
+import { writeSetup } from "../../data/setup";
 
 /**
  * 이 기능의 유일한 진입/종료 지점. App.tsx는 이 컴포넌트 하나만 라우트에 연결한다.
@@ -24,7 +25,7 @@ export default function AXOnboardingFlow() {
 
   const finishSetup = (spaceKeys: SpaceKey[]) => {
     const spaces = Array.from(new Set(spaceKeys.map((key) => SETUP_STORAGE_LABEL[key])));
-    window.localStorage.setItem("bbodeuk.setup.v1", JSON.stringify({ spaces, roomName: "방" }));
+    writeSetup({ spaces, roomName: "방" });
     navigate("/home");
   };
 
