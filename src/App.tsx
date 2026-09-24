@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AX_ONBOARDING_ENABLED, AXOnboardingFlow } from "./features/ax-onboarding";
 import Care from "./pages/Care";
 import CareAction from "./pages/CareAction";
+import Help from "./pages/Help";
 import History from "./pages/History";
 import Home from "./pages/Home";
 import HomeStateDemo from "./pages/HomeStateDemo";
@@ -51,6 +52,7 @@ export default function App() {
       <Route path="/care" element={<Care />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/history" element={<History />} />
+      <Route path="/help" element={<Help />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
