@@ -82,7 +82,7 @@ export default function History() {
   const arrow = (dir: -1 | 1, enabled: boolean) => (
     <button
       aria-label={dir < 0 ? "이전 달" : "다음 달"}
-      className={`flex h-8 w-11 items-center justify-center text-bb-title ${enabled ? "text-sky-muted" : "text-sky-line"}`}
+      className={`-my-1.5 flex h-11 w-11 items-center justify-center text-bb-title ${enabled ? "text-sky-muted" : "text-sky-line"}`}
       disabled={!enabled}
       type="button"
       onClick={() => shift(dir)}
@@ -142,6 +142,9 @@ export default function History() {
             </section>
 
             <h2 className="text-bb-title text-sky-ink">{formatDay(`${selected}T00:00:00`)}</h2>
+            {selected === todayKey && dayRecords.length > 0 ? (
+              <p className="text-bb-caption text-sky-deep">{new Set(dayRecords.map((record) => getItem(record.itemId)?.space).filter(Boolean)).size}곳을 돌봤어요</p>
+            ) : null}
             {dayRecords.length > 0 ? (
               dayRecords.map((record) => {
                 const item = getItem(record.itemId);

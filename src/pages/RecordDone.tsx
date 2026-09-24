@@ -68,10 +68,11 @@ export default function RecordDone() {
         <p className="text-center text-bb-body text-sky-muted">작은 청소 하나로, 오늘의 공간이 산뜻해졌어요.</p>
 
         <GlassButton to={backToRecord}>다른 곳도 기록하기</GlassButton>
-        <Link className="flex h-11 items-center justify-center text-bb-label text-sky-deep" to="/home">
+        {/* 44px tap boxes, negative margins keep Figma 16px text-to-text gaps (29:520). */}
+        <Link className="-my-[11px] flex h-11 items-center justify-center text-bb-label text-sky-deep" to="/home">
           홈으로 돌아가기
         </Link>
-        <button className="-mt-3 flex h-11 items-center justify-center whitespace-pre text-bb-caption text-sky-muted" type="button" onClick={undo}>
+        <button className="-my-[13px] flex h-11 items-center justify-center whitespace-pre text-bb-caption text-sky-muted" type="button" onClick={undo}>
           {"잘못 눌렀나요?  기록 취소"}
         </button>
       </main>

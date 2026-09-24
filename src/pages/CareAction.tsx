@@ -18,6 +18,8 @@ export type Guide = {
   /** Care filter pill. */
   filter: "욕실" | "주방" | "생활 팁";
   intro: string;
+  /** Care list subtitle "{space} · 약 N분" (29:742). */
+  minutes: number;
   materials: [string, string, string];
   steps: Array<[string, string]>;
 };
@@ -31,6 +33,7 @@ export const GUIDES: Guide[] = [
     listTitle: "세면대부터 산뜻하게",
     filter: "욕실",
     intro: "약 3분 · 부드러운 천부터 준비해요.",
+    minutes: 3,
     materials: ["마른 천", "중성 세정제", "스퀴지"],
     steps: [
       ["주변 물기를 먼저 닦아요", "수전과 볼 주변의 물기를 천으로 닦아요."],
@@ -45,6 +48,7 @@ export const GUIDES: Guide[] = [
     listTitle: "거울 얼룩, 말끔하게",
     filter: "욕실",
     intro: "가벼운 청소 · 약 3분",
+    minutes: 2,
     materials: ["마른 천", "유리 세정제", "극세사 천"],
     steps: [
       ["먼지를 먼저 걷어내요", "부드러운 마른 천으로 먼지를 닦아요."],
@@ -59,6 +63,7 @@ export const GUIDES: Guide[] = [
     listTitle: "싱크대에 남은 물기 닦기",
     filter: "주방",
     intro: "가벼운 청소 · 약 3분",
+    minutes: 3,
     materials: ["수세미", "주방 세정제", "고무장갑"],
     steps: [
       ["남은 찌꺼기를 비워요", "거름망에 남은 음식물을 분리해요."],
@@ -73,6 +78,7 @@ export const GUIDES: Guide[] = [
     listTitle: "침구를 가볍게 정돈하기",
     filter: "생활 팁",
     intro: "가벼운 청소 · 약 3분",
+    minutes: 3,
     materials: ["돌돌이", "여분 커버", "세탁망"],
     steps: [
       ["침구를 가볍게 털어요", "구김을 펴고 이불을 가지런히 놓아요."],
@@ -143,8 +149,8 @@ export default function CareAction() {
 
         <GlassButton onClick={record}>청소했어요 · 기록하기</GlassButton>
         <button
-          className="flex h-11 items-center justify-center text-[13px] font-medium leading-[19px] text-sky-deep disabled:text-sky-muted disabled:opacity-60"
-          disabled={!recordId}
+          className="flex h-11 items-center justify-center text-[13px] font-medium leading-[19px] text-sky-deep"
+          aria-disabled={!recordId}
           type="button"
           onClick={undo}
         >

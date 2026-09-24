@@ -66,7 +66,7 @@ export default function Care() {
               </span>
               <span className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate text-bb-label text-sky-ink">{guide.listTitle}</span>
-                <span className="text-bb-caption text-sky-muted">{space.label} · 약 3분</span>
+                <span className="text-bb-caption text-sky-muted">{space.label} · 약 {guide.minutes}분</span>
               </span>
               <span aria-hidden="true" className="w-11 text-center text-bb-title text-sky-deep">
                 ›

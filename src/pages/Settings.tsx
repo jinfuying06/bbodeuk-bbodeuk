@@ -54,8 +54,7 @@ export default function Settings() {
         <NavRow to="/help" label="도움말·서비스 정보" />
 
         <p className="text-bb-caption text-sky-muted">뽀득뽀득 · 버전 0.1.0</p>
-        {/* No standalone motion demo exists; home cards carry the press + glass shine. */}
-        <Link className="self-start text-bb-caption text-sky-deep" to="/home">
+        <Link className="self-start text-bb-caption text-sky-deep" to="/quick-record">
           터치·유리광 효과 체험 →
         </Link>
         <Link className="flex h-11 items-center justify-center text-bb-label text-sky-deep" to="/help">
