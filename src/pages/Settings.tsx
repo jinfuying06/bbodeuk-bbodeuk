@@ -1,70 +1,66 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
-import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-import { isMember, readPoints, SIGNUP_BONUS } from "../data/points";
+import { readPoints } from "../data/points";
+
+const navRow = "press flex h-[62px] items-center justify-between rounded-[16px] bg-sky-white px-4";
+
+function NavRow({ to, label, value }: { to: string; label: string; value?: string }) {
+  return (
+    <Link className={navRow} to={to}>
+      <span className="text-bb-label text-sky-ink">{label}</span>
+      <span className="whitespace-pre text-bb-body text-sky-muted">
+        {value ? `${value}  ` : ""}
+        <span aria-hidden="true">›</span>
+      </span>
+    </Link>
+  );
+}
+
+/** Sky / Switch (Figma 25:136): 52×32, thumb 24, on = sky-brand, off = sky-line. */
+function SwitchRow({ label, defaultOn }: { label: string; defaultOn: boolean }) {
+  const [on, setOn] = useState(defaultOn);
+  return (
+    <button aria-checked={on} className="flex h-[62px] items-center justify-between rounded-[16px] bg-sky-white px-4 text-left" role="switch" type="button" onClick={() => setOn(!on)}>
+      <span className="text-bb-label text-sky-ink">{label}</span>
+      <span className={`flex h-8 w-[52px] items-center rounded-full px-1 transition-colors duration-200 ${on ? "bg-sky-brand" : "bg-sky-line"}`}>
+        <span className={`h-6 w-6 rounded-full bg-sky-white transition-transform duration-200 ${on ? "translate-x-5" : ""}`} />
+      </span>
+    </button>
+  );
+}
 
 export default function Settings() {
   const balance = readPoints();
-  const availableRooms = Math.floor(balance / 300);
-  const member = isMember();
 
   return (
     <PageShell>
       <AppHeader title="설정" back />
-      <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
-        {!member ? (
-          <Link className="flex items-center gap-space-xs rounded-xl bg-primary-fixed/50 px-space-md py-space-sm text-label-md text-primary" to="/signup">
-            <Icon name="redeem" className="text-[18px]" />
-            <span className="flex-1">회원가입 하시면 {SIGNUP_BONUS}P를 드려요</span>
-            <Icon name="chevron_right" className="text-[18px]" />
-          </Link>
-        ) : null}
-        <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-          <div className="flex items-center justify-between gap-space-sm">
-            <div>
-              <span className="text-label-sm text-secondary">보유 포인트</span>
-              <h1 className="mt-1 text-headline-lg text-on-surface">{balance.toLocaleString()}P</h1>
-            </div>
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-fixed text-primary">
-              <Icon name="toll" className="text-[26px]" />
-            </span>
-          </div>
-          <p className="mt-space-sm text-body-md text-on-surface-variant">
-            {availableRooms > 0 ? `방 ${availableRooms}개를 추가할 수 있어요.` : "포인트를 구매하면 방을 추가할 수 있어요."}
-          </p>
-          <Link className="mt-space-md inline-flex min-h-11 items-center gap-space-xs text-label-md text-primary" to="/points">
-            포인트 구매하기
-            <Icon name="chevron_right" className="text-[18px]" />
-          </Link>
+      <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
+        <section className="flex h-[100px] flex-col gap-2 rounded-3xl bg-sky-tint px-5 pt-4">
+          <h1 className="text-bb-title text-sky-ink">하늘님의 아늑한 집</h1>
+          <p className="text-bb-body text-sky-muted">오늘도 내 속도로 산뜻하게.</p>
         </section>
-        <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-          <h2 className="text-title-sm">내 공간</h2>
-          <Link className="mt-space-sm flex min-h-[44px] items-center justify-between" to="/space-manage">
-            <span className="text-body-md text-on-surface-variant">공간 관리</span>
-            <Icon name="chevron_right" className="text-[18px] text-outline-variant" />
-          </Link>
-        </section>
-        <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-          <h2 className="text-title-sm">추천과 알림</h2>
-          {["기본 추천 사용", "부드러운 추천 알림", "숨은 관리 발견"].map((label) => (
-            <div key={label} className="mt-space-sm flex items-center justify-between">
-              <span className="text-body-md">{label}</span>
-              <span className="h-7 w-12 rounded-full bg-primary-container p-1">
-                <span className="block h-5 w-5 translate-x-5 rounded-full bg-white shadow-sm" />
-              </span>
-            </div>
-          ))}
-        </section>
-        <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-          <h2 className="text-title-sm">서비스 정보</h2>
-          {["도움말", "개인정보 처리방침", "앱 버전 0.1.0"].map((item) => (
-            <div key={item} className="flex min-h-[44px] items-center justify-between border-b border-outline-variant/30 last:border-b-0">
-              <span className="text-body-md text-on-surface-variant">{item}</span>
-              <Icon name="chevron_right" className="text-[18px] text-outline-variant" />
-            </div>
-          ))}
-        </section>
+
+        <NavRow to="/points" label="내 포인트" value={`${balance.toLocaleString()}P`} />
+        <NavRow to="/space-manage" label="공간 관리" />
+
+        <h2 className="text-bb-title text-sky-ink">추천과 알림</h2>
+        <SwitchRow label="기본 추천 사용" defaultOn />
+        <SwitchRow label="부드러운 추천 알림" defaultOn={false} />
+        <SwitchRow label="숨은 관리 발견" defaultOn />
+
+        <NavRow to="/help" label="도움말·서비스 정보" />
+
+        <p className="text-bb-caption text-sky-muted">뽀득뽀득 · 버전 0.1.0</p>
+        {/* No standalone motion demo exists; home cards carry the press + glass shine. */}
+        <Link className="self-start text-bb-caption text-sky-deep" to="/home">
+          터치·유리광 효과 체험 →
+        </Link>
+        <Link className="flex h-11 items-center justify-center text-bb-label text-sky-deep" to="/help">
+          기록·공간 이용 안내&nbsp;&nbsp;›
+        </Link>
       </main>
     </PageShell>
   );
