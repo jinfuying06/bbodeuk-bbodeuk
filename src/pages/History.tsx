@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
-import Icon from "../components/Icon";
+import ItemRow from "../components/ItemRow";
+import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
 import { dayKey, formatDay, formatRecency, formatTime, getActiveSpaces, getItem, getItems, getSpace, lastRecord, useRecords } from "../data/cleaning";
@@ -21,25 +21,6 @@ function monthWeeks(month: Date): Array<Array<Date | null>> {
   const weeks = [];
   for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
   return weeks;
-}
-
-function ChevronRow({ title, sub, to, space }: { title: string; sub: string; to: string; space?: ReturnType<typeof getSpace> }) {
-  return (
-    <Link className="press flex h-16 items-center gap-3 rounded-[18px] bg-sky-white px-3" to={to}>
-      {space ? (
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]" style={{ backgroundColor: space.color, color: space.iconColor }}>
-          <Icon name={space.icon} className="text-[24px]" />
-        </span>
-      ) : null}
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-bb-label text-sky-ink">{title}</span>
-        <span className="block truncate text-bb-caption text-sky-muted">{sub}</span>
-      </span>
-      <span aria-hidden="true" className="flex w-11 justify-center text-bb-title text-sky-deep">
-        ›
-      </span>
-    </Link>
-  );
 }
 
 export default function History() {
@@ -97,10 +78,7 @@ export default function History() {
       <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
         {view === "date" ? (
           <>
-            <div className="flex h-[88px] flex-col gap-2">
-              <h1 className="text-bb-heading text-sky-ink">차곡차곡 쌓인 흔적</h1>
-              <p className="text-bb-body text-sky-muted">조금씩 돌본 내 공간을 돌아봐요.</p>
-            </div>
+            <PageIntro title="차곡차곡 쌓인 흔적" body="조금씩 돌본 내 공간을 돌아봐요." />
             {chips}
 
             <section aria-label={`${month.getMonth() + 1}월 달력`} className="flex flex-col gap-2 rounded-3xl bg-sky-white px-[17px] pb-[18px] pt-[14px]">
@@ -149,7 +127,7 @@ export default function History() {
               dayRecords.map((record) => {
                 const item = getItem(record.itemId);
                 if (!item) return null;
-                return <ChevronRow key={record.id} title={item.name} sub={`${getSpace(item.space).label} · ${formatTime(record.at)}`} to={itemHistoryPath(item.id)} />;
+                return <ItemRow key={record.id} title={item.name} sub={`${getSpace(item.space).label} · ${formatTime(record.at)}`} to={itemHistoryPath(item.id)} />;
               })
             ) : (
               <p className="text-bb-body text-sky-muted">
@@ -179,7 +157,7 @@ export default function History() {
                 <section key={space.key} className="flex flex-col gap-3">
                   <h2 className="text-bb-title text-sky-ink">{space.label}</h2>
                   {items.map(({ item, at }) => (
-                    <ChevronRow key={item.id} space={space} title={item.name} sub={formatRecency(at)} to={itemHistoryPath(item.id)} />
+                    <ItemRow key={item.id} space={space.key} title={item.name} sub={formatRecency(at)} to={itemHistoryPath(item.id)} />
                   ))}
                 </section>
               );

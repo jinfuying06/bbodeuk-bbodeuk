@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import PageShell from "../components/PageShell";
+import SwitchRow from "../components/Switch";
 import { readPoints } from "../data/points";
 
 const navRow = "press flex h-[62px] items-center justify-between rounded-[16px] bg-sky-white px-4";
@@ -18,17 +19,9 @@ function NavRow({ to, label, value }: { to: string; label: string; value?: strin
   );
 }
 
-/** Sky / Switch (Figma 25:136): 52×32, thumb 24, on = sky-brand, off = sky-line. */
-function SwitchRow({ label, defaultOn }: { label: string; defaultOn: boolean }) {
+function SettingSwitch({ label, defaultOn }: { label: string; defaultOn: boolean }) {
   const [on, setOn] = useState(defaultOn);
-  return (
-    <button aria-checked={on} className="flex h-[62px] items-center justify-between rounded-[16px] bg-sky-white px-4 text-left" role="switch" type="button" onClick={() => setOn(!on)}>
-      <span className="text-bb-label text-sky-ink">{label}</span>
-      <span className={`flex h-8 w-[52px] items-center rounded-full px-1 transition-colors duration-200 ${on ? "bg-sky-brand" : "bg-sky-line"}`}>
-        <span className={`h-6 w-6 rounded-full bg-sky-white transition-transform duration-200 ${on ? "translate-x-5" : ""}`} />
-      </span>
-    </button>
-  );
+  return <SwitchRow label={label} on={on} onToggle={() => setOn(!on)} />;
 }
 
 export default function Settings() {
@@ -47,9 +40,9 @@ export default function Settings() {
         <NavRow to="/space-manage" label="공간 관리" />
 
         <h2 className="text-bb-title text-sky-ink">추천과 알림</h2>
-        <SwitchRow label="기본 추천 사용" defaultOn />
-        <SwitchRow label="부드러운 추천 알림" defaultOn={false} />
-        <SwitchRow label="숨은 관리 발견" defaultOn />
+        <SettingSwitch label="기본 추천 사용" defaultOn />
+        <SettingSwitch label="부드러운 추천 알림" defaultOn={false} />
+        <SettingSwitch label="숨은 관리 발견" defaultOn />
 
         <NavRow to="/help" label="도움말·서비스 정보" />
 
@@ -57,7 +50,7 @@ export default function Settings() {
         <Link className="-my-3 flex h-11 items-center self-start text-bb-caption text-sky-deep" to="/welcome">
           터치·유리광 효과 체험&nbsp;&nbsp;›
         </Link>
-        <Link className="flex h-11 items-center justify-center text-bb-label text-sky-deep" to="/help">
+        <Link className="text-link" to="/help">
           기록·공간 이용 안내&nbsp;&nbsp;›
         </Link>
       </main>

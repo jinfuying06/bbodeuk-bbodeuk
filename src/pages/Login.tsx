@@ -6,9 +6,6 @@ import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
 import { markMember, resetToGuest } from "../data/points";
 
-const inputClass =
-  "h-[52px] w-full rounded-xl border border-sky-line bg-sky-white pl-4 pr-4 text-bb-body text-sky-ink outline-none transition-colors placeholder:text-sky-muted focus:border-sky-brand";
-const linkClass = "flex h-11 w-full items-center justify-center text-bb-label text-sky-deep";
 
 /** Flow / 로그인 (27:247) + 로그인 확인 (32:1427). Visual only: no real auth in the MVP. */
 export default function Login() {
@@ -53,7 +50,7 @@ export default function Login() {
             </label>
             <input
               autoComplete="email"
-              className={inputClass}
+              className="bb-field"
               id="login-email"
               inputMode="email"
               placeholder="이메일을 입력해 주세요"
@@ -70,7 +67,7 @@ export default function Login() {
             <input
               aria-describedby={error ? "login-password-help" : undefined}
               autoComplete="current-password"
-              className={inputClass}
+              className="bb-field"
               id="login-password"
               placeholder="비밀번호를 입력해 주세요"
               type="password"
@@ -89,13 +86,13 @@ export default function Login() {
               <GlassButton size={52} type="submit">
                 다시 입력하기
               </GlassButton>
-              <button className={linkClass} type="button" onClick={comingSoon}>
+              <button className="text-link w-full" type="button" onClick={comingSoon}>
                 비밀번호 찾기
               </button>
             </>
           ) : (
             <>
-              <button className={linkClass} type="button" onClick={comingSoon}>
+              <button className="text-link w-full" type="button" onClick={comingSoon}>
                 비밀번호를 잊으셨나요?
               </button>
               <GlassButton size={52} type="submit">
@@ -107,10 +104,10 @@ export default function Login() {
               <GlassButton size={52} variant="secondary" onClick={comingSoon}>
                 카카오로 계속하기
               </GlassButton>
-              <Link className={linkClass} to="/signup">
+              <Link className="text-link w-full" to="/signup">
                 이메일로 회원가입
               </Link>
-              <Link className={linkClass} to="/setup" onClick={() => resetToGuest()}>
+              <Link className="text-link w-full" to="/setup" onClick={() => resetToGuest()}>
                 먼저 둘러보기
               </Link>
             </>

@@ -2,13 +2,11 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
+import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
 import { addItem, getActiveSpaces, getSpace, isSpaceKey, type SpaceKey } from "../data/cleaning";
 import { spaceIconClass } from "./QuickRecord";
-
-export const fieldClass =
-  "h-[52px] w-full rounded-xl border border-sky-line bg-sky-white pl-4 pr-4 text-bb-body text-sky-ink outline-none transition-colors placeholder:text-sky-muted focus:border-sky-brand";
 
 export default function ItemAdd() {
   const navigate = useNavigate();
@@ -71,14 +69,11 @@ export default function ItemAdd() {
     <PageShell>
       <AppHeader title="항목 추가" back="/spaces" />
       <form className="flex flex-col gap-3 px-margin-screen pb-nav pt-header" onSubmit={handleSubmit}>
-        <section className="flex min-h-[88px] flex-col gap-2">
-          <h1 className="text-bb-heading text-sky-ink">돌볼 곳을 추가해요</h1>
-          <p className="text-bb-body text-sky-muted">나에게 맞는 이름과 주기를 정해요.</p>
-        </section>
+        <PageIntro title="돌볼 곳을 추가해요" body="나에게 맞는 이름과 주기를 정해요." />
 
         <label className="flex min-h-[84px] flex-col gap-1.5 text-bb-label text-sky-ink">
           항목 이름
-          <input className={fieldClass} maxLength={40} placeholder="예: 욕실 유리거울" required value={name} onChange={(event) => setName(event.target.value)} />
+          <input className="bb-field" maxLength={40} placeholder="예: 욕실 유리거울" required value={name} onChange={(event) => setName(event.target.value)} />
         </label>
 
         <p className="text-bb-label text-sky-ink">공간 선택</p>
@@ -104,7 +99,7 @@ export default function ItemAdd() {
 
         <label className="flex min-h-[84px] flex-col gap-1.5 text-bb-label text-sky-ink">
           청소 주기
-          <span className={`${fieldClass} flex items-center focus-within:border-sky-brand`}>
+          <span className={`bb-field flex items-center focus-within:border-sky-brand`}>
             <input
               aria-label="청소 주기 (일)"
               className="bg-transparent text-bb-body text-sky-ink outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"

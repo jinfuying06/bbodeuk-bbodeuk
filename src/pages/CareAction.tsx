@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
+import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
 import { addRecord, getSpace, removeRecord, type SpaceKey } from "../data/cleaning";
@@ -116,10 +117,7 @@ export default function CareAction() {
     <PageShell>
       <AppHeader title={title} back="/care" />
       <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
-        <section className="flex min-h-[88px] flex-col gap-2">
-          <h1 className="text-bb-heading text-sky-ink">{title}</h1>
-          <p className="text-bb-body text-sky-muted">{guide.intro}</p>
-        </section>
+        <PageIntro title={title} body={guide.intro} />
 
         {guide.id === "basin" ? (
           <div className="flex h-[116px] items-center justify-center rounded-[22px]" style={{ backgroundColor: space.color }}>
@@ -160,7 +158,7 @@ export default function CareAction() {
 
         <GlassButton onClick={record}>청소했어요 · 기록하기</GlassButton>
         <button
-          className={`flex h-11 items-center justify-center text-[13px] font-medium leading-[19px] transition-colors ${recordId ? "text-sky-deep" : "text-sky-muted"}`}
+          className={`text-link-sm transition-colors ${recordId ? "" : "!text-sky-muted"}`}
           aria-disabled={!recordId}
           type="button"
           onClick={undo}
@@ -168,7 +166,7 @@ export default function CareAction() {
           기록 취소
         </button>
         {guide.id === "basin" ? (
-          <Link className="flex h-11 items-center justify-center text-bb-label text-sky-deep" to="/care">
+          <Link className="text-link" to="/care">
             다른 청소법 보기
           </Link>
         ) : null}

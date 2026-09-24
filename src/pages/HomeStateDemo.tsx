@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
-import Icon from "../components/Icon";
+import ItemRow from "../components/ItemRow";
+import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 
 /**
@@ -29,15 +30,6 @@ const PREVIEW_LINKS = [
 
 const TITLES: Record<string, string> = { error: "연결 확인", loading: "기록 불러오는 중", empty: "아직 없는 기록", preview: "상태 미리보기" };
 
-function Intro({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="flex h-[88px] shrink-0 flex-col gap-2">
-      <h1 className="text-bb-heading text-sky-ink">{title}</h1>
-      <p className="text-bb-body text-sky-muted">{body}</p>
-    </div>
-  );
-}
-
 function Feedback({ glyph, title, body }: { glyph: string; title: string; body: string }) {
   return (
     <div className="flex min-h-[140px] flex-col gap-2 rounded-2xl bg-sky-white pb-[18px] pl-5 pr-5 pt-[18px]">
@@ -49,8 +41,6 @@ function Feedback({ glyph, title, body }: { glyph: string; title: string; body: 
     </div>
   );
 }
-
-const textLink = "flex h-11 items-center justify-center text-bb-label text-sky-deep";
 
 export default function HomeStateDemo() {
   const { state = "preview" } = useParams();
@@ -75,7 +65,7 @@ export default function HomeStateDemo() {
             <GlassButton className="w-full" onClick={() => navigate("/home/loading")}>
               다시 불러오기
             </GlassButton>
-            <Link className={textLink} to="/home">
+            <Link className="text-link" to="/home">
               홈으로 돌아가기
             </Link>
           </>
@@ -83,7 +73,7 @@ export default function HomeStateDemo() {
 
         {view === "loading" ? (
           <>
-            <Intro title="기록을 가져오고 있어요" body="잠시만 기다려주세요." />
+            <PageIntro title="기록을 가져오고 있어요" body="잠시만 기다려주세요." />
             <div aria-busy="true" aria-label="기록 불러오는 중" className="flex flex-col gap-3">
               {[0, 1, 2, 3].map((index) => (
                 <div key={index} className="flex h-[92px] animate-pulse items-center gap-[14px] rounded-2xl bg-sky-white pl-4">
@@ -100,12 +90,12 @@ export default function HomeStateDemo() {
 
         {view === "empty" ? (
           <>
-            <Intro title="기록이 쌓일 자리예요" body="빈 날도 괜찮아요. 내 속도로 시작해요." />
+            <PageIntro title="기록이 쌓일 자리예요" body="빈 날도 괜찮아요. 내 속도로 시작해요." />
             <Feedback glyph="○" title="첫 기록을 기다리고 있어요" body="작은 청소 하나부터 남겨보세요." />
             <GlassButton className="w-full" to="/quick-record">
               청소 기록하러 가기
             </GlassButton>
-            <Link className={textLink} to="/history">
+            <Link className="text-link" to="/history">
               전체 기록 보기
             </Link>
           </>
@@ -113,26 +103,15 @@ export default function HomeStateDemo() {
 
         {view === "preview" ? (
           <>
-            <Intro title="예외 상황도 같은 톤으로" body="빈 화면·오류·로딩 상태를 확인해요." />
+            <PageIntro title="예외 상황도 같은 톤으로" body="빈 화면·오류·로딩 상태를 확인해요." />
             <div className="flex flex-col gap-3">
               {PREVIEW_ROWS.map(([title, sub, to]) => (
-                <Link key={title} className="press flex h-[72px] items-center gap-3 rounded-[18px] bg-sky-white px-3" to={to}>
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-sky-bath text-space-bath-icon">
-                    <Icon name="space-bath" className="text-[24px]" />
-                  </span>
-                  <span className="flex w-[222px] min-w-0 flex-col">
-                    <span className="truncate text-bb-label text-sky-ink">{title}</span>
-                    <span className="truncate text-bb-caption text-sky-muted">{sub}</span>
-                  </span>
-                  <span aria-hidden="true" className="shrink-0 text-bb-title text-sky-deep">
-                    ›
-                  </span>
-                </Link>
+                <ItemRow key={title} height={72} space="bathroom" sub={sub} title={title} to={to} />
               ))}
             </div>
             <div className="flex flex-col gap-3">
               {PREVIEW_LINKS.map(([label, to]) => (
-                <Link key={label} className={textLink} to={to}>
+                <Link key={label} className="text-link" to={to}>
                   {label}&nbsp;&nbsp;›
                 </Link>
               ))}

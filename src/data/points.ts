@@ -3,6 +3,8 @@ const MEMBER_KEY = "bbodeuk.preview.member.v1";
 const INITIAL_BALANCE = 0;
 
 export const SIGNUP_BONUS = 300;
+/** Price of one paid expansion space. */
+export const SPACE_PRICE = 300;
 
 export function readPoints(): number {
   try {

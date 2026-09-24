@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import CheckRow from "../components/CheckRow";
 import GlassButton from "../components/GlassButton";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
 import { grantSignupBonus } from "../data/points";
-
-const inputClass =
-  "h-[52px] w-full rounded-xl border border-sky-line bg-sky-white px-4 text-bb-body text-sky-ink outline-none transition-colors placeholder:text-sky-muted focus:border-sky-brand";
 
 const TERMS = [
   { key: "terms", label: "[필수] 만 14세 이상 · 이용약관 동의" },
@@ -64,12 +62,12 @@ export default function SignUp() {
           <p className="text-bb-body text-sky-muted">예시 입력 · 필수 항목에 동의하면 시작할 수 있어요.</p>
 
           <Field id="signup-email" label="이메일">
-            <input autoComplete="email" className={inputClass} id="signup-email" required type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input autoComplete="email" className="bb-field" id="signup-email" required type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </Field>
           <Field id="signup-password" label="비밀번호">
             <input
               autoComplete="new-password"
-              className={inputClass}
+              className="bb-field"
               id="signup-password"
               required
               type="password"
@@ -85,7 +83,7 @@ export default function SignUp() {
               aria-describedby={mismatch ? "signup-confirm-help" : undefined}
               aria-invalid={mismatch}
               autoComplete="new-password"
-              className={inputClass}
+              className="bb-field"
               id="signup-confirm"
               required
               type="password"
@@ -97,32 +95,14 @@ export default function SignUp() {
             />
           </Field>
           <Field id="signup-nickname" label="닉네임">
-            <input className={inputClass} id="signup-nickname" required type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} />
+            <input className="bb-field" id="signup-nickname" required type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} />
           </Field>
 
-          {TERMS.map((term) => {
-            const on = agreed[term.key];
-            return (
-              <button
-                key={term.key}
-                aria-pressed={on}
-                className="flex h-12 items-center gap-3 rounded-2xl bg-sky-white pl-3 text-left"
-                type="button"
-                onClick={() => setAgreed((current) => ({ ...current, [term.key]: !current[term.key] }))}
-              >
-                {/* Sky / Check row: off = empty sky-line circle, on = sky-brand + ✓. */}
-                <span
-                  aria-hidden="true"
-                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-xl text-bb-label transition-colors ${on ? "bg-sky-brand text-onbrand" : "bg-sky-line"}`}
-                >
-                  {on ? "✓" : null}
-                </span>
-                <span className="text-bb-label text-sky-ink">{term.label}</span>
-              </button>
-            );
-          })}
+          {TERMS.map((term) => (
+            <CheckRow key={term.key} label={term.label} on={agreed[term.key]} onClick={() => setAgreed((current) => ({ ...current, [term.key]: !current[term.key] }))} />
+          ))}
 
-          <button className="flex h-11 w-full items-center justify-center text-bb-label text-sky-deep" type="button" onClick={() => showToast("약관 안내는 준비 중이에요")}>
+          <button className="text-link w-full" type="button" onClick={() => showToast("약관 안내는 준비 중이에요")}>
             이용약관 · 개인정보 안내 보기
           </button>
           {/* decisions §6: enabled label stays the same as the disabled label. */}

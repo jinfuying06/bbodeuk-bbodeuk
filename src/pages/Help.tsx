@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 
 const faqs: Array<[string, string[]]> = [
@@ -14,10 +15,7 @@ export default function Help() {
     <PageShell>
       <AppHeader title="도움말" back="/settings" />
       <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
-        <div className="flex h-[88px] flex-col gap-2">
-          <h1 className="text-bb-heading text-sky-ink">가볍게 시작하는 뽀득뽀득</h1>
-          <p className="text-bb-body text-sky-muted">작은 기록에 대한 궁금한 점을 모았어요.</p>
-        </div>
+        <PageIntro title="가볍게 시작하는 뽀득뽀득" body="작은 기록에 대한 궁금한 점을 모았어요." />
         {faqs.map(([question, answer]) => (
           <section key={question} className="flex min-h-[112px] flex-col gap-2 rounded-3xl bg-sky-white px-5 pb-4 pt-4">
             <h2 className="text-bb-title text-sky-ink">{question}</h2>
@@ -30,7 +28,7 @@ export default function Help() {
             </p>
           </section>
         ))}
-        <Link className="flex h-11 items-center justify-center text-bb-label text-sky-deep" to="/settings">
+        <Link className="text-link" to="/settings">
           설정으로 돌아가기
         </Link>
       </main>

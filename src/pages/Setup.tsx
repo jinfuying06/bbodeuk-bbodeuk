@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import CheckRow from "../components/CheckRow";
 import GlassButton from "../components/GlassButton";
+import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
 import { AX_ONBOARDING_ENABLED } from "../features/ax-onboarding";
@@ -40,7 +42,6 @@ export default function Setup() {
   const [toast, showToast] = useToast();
 
   const toggle = (key: string) =>
-    !BASIC_SPACES.find((space) => space.key === key)?.required &&
     setSelected((current) => (current.includes(key) ? current.filter((space) => space !== key) : [...current, key]));
 
   const complete = () => {
@@ -53,14 +54,7 @@ export default function Setup() {
     <PageShell bottomNav={false}>
       <AppHeader back="/welcome" title="내 공간 설정" />
       <main className="flex flex-col gap-3 px-margin-screen pb-7 pt-header">
-        <div className="flex h-[116px] flex-col gap-2">
-          <h1 className="text-bb-heading text-sky-ink">
-            내 집에는
-            <br />
-            어떤 공간이 있나요?
-          </h1>
-          <p className="text-bb-body text-sky-muted">자주 돌보는 공간부터 시작해요.</p>
-        </div>
+        <PageIntro title={<>내 집에는<br />어떤 공간이 있나요?</>} body="자주 돌보는 공간부터 시작해요." className="min-h-[116px]" />
 
         {AX_ONBOARDING_ENABLED ? (
           <Link className={aiCardClass} to="/setup/photo">
@@ -73,28 +67,16 @@ export default function Setup() {
         )}
 
         <h2 className="text-bb-label text-sky-deep">기본 공간 4개는 무료예요</h2>
-        {BASIC_SPACES.map(({ key, label, required }) => {
-          const on = selected.includes(key);
-          return (
-            <button
-              key={key}
-              aria-disabled={required}
-              aria-pressed={on}
-              className="flex h-12 items-center gap-3 rounded-2xl bg-sky-white pl-3 pr-4 text-left"
-              type="button"
-              onClick={() => toggle(key)}
-            >
-              <span
-                aria-hidden="true"
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-xl text-bb-label transition-colors ${required ? "bg-sky-tint text-sky-deep" : on ? "bg-sky-brand text-onbrand" : "bg-sky-line"}`}
-              >
-                {on ? "✓" : null}
-              </span>
-              <span className="flex-1 text-bb-label text-sky-ink">{label}</span>
-              {required ? <span className="text-bb-caption text-sky-muted">기본 관리 공간</span> : null}
-            </button>
-          );
-        })}
+        {BASIC_SPACES.map(({ key, label, required }) => (
+          <CheckRow
+            key={key}
+            label={label}
+            locked={required}
+            on={selected.includes(key)}
+            trailing={required ? <span className="text-bb-caption text-sky-muted">기본 관리 공간</span> : null}
+            onClick={() => toggle(key)}
+          />
+        ))}
 
         <section className="flex flex-col gap-2 rounded-3xl bg-sky-tint px-5 pb-4 pt-4">
           <h2 className="text-bb-title text-sky-ink">공간은 언제든 바꿀 수 있어요</h2>

@@ -1,6 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
+import ItemRow from "../components/ItemRow";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
 import Toast, { useRouteToast } from "../components/Toast";
@@ -9,7 +10,6 @@ import {
   getActiveSpaces,
   getItem,
   getItems,
-  getSpace,
   isRecordedToday,
   itemStaleness,
   lastRecord,
@@ -50,17 +50,6 @@ const recentRows = (records: CleaningRecord[], spaces: Set<string>) => {
   }
   return rows;
 };
-
-const chevron = <span aria-hidden="true" className="shrink-0 text-bb-title text-sky-muted">›</span>;
-
-function SpaceTile({ space }: { space: SpaceKey }) {
-  const { icon, iconColor } = getSpace(space);
-  return (
-    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]" style={{ backgroundColor: spaceColor(space), color: iconColor }}>
-      <Icon name={icon} className="text-[24px]" />
-    </span>
-  );
-}
 
 export default function Home() {
   const allRecords = useRecords();
@@ -161,14 +150,7 @@ export default function Home() {
             </Link>
           ) : (
             recent.map((row) => (
-              <Link key={row.id} className="press flex h-[62px] items-center gap-3 rounded-[16px] bg-sky-white pl-3" to={`/item-history?item=${row.id}`}>
-                <SpaceTile space={row.space} />
-                <span className="flex w-[190px] min-w-0 flex-col">
-                  <span className="truncate text-bb-label text-sky-ink">{row.name}</span>
-                  <span className="truncate text-bb-caption text-sky-muted">{formatRecency(row.at)}</span>
-                </span>
-                {chevron}
-              </Link>
+              <ItemRow key={row.id} chevron="muted" space={row.space} sub={formatRecency(row.at)} title={row.name} to={`/item-history?item=${row.id}`} />
             ))
           )}
         </section>
@@ -179,16 +161,13 @@ export default function Home() {
             <p className="text-bb-caption text-sky-muted">눈에 들어오는 한 곳만 골라도 괜찮아요.</p>
           </div>
           {lightCare.map(({ item, tip }) => (
-            <Link key={item.id} className="press flex h-16 items-center gap-3 rounded-[18px] bg-sky-white px-3" to={`/quick-record?filter=space&space=${item.space}`}>
-              <SpaceTile space={item.space} />
-              <span className="flex w-[222px] min-w-0 flex-col">
-                <span className="truncate text-bb-label text-sky-ink">{item.name}</span>
-                <span className="truncate text-bb-caption text-sky-muted">
-                  {item.hiddenCare ? "숨은 관리" : formatRecency(lastRecord(item.id, records)?.at)} · {tip}
-                </span>
-              </span>
-              <span aria-hidden="true" className="shrink-0 text-bb-title text-sky-deep">›</span>
-            </Link>
+            <ItemRow
+              key={item.id}
+              space={item.space}
+              sub={`${item.hiddenCare ? "숨은 관리" : formatRecency(lastRecord(item.id, records)?.at)} · ${tip}`}
+              title={item.name}
+              to={`/quick-record?filter=space&space=${item.space}`}
+            />
           ))}
           <GlassButton size={52} className="w-full" to="/deep-clean">
             여유 있는 날, 대청소 둘러보기

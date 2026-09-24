@@ -41,6 +41,20 @@
   }
 }
 
+@layer components {
+  /* Text field (Login, SignUp, ItemAdd, ItemInfo). */
+  .bb-field {
+    @apply h-[52px] w-full rounded-xl border border-sky-line bg-sky-white px-4 text-bb-body text-sky-ink outline-none transition-colors placeholder:text-sky-muted focus:border-sky-brand;
+  }
+  /* Text-link button: 44px tap box, label type, sky-deep. `-sm` = 13/19 variant. */
+  .text-link {
+    @apply flex h-11 items-center justify-center text-bb-label text-sky-deep;
+  }
+  .text-link-sm {
+    @apply flex h-11 items-center justify-center text-bb-label-sm text-sky-deep;
+  }
+}
+
 @layer utilities {
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 0px);

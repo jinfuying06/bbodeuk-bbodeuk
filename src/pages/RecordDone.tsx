@@ -69,7 +69,7 @@ export default function RecordDone() {
 
         <GlassButton to={backToRecord}>다른 곳도 기록하기</GlassButton>
         {/* 44px tap boxes, negative margins keep Figma 16px text-to-text gaps (29:520). */}
-        <Link className="-my-[11px] flex h-11 items-center justify-center text-bb-label text-sky-deep" to="/home">
+        <Link className="text-link -my-[11px]" to="/home">
           홈으로 돌아가기
         </Link>
         <button className="-my-[13px] flex h-11 items-center justify-center whitespace-pre text-bb-caption text-sky-muted" type="button" onClick={undo}>

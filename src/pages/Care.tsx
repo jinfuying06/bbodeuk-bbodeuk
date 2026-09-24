@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
+import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
-import { getSpace, spaceColor } from "../data/cleaning";
+import ItemRow from "../components/ItemRow";
+import { getSpace } from "../data/cleaning";
 import { GUIDES, type Guide } from "./CareAction";
-import { spaceIconClass } from "./QuickRecord";
 
 type Filter = "전체" | Guide["filter"];
 
@@ -27,10 +28,7 @@ export default function Care() {
     <PageShell>
       <AppHeader title="청소 가이드" />
       <main className="flex flex-col gap-[10px] px-margin-screen pb-nav pt-header">
-        <section className="flex min-h-[88px] flex-col gap-2">
-          <h1 className="text-bb-heading text-sky-ink">작은 청소, 쉽게 시작해요</h1>
-          <p className="text-bb-body text-sky-muted">익숙하지 않아도 괜찮아요. 하나씩 함께해요.</p>
-        </section>
+        <PageIntro title="작은 청소, 쉽게 시작해요" body="익숙하지 않아도 괜찮아요. 하나씩 함께해요." />
 
         <Link aria-label="추천 가이드: 세면대부터 산뜻하게" className="press flex min-h-[206px] flex-col gap-2 rounded-3xl bg-sky-tint pb-4 pl-5 pr-5 pt-4" to="/care-action?item=basin">
           <span className="whitespace-pre text-bb-caption text-sky-deep">{"오늘의 가벼운 청소  ·  약 3분"}</span>
@@ -57,23 +55,9 @@ export default function Care() {
         </div>
 
         <h2 className="text-bb-title text-sky-ink">나에게 필요한 청소법</h2>
-        {list.map((guide) => {
-          const space = getSpace(guide.space);
-          return (
-            <Link key={guide.id} className="press flex h-[72px] items-center gap-3 rounded-[18px] bg-sky-white px-3" to={`/care-action?item=${guide.id}`}>
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]" style={{ backgroundColor: spaceColor(guide.space) }}>
-                <Icon name={space.icon} className={`text-[24px] ${spaceIconClass[guide.space]}`} />
-              </span>
-              <span className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-bb-label text-sky-ink">{guide.listTitle}</span>
-                <span className="text-bb-caption text-sky-muted">{space.label} · 약 {guide.minutes}분</span>
-              </span>
-              <span aria-hidden="true" className="w-11 text-center text-bb-title text-sky-deep">
-                ›
-              </span>
-            </Link>
-          );
-        })}
+        {list.map((guide) => (
+          <ItemRow key={guide.id} height={72} space={guide.space} sub={`${getSpace(guide.space).label} · 약 ${guide.minutes}분`} title={guide.listTitle} to={`/care-action?item=${guide.id}`} />
+        ))}
       </main>
     </PageShell>
   );

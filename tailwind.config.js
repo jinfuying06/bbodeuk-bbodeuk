@@ -68,6 +68,11 @@ export default {
         xl: "0.75rem",
         "2xl": "1.25rem",
         full: "9999px",
+        // Sky/BB surfaces (2026-09-24 polish): 40px space tile · nav/switch row · item row.
+        // Cards = 2xl (20), info cards = 3xl (24).
+        tile: "14px",
+        "row-sm": "16px",
+        row: "18px",
       },
       spacing: {
         "space-xxs": "0.25rem",
@@ -111,6 +116,8 @@ export default {
         "bb-label": ["14px", { lineHeight: "22px", letterSpacing: "0", fontWeight: "500" }],
         "bb-body": ["14px", { lineHeight: "22px", letterSpacing: "0", fontWeight: "400" }],
         "bb-caption": ["12px", { lineHeight: "18px", letterSpacing: "0", fontWeight: "400" }],
+        // Toast / small text link / empty-card copy (off the Figma scale but recurring).
+        "bb-label-sm": ["13px", { lineHeight: "19px", letterSpacing: "0", fontWeight: "500" }],
         "bb-small": ["10px", { lineHeight: "16px", letterSpacing: "0", fontWeight: "500" }],
       },
     },

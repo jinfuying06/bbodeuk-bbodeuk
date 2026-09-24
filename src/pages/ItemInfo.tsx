@@ -1,61 +1,13 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useState } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import Dialog from "../components/Dialog";
 import GlassButton from "../components/GlassButton";
+import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
 import { hideItem, readOverrides, writeOverride } from "../data/itemStorage";
 import { getActiveSpaces, getItem, getSpace, isSpaceKey, type Item, type SpaceKey } from "../data/cleaning";
-import { fieldClass } from "./ItemAdd";
-
-
-type DeleteConfirmDialogProps = {
-  open: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-};
-
-function DeleteConfirmDialog({ open, onClose, onConfirm }: DeleteConfirmDialogProps) {
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [open, onClose]);
-
-  if (!open) return null;
-
-  return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-scrim px-margin-screen" role="presentation" onClick={onClose}>
-      <section
-        aria-labelledby="delete-confirm-title"
-        aria-modal="true"
-        className="flex w-full max-w-[342px] flex-col gap-4 rounded-2xl bg-sky-white px-5 pb-[22px] pt-[22px]"
-        role="dialog"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <h2 id="delete-confirm-title" className="text-bb-title text-sky-ink">
-          청소 항목을 삭제할까요?
-        </h2>
-        <p className="text-bb-body text-sky-muted">목록에서 항목을 숨겨요. 이전 청소 기록은 히스토리에 남아 있어요.</p>
-        <GlassButton onClick={onConfirm}>항목 삭제</GlassButton>
-        <button ref={closeButtonRef} className="flex h-11 w-full items-center justify-center text-bb-label text-sky-deep" type="button" onClick={onClose}>
-          취소
-        </button>
-      </section>
-    </div>
-  );
-}
 
 export default function ItemInfo() {
   const [searchParams] = useSearchParams();
@@ -115,19 +67,16 @@ function ItemInfoForm({ item }: { item: Item }) {
     <PageShell>
       <AppHeader title="항목 설정" back="/spaces" />
       <form className="flex flex-col gap-3 px-margin-screen pb-nav pt-header" onSubmit={handleSubmit}>
-        <section className="flex min-h-[88px] flex-col gap-2">
-          <h1 className="text-bb-heading text-sky-ink">{savedName}</h1>
-          <p className="text-bb-body text-sky-muted">이름과 기록 주기를 편하게 바꿔요.</p>
-        </section>
+        <PageIntro title={savedName} body="이름과 기록 주기를 편하게 바꿔요." />
 
         <label className="flex min-h-[84px] flex-col gap-1.5 text-bb-label text-sky-ink">
           항목 이름
-          <input className={fieldClass} maxLength={40} required value={name} onChange={(event) => setName(event.target.value)} />
+          <input className="bb-field" maxLength={40} required value={name} onChange={(event) => setName(event.target.value)} />
         </label>
 
         <label className="flex min-h-[84px] flex-col gap-1.5 text-bb-label text-sky-ink">
           공간
-          <select className={`${fieldClass} appearance-none`} value={space} onChange={(event) => isSpaceKey(event.target.value) && setSpace(event.target.value)}>
+          <select className={`bb-field appearance-none`} value={space} onChange={(event) => isSpaceKey(event.target.value) && setSpace(event.target.value)}>
             {spaceOptions.map((option) => (
               <option key={option.key} value={option.key}>
                 {option.label}
@@ -138,7 +87,7 @@ function ItemInfoForm({ item }: { item: Item }) {
 
         <label className="flex min-h-[84px] flex-col gap-1.5 text-bb-label text-sky-ink">
           청소 주기
-          <span className={`${fieldClass} flex items-center focus-within:border-sky-brand`}>
+          <span className={`bb-field flex items-center focus-within:border-sky-brand`}>
             <input
               aria-label="청소 주기 (일)"
               className="bg-transparent text-bb-body text-sky-ink outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
@@ -158,16 +107,23 @@ function ItemInfoForm({ item }: { item: Item }) {
         <GlassButton disabled={!valid} type="submit">
           변경 내용 저장
         </GlassButton>
-        <Link className="flex h-11 items-center justify-center text-bb-label text-sky-deep" to={`/item-history?item=${item.id}`}>
+        <Link className="text-link" to={`/item-history?item=${item.id}`}>
           이 항목의 기록 보기
         </Link>
-        <button className="flex h-11 items-center justify-center text-bb-label text-sky-deep" type="button" onClick={() => setShowDeleteConfirm(true)}>
+        <button className="text-link" type="button" onClick={() => setShowDeleteConfirm(true)}>
           항목 삭제
         </button>
       </form>
 
       <Toast message={toast} visible={Boolean(toast)} pill />
-      <DeleteConfirmDialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} onConfirm={handleDelete} />
+      <Dialog
+        body="목록에서 항목을 숨겨요. 이전 청소 기록은 히스토리에 남아 있어요."
+        open={showDeleteConfirm}
+        primaryLabel="항목 삭제"
+        title="청소 항목을 삭제할까요?"
+        onClose={() => setShowDeleteConfirm(false)}
+        onPrimary={handleDelete}
+      />
     </PageShell>
   );
 }

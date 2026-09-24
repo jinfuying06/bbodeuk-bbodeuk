@@ -76,7 +76,7 @@ export default function SpaceInfo() {
         <GlassButton className="w-full" to={`/quick-record?filter=space&space=${key}`}>
           {space.label} 기록하기
         </GlassButton>
-        <Link className="flex h-11 items-center justify-center text-bb-label text-sky-deep" to={`/item-add?space=${key}`}>
+        <Link className="text-link" to={`/item-add?space=${key}`}>
           ＋ 새 청소 항목
         </Link>
       </main>

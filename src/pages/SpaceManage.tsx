@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
+import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import SpaceExpansionDialog from "../components/SpaceExpansionDialog";
+import SwitchRow from "../components/Switch";
 import { SPACES } from "../data/cleaning";
-import { spendPoints } from "../data/points";
+import { SPACE_PRICE, spendPoints } from "../data/points";
 import { DEFAULT_SPACES, EXPANSION_CATALOG, hasCompletedSetup, readSetup, writeSetup, type SetupData } from "../data/setup";
 
-const SPACE_PRICE = 300;
 // Figma 17 row order: 욕실, 주방, 거실, 방.
 const ROWS = ["욕실", "주방", "거실", "침실 / 방"].map((key) => DEFAULT_SPACES.find((space) => space.key === key)!);
 
@@ -19,23 +20,6 @@ function withRequiredSpaces(setup: SetupData): SetupData {
   const normalized = { ...setup, spaces: [...setup.spaces, ...missing] };
   writeSetup(normalized);
   return normalized;
-}
-
-/** Sky / Switch (25:136): Off · On · Locked (tint track, "–" thumb, not interactive). */
-function Switch({ label, on, locked, onToggle }: { label: string; on: boolean; locked: boolean; onToggle: () => void }) {
-  return (
-    <button
-      aria-checked={on}
-      aria-disabled={locked}
-      aria-label={locked ? `${label} (기본 관리 공간)` : label}
-      className={`flex h-8 w-[52px] shrink-0 items-center rounded-full px-1 transition-colors duration-200 ${on ? "justify-end" : "justify-start"} ${locked ? "bg-sky-tint" : on ? "bg-sky-brand" : "bg-sky-line"}`}
-      role="switch"
-      type="button"
-      onClick={locked ? undefined : onToggle}
-    >
-      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-literal-white text-bb-label text-sky-muted">{locked ? "–" : null}</span>
-    </button>
-  );
 }
 
 export default function SpaceManage() {
@@ -72,16 +56,10 @@ export default function SpaceManage() {
     <PageShell>
       <AppHeader title="공간 관리" back="/spaces" />
       <main className="flex flex-1 flex-col gap-3 px-margin-screen pb-nav pt-header">
-        <div className="flex flex-col gap-2 pb-6">
-          <h1 className="text-bb-heading text-sky-ink">내 집에 맞게 관리해요</h1>
-          <p className="text-bb-body text-sky-muted">필요한 공간만 켜두세요.</p>
-        </div>
+        <PageIntro title="내 집에 맞게 관리해요" body="필요한 공간만 켜두세요." className="pb-6" />
 
         {rows.map((row) => (
-          <div key={row.key} className="flex h-[62px] items-center justify-between rounded-[16px] bg-sky-white px-4">
-            <span className="truncate text-bb-label text-sky-ink">{row.label}</span>
-            <Switch label={row.label} locked={row.locked} on={row.locked || setup.spaces.includes(row.key)} onToggle={() => toggle(row.key)} />
-          </div>
+          <SwitchRow key={row.key} label={row.label} locked={row.locked} on={row.locked || setup.spaces.includes(row.key)} onToggle={() => toggle(row.key)} />
         ))}
 
         <p className="text-bb-caption text-sky-muted">* 욕실과 주방은 기본 관리 공간이에요.</p>
@@ -91,7 +69,7 @@ export default function SpaceManage() {
           <p className="text-bb-body text-sky-muted">
             베란다·드레스룸 같은 추가 공간은
             <br />
-            1개당 300P로 열 수 있어요.
+            1개당 {SPACE_PRICE}P로 열 수 있어요.
           </p>
         </section>
 

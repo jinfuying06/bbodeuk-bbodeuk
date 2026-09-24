@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
-import Icon from "../components/Icon";
+import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
+import SpaceTile from "../components/SpaceTile";
 import { daysAgo, getActiveSpaces, getItems, isSpaceKey, itemFade, lastRecord, spaceColor, useRecords, type SpaceKey } from "../data/cleaning";
 
 /** Figma 07 short recency: 오늘 · N일 전 · 기록 없음. */
@@ -23,14 +24,7 @@ export default function Spaces() {
     <PageShell>
       <AppHeader title="내 공간" back />
       <main className="flex flex-1 flex-col gap-3 px-margin-screen pb-nav pt-header">
-        <div className="flex flex-col gap-2 pb-4">
-          <h1 className="text-bb-heading text-sky-ink">
-            공간마다 쌓이는
-            <br />
-            작은 돌봄
-          </h1>
-          <p className="text-bb-body text-sky-muted">오늘은 어디부터 살펴볼까요?</p>
-        </div>
+        <PageIntro title={<>공간마다 쌓이는<br />작은 돌봄</>} body="오늘은 어디부터 살펴볼까요?" className="pb-4" />
 
         {spaces.map((space) => {
           const items = getItems(space.key);
@@ -44,9 +38,7 @@ export default function Spaces() {
                 type="button"
                 onClick={() => setOpen(expanded ? null : space.key)}
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]" style={{ backgroundColor: space.color, color: space.iconColor }}>
-                  <Icon name={space.icon} className="text-[24px]" />
-                </span>
+                <SpaceTile space={space.key} />
                 <span className="flex min-w-0 flex-col">
                   <span className="truncate text-bb-label text-sky-ink">{space.label}</span>
                   <span className="text-bb-caption text-sky-muted">{items.length}개 항목</span>
@@ -84,7 +76,7 @@ export default function Spaces() {
         <GlassButton variant="secondary" className="w-full" to="/space-manage">
           공간 관리하기
         </GlassButton>
-        <Link className="flex h-11 items-center justify-center text-bb-label text-sky-deep" to="/item-add">
+        <Link className="text-link" to="/item-add">
           ＋ 새 청소 항목
         </Link>
       </main>

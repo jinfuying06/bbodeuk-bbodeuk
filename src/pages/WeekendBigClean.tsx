@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import CheckRow from "../components/CheckRow";
 import GlassButton from "../components/GlassButton";
-import Icon from "../components/Icon";
+import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
-import { addRecord, formatRecency, getActiveSpaces, getItems, itemStaleness, lastRecord, spaceColor, useRecords, type Item } from "../data/cleaning";
-import { spaceIconClass } from "./QuickRecord";
+import SpaceTile from "../components/SpaceTile";
+import { addRecord, formatRecency, getActiveSpaces, getItems, itemStaleness, lastRecord, useRecords, type Item } from "../data/cleaning";
 
 /** Per space: the 2 spots most worth a look — 숨은 관리 first, then the stalest. */
 const PICKS = 2;
@@ -46,8 +47,7 @@ export default function WeekendBigClean() {
     <PageShell>
       <AppHeader title="주말 대청소" back />
       <main className="flex flex-col gap-3 px-margin-screen pb-[calc(76px+72px+24px+env(safe-area-inset-bottom,0px))] pt-header">
-        <h1 className="text-bb-heading text-sky-ink">여유 있는 날, 대청소</h1>
-        <p className="text-bb-body text-sky-muted">오래 안 본 곳과 숨은 관리를 가볍게 훑어요.</p>
+        <PageIntro title="여유 있는 날, 대청소" body="오래 안 본 곳과 숨은 관리를 가볍게 훑어요." />
         <p className="rounded-xl bg-sky-tint p-3 text-bb-label text-sky-deep">먼지 털기 → 표면 닦기 → 바닥 정리</p>
 
         {groups.map(({ space, items }) => {
@@ -62,9 +62,7 @@ export default function WeekendBigClean() {
                 type="button"
                 onClick={() => setOpen(isOpen ? null : space.key)}
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]" style={{ backgroundColor: spaceColor(space.key) }}>
-                  <Icon name={space.icon} className={`text-[24px] ${spaceIconClass[space.key]}`} />
-                </span>
+                <SpaceTile space={space.key} />
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="text-bb-label text-sky-ink">
                     {space.label} · {items.length}곳
@@ -83,16 +81,7 @@ export default function WeekendBigClean() {
                     const recency = formatRecency(lastRecord(item.id, records)?.at);
                     return (
                       <div key={item.id} className="flex flex-col gap-2">
-                        <button
-                          aria-pressed={done}
-                          className="press flex h-12 items-center gap-3 rounded-[20px] pl-3 text-left transition-colors duration-300"
-                          style={{ backgroundColor: done ? spaceColor(space.key) : "#ffffff" }}
-                          type="button"
-                          onClick={() => toggle(item)}
-                        >
-                          <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-xl text-bb-label ${done ? "bg-sky-brand text-onbrand" : "bg-sky-line"}`}>{done ? "✓" : null}</span>
-                          <span className="text-bb-label text-sky-ink">{item.name}</span>
-                        </button>
+                        <CheckRow fill={space.color} label={item.name} on={done} onClick={() => toggle(item)} />
                         <p className="text-bb-caption text-sky-muted">{item.hiddenCare ? `숨은 관리 · ${recency}` : recency}</p>
                       </div>
                     );

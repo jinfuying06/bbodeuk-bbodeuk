@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
-import BottomNavigation from "../components/BottomNavigation";
 import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
+import PageIntro from "../components/PageIntro";
+import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
+import SpaceTile from "../components/SpaceTile";
 import Toast, { useRouteToast } from "../components/Toast";
-import { formatRecency, getActiveSpaces, getItems, getSpace, isRecordedToday, isSpaceKey, lastRecord, spaceColor, toggleTodayRecord, useRecords, type Item, type SpaceKey } from "../data/cleaning";
+import { formatRecency, getActiveSpaces, getItems, getSpace, isRecordedToday, lastRecord, spaceColor, toggleTodayRecord, useRecords, type Item, type SpaceKey } from "../data/cleaning";
 
 type Filter = "recent" | "fav" | "space";
 
@@ -130,13 +132,10 @@ export default function QuickRecord() {
   const [heading, body] = intro[filter];
 
   return (
-    <div className="phone-shell">
+    <PageShell>
       <AppHeader title="청소 기록" />
       <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
-        <section className="flex min-h-[88px] flex-col gap-2">
-          <h1 className="text-bb-heading text-sky-ink">{heading}</h1>
-          <p className="text-bb-body text-sky-muted">{body}</p>
-        </section>
+        <PageIntro title={heading} body={body} />
 
         <div aria-label="기록 보기 방식" className="flex gap-2" role="group">
           {filters.map((entry) => (
@@ -210,9 +209,7 @@ export default function QuickRecord() {
                     type="button"
                     onClick={() => record(item)}
                   >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]" style={{ backgroundColor: spaceColor(item.space) }}>
-                      <Icon name={space.icon} className={`text-[24px] ${spaceIconClass[item.space]}`} />
-                    </span>
+                    <SpaceTile onFill={recorded} space={item.space} />
                     <span className="flex min-w-0 flex-col gap-0.5">
                       <span className="truncate text-bb-label text-sky-ink">
                         {space.label} · {item.name}
@@ -233,7 +230,6 @@ export default function QuickRecord() {
       </main>
 
       <Toast message={toast} visible={Boolean(toast)} />
-      <BottomNavigation />
-    </div>
+    </PageShell>
   );
 }

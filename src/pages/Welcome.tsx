@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import SpaceTile from "../components/SpaceTile";
 import { getSpace, type SpaceKey } from "../data/cleaning";
 import { resetToGuest } from "../data/points";
 
@@ -177,9 +178,7 @@ export default function Welcome() {
                   className="flex h-14 items-center gap-[10px] rounded-[14px] px-3"
                   style={{ backgroundColor: mix(BATH.color, tier.pct) }}
                 >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-sky-bath">
-                    <Icon className="text-[24px] text-space-bath-icon" name="space-bath" />
-                  </span>
+                  <SpaceTile space="bathroom" />
                   <span className="flex min-w-0 flex-col gap-px">
                     <span className="text-[16px] font-bold leading-[22px] text-sky-ink">
                       {tier.label} · {tier.pct}%
