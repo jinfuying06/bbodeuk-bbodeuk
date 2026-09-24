@@ -23,7 +23,7 @@ const PREVIEW_LINKS = [
   ["로그인 · 가입 흐름", "/welcome"],
   ["연결 없는 로그인", "/home/error"],
   ["기록 저장 실패", "/home/error"],
-  ["포인트 부족", "/points"],
+  ["포인트 부족", "/points?intent=short"],
   ["기록·공간 이용 정책", "/help"],
 ] as const;
 
@@ -31,7 +31,7 @@ const TITLES: Record<string, string> = { error: "연결 확인", loading: "기�
 
 function Intro({ title, body }: { title: string; body: string }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex h-[88px] shrink-0 flex-col gap-2">
       <h1 className="text-bb-heading text-sky-ink">{title}</h1>
       <p className="text-bb-body text-sky-muted">{body}</p>
     </div>
@@ -114,23 +114,23 @@ export default function HomeStateDemo() {
         {view === "preview" ? (
           <>
             <Intro title="예외 상황도 같은 톤으로" body="빈 화면·오류·로딩 상태를 확인해요." />
-            <div className="mt-6 flex flex-col gap-3">
+            <div className="flex flex-col gap-3">
               {PREVIEW_ROWS.map(([title, sub, to]) => (
                 <Link key={title} className="press flex h-[72px] items-center gap-3 rounded-[18px] bg-sky-white px-3" to={to}>
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-sky-bath text-space-bath-icon">
                     <Icon name="space-bath" className="text-[24px]" />
                   </span>
-                  <span className="flex min-w-0 flex-col">
+                  <span className="flex w-[222px] min-w-0 flex-col">
                     <span className="truncate text-bb-label text-sky-ink">{title}</span>
                     <span className="truncate text-bb-caption text-sky-muted">{sub}</span>
                   </span>
-                  <span aria-hidden="true" className="ml-auto shrink-0 pl-2 pr-2 text-bb-title text-sky-deep">
+                  <span aria-hidden="true" className="shrink-0 text-bb-title text-sky-deep">
                     ›
                   </span>
                 </Link>
               ))}
             </div>
-            <div className="mt-3 flex flex-col">
+            <div className="flex flex-col gap-3">
               {PREVIEW_LINKS.map(([label, to]) => (
                 <Link key={label} className={textLink} to={to}>
                   {label}&nbsp;&nbsp;›

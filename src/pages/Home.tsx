@@ -50,7 +50,7 @@ const recentRows = (records: CleaningRecord[], spaces: Set<string>) => {
   return rows;
 };
 
-const chevron = <span aria-hidden="true" className="ml-auto shrink-0 pl-2 text-bb-title text-sky-muted">›</span>;
+const chevron = <span aria-hidden="true" className="shrink-0 text-bb-title text-sky-muted">›</span>;
 
 function SpaceTile({ space }: { space: SpaceKey }) {
   const { icon, iconColor } = getSpace(space);
@@ -69,7 +69,8 @@ export default function Home() {
   const spaces = getActiveSpaces();
   const spaceKeys = new Set<string>(spaces.map((space) => space.key));
   const hasRecords = records.some((record) => spaceKeys.has(getItem(record.itemId)?.space ?? ""));
-  const todayCount = new Set(todaysRecords(records).map((record) => record.itemId)).size;
+  // Distinct spaces cared for today (not items): 세면대 + 변기 = 욕실 1곳.
+  const todayCount = new Set(todaysRecords(records).map((record) => getItem(record.itemId)?.space).filter((space) => space && spaceKeys.has(space))).size;
   const items = getItems().filter((item) => spaceKeys.has(item.space));
   const anyOverdue = items.some((item) => itemStaleness(item, records) >= 1);
 
@@ -93,7 +94,7 @@ export default function Home() {
     <PageShell>
       <AppHeader title="뽀득뽀득" />
       <main className="flex flex-1 flex-col px-margin-screen pb-nav pt-header">
-        <section className="flex flex-col gap-1 pt-1">
+        <section className="flex h-[110px] shrink-0 flex-col gap-1 pt-1">
           <h1 className="text-bb-heading text-sky-ink">
             {headline[0]}
             <br />
@@ -102,7 +103,7 @@ export default function Home() {
           <p className="text-bb-body text-sky-muted">{message}</p>
         </section>
 
-        <section className="flex flex-col gap-3 pb-3 pt-4">
+        <section className="flex flex-col gap-3 pb-1 pt-1">
           <div className="flex h-7 items-center justify-between">
             <h2 className="text-bb-title text-sky-ink">내 공간</h2>
             <Link className="-mr-2 flex h-11 items-center px-2 text-bb-caption text-sky-muted" to="/space-manage">
@@ -132,18 +133,18 @@ export default function Home() {
           </div>
         </section>
 
-        <div className="pt-2">
+        <div className="pb-4 pt-2">
           <GlassButton to="/quick-record">청소 기록하기&nbsp;&nbsp;&nbsp;+</GlassButton>
         </div>
         {hasRecords ? (
-          <div className="pt-6">
+          <div className="pb-6">
             <GlassButton variant="secondary" size={52} className="w-full" to="/history">
               기록 모아보기
             </GlassButton>
           </div>
         ) : null}
 
-        <section className={`flex flex-col pt-8 ${hasRecords ? "gap-1.5" : "gap-3"}`}>
+        <section className={`flex flex-col pt-2 ${hasRecords ? "gap-1.5" : "gap-3"}`}>
           <div className="flex h-7 items-center justify-between">
             <h2 className="text-bb-title text-sky-ink">최근 돌본 흔적</h2>
             <Link className="-mr-2 flex h-11 items-center px-2 text-bb-caption text-sky-muted" to="/history">
@@ -158,9 +159,9 @@ export default function Home() {
             </Link>
           ) : (
             recent.map((row) => (
-              <Link key={row.id} className="press flex h-[62px] items-center gap-3 rounded-[16px] bg-sky-white pl-3 pr-4" to={`/item-history?item=${row.id}`}>
+              <Link key={row.id} className="press flex h-[62px] items-center gap-3 rounded-[16px] bg-sky-white pl-3" to={`/item-history?item=${row.id}`}>
                 <SpaceTile space={row.space} />
-                <span className="flex min-w-0 flex-col">
+                <span className="flex w-[190px] min-w-0 flex-col">
                   <span className="truncate text-bb-label text-sky-ink">{row.name}</span>
                   <span className="truncate text-bb-caption text-sky-muted">{formatRecency(row.at)}</span>
                 </span>
@@ -178,13 +179,13 @@ export default function Home() {
           {lightCare.map(({ item, tip }) => (
             <Link key={item.id} className="press flex h-16 items-center gap-3 rounded-[18px] bg-sky-white px-3" to={`/quick-record?filter=space&space=${item.space}`}>
               <SpaceTile space={item.space} />
-              <span className="flex min-w-0 flex-col">
+              <span className="flex w-[222px] min-w-0 flex-col">
                 <span className="truncate text-bb-label text-sky-ink">{item.name}</span>
                 <span className="truncate text-bb-caption text-sky-muted">
                   {item.hiddenCare ? "숨은 관리" : formatRecency(lastRecord(item.id, records)?.at)} · {tip}
                 </span>
               </span>
-              <span aria-hidden="true" className="ml-auto shrink-0 pl-2 text-bb-title text-sky-deep">›</span>
+              <span aria-hidden="true" className="shrink-0 text-bb-title text-sky-deep">›</span>
             </Link>
           ))}
           <GlassButton size={52} className="w-full" to="/deep-clean">

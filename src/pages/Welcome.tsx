@@ -76,7 +76,7 @@ function DemoCard() {
             }}
           />
           <Icon
-            className={`pointer-events-none absolute right-[40px] top-[14px] text-[28px] text-white transition-[opacity,transform] duration-300 motion-reduce:hidden ${
+            className={`pointer-events-none absolute left-[111px] top-[14px] text-[28px] text-white transition-[opacity,transform] duration-300 motion-reduce:hidden ${
               moving ? "scale-100 opacity-100" : "scale-50 opacity-0"
             }`}
             name="sparkle"

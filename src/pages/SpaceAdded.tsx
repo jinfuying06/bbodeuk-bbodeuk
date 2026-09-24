@@ -37,11 +37,11 @@ export default function SpaceAdded() {
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]" style={{ backgroundColor: space.color, color: space.iconColor }}>
             <Icon name={space.icon} className="text-[24px]" />
           </span>
-          <span className="flex min-w-0 flex-col">
+          <span className="flex w-[222px] min-w-0 flex-col">
             <span className="truncate text-bb-label text-sky-ink">{space.label}</span>
             <span className="truncate text-bb-caption text-sky-muted">{getItems(space.key).map((item) => item.name).join(" · ")}</span>
           </span>
-          <span aria-hidden="true" className="ml-auto shrink-0 pl-2 pr-2 text-bb-title text-sky-deep">
+          <span aria-hidden="true" className="shrink-0 text-bb-title text-sky-deep">
             ›
           </span>
         </Link>
