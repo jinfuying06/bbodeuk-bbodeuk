@@ -1,212 +1,78 @@
-import { useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-import { dayKey, formatTime, getItem, getSpace, recordsForItem, useRecords } from "../data/cleaning";
-import { spaceTones } from "../data/spaceTones";
+import { daysAgo, formatDay, formatTime, getItem, getSpace, recordsForItem, spaceColor, useRecords } from "../data/cleaning";
+import { spaceIconClass } from "./QuickRecord";
 
-type CleaningRecord = {
-  id: string;
-  date: string;
-  time: string;
+/** 을/를 by the last syllable's final consonant (거실 바닥을, 세면대를). */
+export const objectParticle = (word: string) => {
+  const code = word.charCodeAt(word.length - 1) - 0xac00;
+  return code >= 0 && code <= 11171 && code % 28 !== 0 ? "을" : "를";
 };
 
-type HistoryView = "daily" | "monthly";
-
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-
-const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-  weekday: "long",
-});
-
-const formatDate = (dateText: string) => dateFormatter.format(new Date(`${dateText}T00:00:00`)).replace(/\s/g, " ");
-
-const getStartOfWeek = (date: Date) => {
-  const next = new Date(date);
-  const day = next.getDay() || 7;
-  next.setDate(next.getDate() - day + 1);
-  next.setHours(0, 0, 0, 0);
-  return next;
+const relativeDay = (at: string) => {
+  const days = daysAgo(at);
+  if (days === 0) return "오늘";
+  if (days === 1) return "어제";
+  return formatDay(at).replace(/ \S+요일$/, "");
 };
 
-const isSameMonth = (date: Date, target: Date) => date.getFullYear() === target.getFullYear() && date.getMonth() === target.getMonth();
-
-const isSameYear = (date: Date, target: Date) => date.getFullYear() === target.getFullYear();
-
-const makeMonthCells = (target: Date) => {
-  const firstDay = new Date(target.getFullYear(), target.getMonth(), 1);
-  const startOffset = firstDay.getDay();
-  const start = new Date(firstDay);
-  start.setDate(firstDay.getDate() - startOffset);
-
-  return Array.from({ length: 42 }, (_, index) => {
-    const date = new Date(start);
-    date.setDate(start.getDate() + index);
-    return date;
-  });
-};
-
+/** Figma 개선 / 거실 바닥 기록 (76:2151) · 싱크대 기록 (76:2250) — per-item history. */
 export default function ItemHistory() {
   const [searchParams] = useSearchParams();
-  const [view, setView] = useState<HistoryView>("daily");
-  const allRecords = useRecords();
+  const records = useRecords();
   // ?item= takes an item id (legacy full names still resolve). Unknown → 세면대.
   const item = getItem(searchParams.get("item")) ?? getItem("basin")!;
-  const selectedItem = item.fullName;
   const space = getSpace(item.space);
-  const itemRecords: CleaningRecord[] = recordsForItem(item.id, allRecords).map((record) => ({ id: record.id, date: dayKey(record.at), time: formatTime(record.at) }));
-  const tone = spaceTones[item.space];
-  const latestRecord = itemRecords[0];
-  const currentWeekStart = getStartOfWeek(today);
-  const currentWeekEnd = new Date(currentWeekStart);
-  currentWeekEnd.setDate(currentWeekStart.getDate() + 6);
-  const thisWeekCount = itemRecords.filter((record) => {
-    const recordDate = new Date(`${record.date}T00:00:00`);
-    return recordDate >= currentWeekStart && recordDate <= currentWeekEnd;
+  const itemRecords = recordsForItem(item.id, records);
+  const latest = itemRecords[0];
+  const now = new Date();
+  const monthCount = itemRecords.filter((record) => {
+    const at = new Date(record.at);
+    return at.getFullYear() === now.getFullYear() && at.getMonth() === now.getMonth();
   }).length;
-  const thisMonthCount = itemRecords.filter((record) => isSameMonth(new Date(`${record.date}T00:00:00`), today)).length;
-  const thisYearCount = itemRecords.filter((record) => isSameYear(new Date(`${record.date}T00:00:00`), today)).length;
-  const [selectedMonth, setSelectedMonth] = useState(() => (latestRecord ? new Date(`${latestRecord.date}T00:00:00`) : today));
-  const monthCells = useMemo(() => makeMonthCells(selectedMonth), [selectedMonth]);
-  const selectedMonthCount = itemRecords.filter((record) => isSameMonth(new Date(`${record.date}T00:00:00`), selectedMonth)).length;
-  const recordsByDate = useMemo(
-    () =>
-      itemRecords.reduce<Record<string, CleaningRecord[]>>((acc, record) => {
-        acc[record.date] = [...(acc[record.date] ?? []), record];
-        return acc;
-      }, {}),
-    [itemRecords],
-  );
-  const shiftMonth = (amount: number) => setSelectedMonth((current) => new Date(current.getFullYear(), current.getMonth() + amount, 1));
 
   return (
     <PageShell>
-      <AppHeader title={`${selectedItem} 기록`} back="/history" />
-      <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
-        <section className="rounded-xl bg-surface-container-lowest p-space-lg text-center shadow-sm">
-          <span className={`mx-auto mb-space-sm flex h-16 w-16 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
-            <Icon name={space.icon} className="text-[32px]" />
-          </span>
-          <h1 className="text-headline-lg">{selectedItem}</h1>
-          <p className="mt-1 text-body-md text-on-surface-variant">
-            {latestRecord ? `최근 청소 ${formatDate(latestRecord.date)} · ${latestRecord.time}` : "아직 청소 기록이 없어요."}
+      <AppHeader title={`${item.fullName} 기록`} back="/history" />
+      <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
+        <section className="flex min-h-[88px] flex-col gap-2">
+          <h1 className="text-bb-heading text-sky-ink">
+            {item.fullName}
+            {objectParticle(item.fullName)} 돌본 날들
+          </h1>
+          <p className="text-bb-body text-sky-muted">
+            {space.label} · {latest ? `최근 기록 ${relativeDay(latest.at)} ${formatTime(latest.at)}` : "아직 기록 없음"}
           </p>
         </section>
 
-        <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-          <h2 className="text-title-sm">기록 요약</h2>
-          <div className="mt-space-sm grid grid-cols-4 gap-space-xs">
-            {[
-              ["이번주", thisWeekCount],
-              ["이번달", thisMonthCount],
-              ["올해", thisYearCount],
-              ["총", itemRecords.length],
-            ].map(([label, count]) => (
-              <div key={label} className="rounded-lg bg-surface-container-low p-space-xs text-center">
-                <p className="text-caption text-on-surface-variant">{label}</p>
-                <p className={`mt-1 text-title-sm ${tone.text}`}>{count}회</p>
-              </div>
-            ))}
-          </div>
+        <section className="flex flex-col gap-2 rounded-3xl bg-sky-tint px-5 pb-4 pt-4">
+          <h2 className="text-bb-title text-sky-ink">이번 달 {monthCount}번의 작은 돌봄</h2>
+          <p className="text-bb-body text-sky-muted">
+            빈 날도 괜찮아요.
+            <br />
+            남긴 기록을 가볍게 돌아봐요.
+          </p>
         </section>
 
         {itemRecords.length > 0 ? (
-          <section className="flex flex-col gap-space-sm">
-            <div className="flex w-full items-center gap-space-xs rounded-full bg-surface-container p-space-xxs">
-              {[
-                ["daily", "일별"],
-                ["monthly", "월별"],
-              ].map(([key, label]) => (
-                <button
-                  key={key}
-                  aria-pressed={view === key}
-                  className={`flex min-h-10 flex-1 items-center justify-center rounded-full text-label-md transition-all ${
-                    view === key ? "bg-surface-container-lowest text-primary shadow-sm" : "text-on-surface-variant"
-                  }`}
-                  type="button"
-                  onClick={() => setView(key as HistoryView)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            {view === "daily" ? (
-              <div className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-                <ol className="flex flex-col">
-                  {itemRecords.map((record, index) => {
-                    const isLast = index === itemRecords.length - 1;
-
-                    return (
-                      <li key={record.id} className="flex gap-space-sm">
-                        <div className="flex flex-col items-center">
-                          <span aria-hidden="true" className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${tone.dot}`} />
-                          {!isLast ? <span aria-hidden="true" className={`w-px flex-1 ${tone.line}`} /> : null}
-                        </div>
-                        <div className={`min-w-0 flex-1 ${isLast ? "pb-0.5" : "pb-space-md"}`}>
-                          <h2 className="text-title-sm text-on-surface">{formatDate(record.date)}</h2>
-                          <p className="mt-0.5 text-caption text-on-surface-variant">{record.time} · 청소 완료</p>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ol>
-              </div>
-            ) : (
-              <div className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-                <div className="mb-space-sm flex items-center justify-between">
-                  <button className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-low text-on-surface-variant" type="button" onClick={() => shiftMonth(-1)} aria-label="이전달">
-                    <Icon name="chevron_left" className="text-[20px]" />
-                  </button>
-                  <div className="text-center">
-                    <h2 className="text-title-sm">{selectedMonth.getFullYear()}년 {selectedMonth.getMonth() + 1}월</h2>
-                    <span className="text-caption text-on-surface-variant">{selectedMonthCount}회 기록</span>
-                  </div>
-                  <button className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-low text-on-surface-variant" type="button" onClick={() => shiftMonth(1)} aria-label="다음달">
-                    <Icon name="chevron_right" className="text-[20px]" />
-                  </button>
-                </div>
-                <div className="grid grid-cols-7 gap-1 text-center text-caption text-outline">
-                  {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
-                    <span key={day} className="py-1">{day}</span>
-                  ))}
-                </div>
-                <div className="mt-1 grid grid-cols-7 gap-1">
-                  {monthCells.map((date) => {
-                    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-                    const count = recordsByDate[key]?.length ?? 0;
-                    const inMonth = isSameMonth(date, selectedMonth);
-
-                    return (
-                      <div
-                        key={key}
-                        className={`flex aspect-square flex-col items-center justify-center rounded-lg text-caption ${
-                          count > 0 ? `${tone.fill} ${tone.text} font-semibold` : inMonth ? "bg-surface-container-low text-on-surface" : "bg-transparent text-outline-variant"
-                        }`}
-                      >
-                        <span>{date.getDate()}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </section>
+          <ol className="flex flex-col gap-3">
+            {itemRecords.map((record) => (
+              <li key={record.id} className="flex h-[72px] items-center gap-3 rounded-[18px] bg-sky-white px-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]" style={{ backgroundColor: spaceColor(item.space) }}>
+                  <Icon name={space.icon} className={`text-[24px] ${spaceIconClass[item.space]}`} />
+                </span>
+                <span className="flex min-w-0 flex-col">
+                  <span className="text-bb-label text-sky-ink">{formatDay(record.at)}</span>
+                  <span className="text-bb-caption text-sky-muted">{formatTime(record.at)} · 청소 기록</span>
+                </span>
+              </li>
+            ))}
+          </ol>
         ) : (
-          <section className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
-            <p className="text-title-sm text-on-surface">아직 청소 기록이 없어요.</p>
-            <p className="mt-1 text-body-md text-on-surface-variant">청소를 기록하면 이 항목의 히스토리를 모아볼 수 있어요.</p>
-          </section>
+          <p className="py-6 text-center text-bb-body text-sky-muted">아직 남긴 기록이 없어요.</p>
         )}
-
-        <Link className="flex min-h-12 items-center justify-center rounded-xl bg-surface-container-lowest text-label-md text-primary shadow-sm" to="/history">
-          히스토리로 돌아가기
-        </Link>
       </main>
     </PageShell>
   );
