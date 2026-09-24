@@ -14,6 +14,7 @@ import Points from "./pages/Points";
 import Settings from "./pages/Settings";
 import Setup from "./pages/Setup";
 import SignUp from "./pages/SignUp";
+import SignUpDone from "./pages/SignUpDone";
 import SpaceInfo from "./pages/SpaceInfo";
 import SpaceManage from "./pages/SpaceManage";
 import Spaces from "./pages/Spaces";
@@ -33,6 +34,7 @@ export default function App() {
       <Route path="/welcome" element={<Welcome />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/signup-done" element={<SignUpDone />} />
       <Route path="/sample-paint" element={<SamplePaint />} />
       <Route path="/setup" element={<Setup />} />
       {AX_ONBOARDING_ENABLED ? <Route path="/setup/photo" element={<AXOnboardingFlow />} /> : null}
