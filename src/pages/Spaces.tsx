@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-import { daysAgo, getActiveSpaces, getItems, itemFade, lastRecord, spaceColor, useRecords, type SpaceKey } from "../data/cleaning";
+import { daysAgo, getActiveSpaces, getItems, isSpaceKey, itemFade, lastRecord, spaceColor, useRecords, type SpaceKey } from "../data/cleaning";
 
 /** Figma 07 short recency: 오늘 · N일 전 · 기록 없음. */
 const shortRecency = (at: string | undefined) => {
@@ -16,7 +16,8 @@ const shortRecency = (at: string | undefined) => {
 export default function Spaces() {
   const records = useRecords();
   const spaces = getActiveSpaces();
-  const [open, setOpen] = useState<SpaceKey | null>(spaces[0]?.key ?? null);
+  const requested = useSearchParams()[0].get("space");
+  const [open, setOpen] = useState<SpaceKey | null>(isSpaceKey(requested) && spaces.some((space) => space.key === requested) ? requested : spaces[0]?.key ?? null);
 
   return (
     <PageShell>

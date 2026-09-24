@@ -72,6 +72,9 @@ function PointsShort() {
       <main className="flex flex-col gap-3 px-margin-screen pb-5 pt-header">
         <h1 className="pt-5 text-bb-heading text-sky-ink">포인트가 조금 모자라요</h1>
         <p className="text-bb-body text-sky-muted">새 공간에 필요한 포인트와 보유 포인트를 확인해 주세요. 포인트는 차감되지 않았어요.</p>
+        <p className="text-bb-label text-sky-deep">
+          필요 {SPACE_PRICE}P&nbsp;&nbsp;·&nbsp;&nbsp;보유 {readPoints().toLocaleString()}P
+        </p>
         <GlassButton size={52} to="/points">
           내 포인트 보기
         </GlassButton>

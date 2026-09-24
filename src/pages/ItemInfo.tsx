@@ -5,10 +5,9 @@ import GlassButton from "../components/GlassButton";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
 import { hideItem, readOverrides, writeOverride } from "../data/itemStorage";
-import { getItem, getSpace, isSpaceKey, SPACES, type Item, type SpaceKey } from "../data/cleaning";
+import { getActiveSpaces, getItem, getSpace, isSpaceKey, type Item, type SpaceKey } from "../data/cleaning";
 import { fieldClass } from "./ItemAdd";
 
-const spaceOptions = SPACES.map((space) => ({ key: space.key, label: getSpace(space.key).label }));
 
 type DeleteConfirmDialogProps = {
   open: boolean;
@@ -69,6 +68,8 @@ export default function ItemInfo() {
 function ItemInfoForm({ item }: { item: Item }) {
   const override = readOverrides()[item.id];
   const [name, setName] = useState(override?.name ?? item.name);
+  // Same source as ItemAdd: only the user's active spaces (plus the item's current one so the select never goes blank).
+  const spaceOptions = getActiveSpaces().some((entry) => entry.key === item.space) ? getActiveSpaces() : [...getActiveSpaces(), getSpace(item.space)];
   const [space, setSpace] = useState<SpaceKey>(override && isSpaceKey(override.space) ? override.space : item.space);
   const [intervalDays, setIntervalDays] = useState(String(override?.intervalDays ?? item.intervalDays));
   const [savedName, setSavedName] = useState(override?.name ?? item.name);

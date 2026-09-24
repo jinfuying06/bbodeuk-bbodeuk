@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
 import PageShell from "../components/PageShell";
@@ -12,7 +12,6 @@ export const fieldClass =
 
 export default function ItemAdd() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams] = useSearchParams();
   const spaces = useMemo(() => getActiveSpaces(), []);
   const requestedSpace = searchParams.get("space");
@@ -64,8 +63,8 @@ export default function ItemAdd() {
     event.preventDefault();
     if (!valid) return;
     addItem(name.trim(), space, Math.round(Number(intervalDays)));
-    if (location.key === "default") navigate("/spaces", { replace: true });
-    else navigate(-1);
+    // Land on /spaces with the new item's space expanded.
+    navigate(`/spaces?space=${space}`, { replace: true });
   };
 
   return (
