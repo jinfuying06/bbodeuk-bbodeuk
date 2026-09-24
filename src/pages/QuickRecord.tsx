@@ -1,73 +1,95 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import BottomNavigation from "../components/BottomNavigation";
+import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
+import Pill from "../components/Pill";
 import Toast, { useToast } from "../components/Toast";
-import { formatRecency, getActiveSpaces, getItems, isRecordedToday, isSpaceKey, lastRecord, toggleTodayRecord, useRecords, type Item, type SpaceKey } from "../data/cleaning";
-import { spaceTones } from "../data/spaceTones";
+import { formatRecency, getActiveSpaces, getItems, getSpace, isRecordedToday, isSpaceKey, lastRecord, spaceColor, toggleTodayRecord, useRecords, type Item, type SpaceKey } from "../data/cleaning";
 
 type Filter = "recent" | "fav" | "space";
 
-const filters: Array<{ key: Filter; icon: string; label: string }> = [
-  { key: "recent", icon: "schedule", label: "최근 기록" },
-  { key: "fav", icon: "favorite", label: "자주" },
-  { key: "space", icon: "grid_view", label: "공간별 보기" },
+const filters: Array<{ key: Filter; label: string }> = [
+  { key: "recent", label: "최근 기록" },
+  { key: "fav", label: "자주" },
+  { key: "space", label: "공간별 보기" },
 ];
 
-function isFilter(value: string | null): value is Filter {
-  return value === "recent" || value === "fav" || value === "space";
-}
+const intro: Record<Filter, [string, string]> = {
+  recent: ["최근 돌본 곳을 다시", "한 번 누르면 기록, 다시 누르면 취소돼요."],
+  fav: ["자주 돌보는 곳부터", "한 번 누르면 기록, 다시 누르면 취소돼요."],
+  space: ["어디를 청소했나요?", "청소한 곳을 톡 눌러 기록해요."],
+};
+
+/** Static class names so Tailwind keeps them (space icon colors). */
+export const spaceIconClass: Record<SpaceKey, string> = {
+  bathroom: "text-space-bath-icon",
+  kitchen: "text-space-kitchen-icon",
+  living: "text-space-living-icon",
+  bedroom: "text-space-bed-icon",
+  terrace: "text-sky-deep",
+};
+
+const isFilter = (value: string | null): value is Filter => value === "recent" || value === "fav" || value === "space";
+
+const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+/** Figma Glass / light sweep: one left→right pass, 480ms. Stable ref → runs once per mount. */
+const playSweep = (el: HTMLElement | null) => {
+  if (!el || reducedMotion()) return;
+  el.animate([{ transform: "translateX(0) rotate(10deg)", opacity: 1 }, { transform: "translateX(420px) rotate(10deg)", opacity: 1 }], {
+    duration: 480,
+    easing: "cubic-bezier(.2,.7,.2,1)",
+    fill: "forwards",
+  });
+};
+
+/** Figma Glass / sparkle: fades/scales in during the sweep, gone by ~1.2s. */
+const playSparkle = (el: HTMLElement | null) => {
+  if (!el || reducedMotion()) return;
+  el.animate(
+    [
+      { opacity: 0, transform: "scale(.6)" },
+      { opacity: 1, transform: "scale(1)", offset: 0.35 },
+      { opacity: 1, transform: "scale(1)", offset: 0.7 },
+      { opacity: 0, transform: "scale(.9)" },
+    ],
+    { duration: 1200, easing: "ease-out", fill: "forwards" },
+  );
+};
+
+const sweepGradient = "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(199,255,250,.22) 32%, rgba(255,255,255,.88) 50%, rgba(199,255,250,.22) 68%, rgba(255,255,255,0) 100%)";
 
 export default function QuickRecord() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const records = useRecords();
   const activeSpaces = useMemo(() => getActiveSpaces(), []);
-  const availableSpaces = useMemo(() => activeSpaces.map((item) => item.key), [activeSpaces]);
-  const allItems = useMemo(() => getItems().filter((item) => availableSpaces.includes(item.space)), [availableSpaces]);
-  const [filter, setFilter] = useState<Filter>(() => {
-    const initialFilter = searchParams.get("filter");
-    return isFilter(initialFilter) ? initialFilter : "space";
-  });
-  const [space, setSpace] = useState<SpaceKey>(() => {
-    const initialSpace = searchParams.get("space");
-    return isSpaceKey(initialSpace) ? initialSpace : "bathroom";
-  });
-  const [flashCard, setFlashCard] = useState<string | null>(null);
-  const [sweepingId, setSweepingId] = useState<string | null>(null);
-  const [sweepKey, setSweepKey] = useState(0);
+  const allItems = useMemo(() => getItems().filter((item) => activeSpaces.some((space) => space.key === item.space)), [activeSpaces]);
+  const paramFilter = searchParams.get("filter");
+  const filter: Filter = isFilter(paramFilter) ? paramFilter : "space";
+  const paramSpace = searchParams.get("space");
+  const currentSpace: SpaceKey = activeSpaces.find((space) => space.key === paramSpace)?.key ?? activeSpaces[0]?.key ?? "bathroom";
+  // Keyed per tap so the sweep/sparkle overlays remount and replay.
+  const [shine, setShine] = useState<{ id: string; n: number } | null>(null);
   const [toast, showToast] = useToast();
-  const currentSpace = availableSpaces.includes(space) ? space : availableSpaces[0] ?? "bathroom";
-  const selectedItemId = searchParams.get("item");
+  const doneTimer = useRef<number | undefined>(undefined);
 
-  // Per-item paint-cycle counter, so a stale timeout from an earlier tap can't
-  // clobber a newer one's flash feedback on rapid untap->retap of the same item.
-  const paintCycleRef = useRef<Record<string, number>>({});
-  const pendingTimeoutIdsRef = useRef<number[]>([]);
+  useEffect(() => () => window.clearTimeout(doneTimer.current), []);
 
+  // Toast handed over from 기록 완료 → "기록 취소".
   useEffect(() => {
-    return () => {
-      pendingTimeoutIdsRef.current.forEach((id) => window.clearTimeout(id));
-      pendingTimeoutIdsRef.current = [];
-    };
-  }, []);
+    const message = (location.state as { toast?: string } | null)?.toast;
+    if (message) {
+      showToast(message);
+      navigate(`${location.pathname}${location.search}`, { replace: true, state: null });
+    }
+  }, [location, navigate, showToast]);
 
-  useEffect(() => {
-    const nextFilter = searchParams.get("filter");
-    const nextSpace = searchParams.get("space");
-    if (isFilter(nextFilter)) setFilter(nextFilter);
-    if (isSpaceKey(nextSpace)) setSpace(nextSpace);
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (space === currentSpace) return;
-    setSpace(currentSpace);
-    if (filter === "space") setSearchParams({ filter: "space", space: currentSpace }, { replace: true });
-  }, [currentSpace, filter, setSearchParams, space]);
-
-  const activeItems = useMemo(() => {
+  const items = useMemo(() => {
     if (filter === "recent") {
-      // Most recently cared-for items first (records are newest-first).
       const recent: Item[] = [];
       for (const record of records) {
         const item = allItems.find((entry) => entry.id === record.itemId);
@@ -89,196 +111,134 @@ export default function QuickRecord() {
     return allItems.filter((item) => item.space === currentSpace);
   }, [allItems, currentSpace, filter, records]);
 
-  const updateFilter = (nextFilter: Filter) => {
-    setFilter(nextFilter);
-    const nextParams: Record<string, string> = { filter: nextFilter };
-    if (nextFilter === "space") nextParams.space = currentSpace;
-    setSearchParams(nextParams);
-  };
+  const setView = (nextFilter: Filter, nextSpace = currentSpace) =>
+    setSearchParams(nextFilter === "space" ? { filter: nextFilter, space: nextSpace } : { filter: nextFilter }, { replace: true });
 
-  const updateSpace = (nextSpace: SpaceKey) => {
-    if (!availableSpaces.includes(nextSpace)) return;
-    setSpace(nextSpace);
-    setFilter("space");
-    setSearchParams({ filter: "space", space: nextSpace });
-  };
-
-  const selectedItem = filter === "space" ? activeItems.find((item) => item.id === selectedItemId) : undefined;
-
-  const paintItem = (item: Item) => {
+  const record = (item: Item) => {
+    window.clearTimeout(doneTimer.current);
     if (toggleTodayRecord(item.id) === "removed") {
-      setFlashCard(null);
-      setSweepingId(null);
+      setShine(null);
       showToast("공간 기록이 취소되었어요");
       return;
     }
-
-    showToast("청소 기록이 저장됐어요");
-    setFlashCard(item.id);
-    // Glass-sweep feedback (Figma spec: 480ms sweep, ~1.2s total settle).
-    // Deferred by one tick so the transform actually transitions from its
-    // resting -translate-x-full instead of mounting already-translated.
-    setSweepingId(null);
-    setSweepKey((key) => key + 1);
-    const cycle = (paintCycleRef.current[item.id] ?? 0) + 1;
-    paintCycleRef.current[item.id] = cycle;
-    const sweepTimeoutId = window.setTimeout(() => setSweepingId(item.id), 10);
-    const clearTimeoutId = window.setTimeout(() => {
-      setFlashCard((current) => (current === item.id && paintCycleRef.current[item.id] === cycle ? null : current));
-    }, 1200);
-    pendingTimeoutIdsRef.current.push(sweepTimeoutId, clearTimeoutId);
+    setShine((prev) => ({ id: item.id, n: (prev?.n ?? 0) + 1 }));
+    // 탭 → 유리광 480ms + 반짝임 → ~1.2s 후 09/기록 완료.
+    doneTimer.current = window.setTimeout(() => navigate(`/record-done?item=${item.id}`), 1200);
   };
 
+  const overlays = (item: Item, sparkleClass: string, sweepClass: string) =>
+    shine?.id === item.id ? (
+      <>
+        <span key={`sw-${shine.n}`} ref={playSweep} aria-hidden="true" className={`pointer-events-none absolute opacity-0 mix-blend-screen ${sweepClass}`} style={{ background: sweepGradient }} />
+        <span key={`sp-${shine.n}`} ref={playSparkle} aria-hidden="true" className={`pointer-events-none absolute opacity-0 text-sky-white ${sparkleClass}`}>
+          <Icon name="sparkle" className="drop-shadow-[0_0_2px_rgba(20,107,99,.35)]" />
+        </span>
+      </>
+    ) : null;
+
+  const [heading, body] = intro[filter];
+
   return (
-    <div className="phone-shell bg-sky-bg text-sky-ink">
+    <div className="phone-shell">
       <AppHeader title="청소 기록" />
-      <main className="flex flex-col bg-sky-bg pb-24 pt-header">
-        <section className="px-margin-screen pb-space-sm pt-space-md">
-          <h1 className="text-headline-lg text-sky-ink">{selectedItem ? `${selectedItem.name} 청소를 기록할까요?` : "어디를 청소했나요?"}</h1>
+      <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
+        <section className="flex min-h-[88px] flex-col gap-2">
+          <h1 className="text-bb-heading text-sky-ink">{heading}</h1>
+          <p className="text-bb-body text-sky-muted">{body}</p>
         </section>
 
-        <section className="px-margin-screen py-space-xs">
-          <div className="flex w-full items-center gap-space-xs rounded-full bg-sky-bg p-space-xxs">
-            {filters.map((item) => (
-              <button
-                key={item.key}
-                aria-pressed={filter === item.key}
-                className={`flex flex-1 items-center justify-center gap-1 rounded-full px-space-xs py-space-xs text-label-md transition-all duration-200 ${
-                  filter === item.key ? "bg-sky-white text-sky-deep shadow-sm" : "text-sky-muted"
-                }`}
-                type="button"
-                onClick={() => updateFilter(item.key)}
-              >
-                <Icon name={item.icon} className="text-[18px]" />
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </section>
+        <div aria-label="기록 보기 방식" className="flex gap-2" role="group">
+          {filters.map((entry) => (
+            <Pill key={entry.key} className="flex-1" selected={filter === entry.key} onClick={() => setView(entry.key)}>
+              {entry.label}
+            </Pill>
+          ))}
+        </div>
 
         {filter === "space" ? (
-          <section className="mt-space-sm px-margin-screen">
-            <div className="hide-scrollbar -mx-margin-screen overflow-x-auto px-margin-screen">
-              <div className="flex min-w-max gap-space-xs">
-                {activeSpaces.map((item) => (
-                  <button
-                    key={item.key}
-                    aria-pressed={currentSpace === item.key}
-                    className={`flex items-center gap-1.5 rounded-full border px-space-md py-space-xs text-label-md transition-colors duration-150 ${
-                      currentSpace === item.key ? `${spaceTones[item.key].fill} ${spaceTones[item.key].border} ${spaceTones[item.key].text}` : "border-art-line bg-sky-white text-sky-muted"
-                    }`}
-                    type="button"
-                    onClick={() => updateSpace(item.key)}
-                  >
-                    <Icon name={item.icon} className="text-[16px]" />
-                    {item.label}
-                  </button>
-                ))}
-              </div>
+          <>
+            <div aria-label="공간 선택" className="flex gap-2" role="group">
+              {activeSpaces.map((space) => (
+                <Pill
+                  key={space.key}
+                  className="min-w-0 flex-1 !px-[7px]"
+                  icon={space.icon}
+                  iconClassName={spaceIconClass[space.key]}
+                  selected={currentSpace === space.key}
+                  size={38}
+                  onClick={() => setView("space", space.key)}
+                >
+                  {space.label}
+                </Pill>
+              ))}
             </div>
-          </section>
-        ) : null}
 
-        <section className="mt-space-md px-margin-screen">
-          {filter === "space" ? (
-            <div className="grid grid-cols-3 gap-space-xs">
-              {activeItems.map((item) => {
-                const flashed = flashCard === item.id;
-                const painted = isRecordedToday(item.id, records);
-                const selected = selectedItemId === item.id;
-                const sweeping = sweepingId === item.id;
-                const tone = spaceTones[currentSpace];
+            <p className="h-[62px] rounded-[16px] bg-sky-tint pl-4 pr-4 pt-[11px] text-[12px] font-medium leading-[22px] text-sky-deep">색이 채워진 항목을 한 번 더 누르면 기록을 취소해요.</p>
 
+            <div aria-label="청소 항목" className="grid grid-cols-2 gap-[10px]">
+              {items.map((item) => {
+                const recorded = isRecordedToday(item.id, records);
+                const space = getSpace(item.space);
+                const objectArt = item.icon.startsWith("object-");
                 return (
                   <button
                     key={item.id}
-                    aria-pressed={painted}
-                    className={`relative flex aspect-square flex-col items-center justify-center gap-space-xs overflow-hidden rounded-lg border p-space-xs text-center transition-all active:scale-95 ${
-                      painted || selected ? `${tone.border} ${tone.fill} ${tone.text} shadow-sm` : "border-art-line bg-sky-white text-sky-ink"
-                    }`}
+                    aria-pressed={recorded}
+                    className="press relative flex h-[122px] flex-col items-start overflow-hidden rounded-[20px] border pl-[14px] pt-2 text-left transition-colors duration-300"
+                    style={{ borderColor: space.iconColor, backgroundColor: recorded ? spaceColor(item.space) : "#ffffff" }}
                     type="button"
-                    onClick={() => paintItem(item)}
-                    >
-                    {selected ? <span className="absolute right-2 top-2 rounded-full bg-sky-white px-2 py-0.5 text-caption font-semibold">선택됨</span> : null}
-                    <Icon name={item.icon} className="text-[32px]" />
-                    <span className="text-label-sm font-semibold">{item.name}</span>
-                    <span className="text-caption text-sky-muted">{formatRecency(lastRecord(item.id, records)?.at)}</span>
-                    {painted ? (
-                      <span
-                        key={`${item.id}-${sweepKey}`}
-                        aria-hidden="true"
-                        className={`pointer-events-none absolute inset-y-0 left-0 w-1/2 -skew-x-12 bg-white/70 blur-sm transition-transform duration-[480ms] ease-out ${
-                          sweeping ? "translate-x-[260%]" : "-translate-x-full"
-                        }`}
-                      />
-                    ) : null}
-                    <div role="status" aria-live="polite" className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
-                      {flashed ? (
-                        <span className={`rounded-full bg-sky-white px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
-                          이제 깨끗해요!
-                        </span>
-                      ) : null}
-                    </div>
+                    onClick={() => record(item)}
+                  >
+                    <span className="flex h-[62px] w-[76px] items-start">
+                      {objectArt ? (
+                        <Icon name={item.icon} className="ml-3 mt-1 text-[46px]" />
+                      ) : (
+                        <Icon name={item.icon} className={`mt-1 text-[24px] ${spaceIconClass[item.space]}`} />
+                      )}
+                    </span>
+                    <span className="text-bb-label text-sky-ink">{item.name}</span>
+                    <span className="text-bb-caption text-sky-muted">{formatRecency(lastRecord(item.id, records)?.at)}</span>
+                    {overlays(item, "left-[111px] top-[14px] text-[28px]", "-left-[174px] -top-[49px] h-[220px] w-[118px]")}
                   </button>
                 );
               })}
-              <Link className="flex aspect-square flex-col items-center justify-center gap-space-xs rounded-lg border border-dashed border-art-line bg-sky-white text-sky-muted" to={`/item-add?space=${currentSpace}`}>
-                <Icon name="add" className="text-[24px]" />
-                <span className="text-label-sm">항목 추가</span>
-              </Link>
             </div>
-          ) : (
-            <div className="flex flex-col gap-space-xs">
-              {activeItems.map((item) => {
-                const flashed = flashCard === item.id;
-                const painted = isRecordedToday(item.id, records);
-                const sweeping = sweepingId === item.id;
-                const itemSpace = activeSpaces.find((entry) => entry.key === item.space);
-                const tone = spaceTones[item.space];
-
+          </>
+        ) : (
+          <>
+            <div className="flex flex-col gap-3">
+              {items.map((item) => {
+                const recorded = isRecordedToday(item.id, records);
+                const space = getSpace(item.space);
                 return (
                   <button
                     key={item.id}
-                    aria-pressed={painted}
-                    className={`relative flex items-center overflow-hidden rounded-xl border p-space-sm text-left transition-all duration-200 active:scale-[0.99] ${
-                      painted ? `${tone.border} ${tone.fill} shadow-sm` : "border-transparent bg-sky-white"
-                    }`}
+                    aria-pressed={recorded}
+                    className="press relative flex h-20 items-center gap-3 overflow-hidden rounded-[20px] px-[14px] text-left transition-colors duration-300"
+                    style={{ backgroundColor: recorded ? spaceColor(item.space) : "#ffffff" }}
                     type="button"
-                    onClick={() => paintItem(item)}
+                    onClick={() => record(item)}
                   >
-                    <div className="flex min-w-0 items-center gap-space-sm">
-                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
-                        <Icon name={itemSpace?.icon ?? "grid_view"} className="text-[22px]" />
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]" style={{ backgroundColor: spaceColor(item.space) }}>
+                      <Icon name={space.icon} className={`text-[24px] ${spaceIconClass[item.space]}`} />
+                    </span>
+                    <span className="flex min-w-0 flex-col gap-0.5">
+                      <span className="truncate text-bb-label text-sky-ink">
+                        {space.label} · {item.name}
                       </span>
-                      <div className="flex min-w-0 flex-col">
-                        <span className={`text-title-sm ${painted ? tone.text : "text-sky-ink"}`}>
-                          {itemSpace?.label} · {item.name}
-                        </span>
-                        <span className="truncate text-caption text-sky-muted">{formatRecency(lastRecord(item.id, records)?.at)}</span>
-                      </div>
-                    </div>
-                    {painted ? (
-                      <span
-                        key={`${item.id}-${sweepKey}`}
-                        aria-hidden="true"
-                        className={`pointer-events-none absolute inset-y-0 left-0 w-1/3 -skew-x-12 bg-white/70 blur-sm transition-transform duration-[480ms] ease-out ${
-                          sweeping ? "translate-x-[420%]" : "-translate-x-full"
-                        }`}
-                      />
-                    ) : null}
-                    <div role="status" aria-live="polite" className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
-                      {flashed ? (
-                        <span className={`rounded-full bg-sky-white px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
-                          이제 깨끗해요!
-                        </span>
-                      ) : null}
-                    </div>
+                      <span className="text-bb-caption text-sky-muted">{formatRecency(lastRecord(item.id, records)?.at)}</span>
+                    </span>
+                    {overlays(item, "right-4 top-3 text-[24px]", "-left-[120px] -top-10 h-[160px] w-[110px]")}
                   </button>
                 );
               })}
+              {items.length === 0 ? <p className="py-6 text-center text-bb-body text-sky-muted">아직 남긴 기록이 없어요. 공간별 보기에서 시작해보세요.</p> : null}
             </div>
-          )}
-        </section>
+            <GlassButton size={52} to="/history" variant="secondary">
+              기록 모아보기
+            </GlassButton>
+          </>
+        )}
       </main>
 
       <Toast message={toast} visible={Boolean(toast)} />

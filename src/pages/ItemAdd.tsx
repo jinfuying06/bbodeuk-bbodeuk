@@ -1,35 +1,31 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
-import Icon from "../components/Icon";
+import GlassButton from "../components/GlassButton";
 import PageShell from "../components/PageShell";
-import { spaceToneLabels, spaceTones, type SpaceToneKey } from "../data/spaceTones";
+import Pill from "../components/Pill";
+import { addItem, getActiveSpaces, getSpace, isSpaceKey, type SpaceKey } from "../data/cleaning";
+import { spaceIconClass } from "./QuickRecord";
 
-type SpaceKey = Extract<SpaceToneKey, "bathroom" | "kitchen" | "bedroom" | "living">;
-
-const spaceOptions: Array<{ key: SpaceKey; label: string; fill: string; text: string }> = (
-  ["bathroom", "kitchen", "bedroom", "living"] as SpaceKey[]
-).map((key) => ({ key, label: spaceToneLabels[key], fill: spaceTones[key].fill, text: spaceTones[key].text }));
-
-const isSpaceKey = (value: string | null): value is SpaceKey => value === "bathroom" || value === "kitchen" || value === "bedroom" || value === "living";
+export const fieldClass =
+  "h-[52px] w-full rounded-xl border border-sky-line bg-sky-white pl-4 pr-4 text-bb-body text-sky-ink outline-none transition-colors placeholder:text-sky-muted focus:border-sky-brand";
 
 export default function ItemAdd() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
+  const spaces = useMemo(() => getActiveSpaces(), []);
   const requestedSpace = searchParams.get("space");
-  const initialSpace: SpaceKey = isSpaceKey(requestedSpace) ? requestedSpace : "bathroom";
   const [name, setName] = useState("");
-  const [space, setSpace] = useState<SpaceKey>(initialSpace);
+  const [space, setSpace] = useState<SpaceKey>(isSpaceKey(requestedSpace) ? requestedSpace : spaces[0]?.key ?? "bathroom");
   const [spaceTouchedByUser, setSpaceTouchedByUser] = useState(false);
-  const [intervalDays, setIntervalDays] = useState("");
-  const [saved, setSaved] = useState(false);
+  const [intervalDays, setIntervalDays] = useState("7");
   const [spaceHint, setSpaceHint] = useState<SpaceKey | null>(null);
-  const [suggestedIntervalDays, setSuggestedIntervalDays] = useState<number | null>(null);
   const latestRequestId = useRef(0);
-  const savedTimer = useRef<number | undefined>(undefined);
-  const currentSpace = spaceOptions.find((option) => option.key === space) ?? spaceOptions[0];
+  const valid = name.trim().length > 0 && Number(intervalDays) >= 1;
 
-  // 항목명 입력이 잠잠해지면(500ms) AI에게 공간/청소주기를 물어본다 — 어디까지나 제안일 뿐,
-  // 사용자가 이미 고른 공간이나 입력한 주기를 덮어쓰지는 않는다.
+  // 항목명 입력이 잠잠해지면(500ms) AI에게 공간/청소주기를 물어본다 — 제안일 뿐,
+  // 사용자가 이미 고른 공간은 덮어쓰지 않는다.
   useEffect(() => {
     const trimmed = name.trim();
     if (trimmed.length < 2) return;
@@ -47,15 +43,8 @@ export default function ItemAdd() {
           });
           if (!response.ok) return;
           const result = (await response.json()) as { spaceKey: string; spaceConfidence: number; intervalDays: number };
-          if (requestId !== latestRequestId.current) return;
-          if (!isSpaceKey(result.spaceKey)) return;
-
-          setSuggestedIntervalDays(result.intervalDays);
-
-          if (spaceTouchedByUser) {
-            setSpaceHint(null);
-            return;
-          }
+          if (requestId !== latestRequestId.current || !isSpaceKey(result.spaceKey)) return;
+          if (spaceTouchedByUser) return setSpaceHint(null);
           if (result.spaceConfidence >= 0.8) {
             setSpace(result.spaceKey);
             setSpaceHint(null);
@@ -73,85 +62,78 @@ export default function ItemAdd() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!name.trim() || !space || !intervalDays.trim()) return;
-    setSaved(true);
-    window.clearTimeout(savedTimer.current);
-    savedTimer.current = window.setTimeout(() => setSaved(false), 1200);
+    if (!valid) return;
+    addItem(name.trim(), space, Math.round(Number(intervalDays)));
+    if (location.key === "default") navigate("/spaces", { replace: true });
+    else navigate(-1);
   };
-
-  useEffect(() => () => window.clearTimeout(savedTimer.current), []);
 
   return (
     <PageShell>
       <AppHeader title="항목 추가" back="/spaces" />
-      <form id="item-add-form" className="flex flex-col gap-space-md bg-sky-bg px-margin-screen pb-[156px] pt-header" onSubmit={handleSubmit}>
-        <section className="rounded-xl bg-sky-white p-space-lg text-center shadow-sm">
-          <span className={`mx-auto mb-space-sm flex h-16 w-16 items-center justify-center rounded-xl ${currentSpace.fill} ${currentSpace.text}`}>
-            <Icon name="add" className="text-[32px]" />
-          </span>
-          <h1 className="text-headline-lg text-sky-ink">새 청소 항목</h1>
-          <p className="mt-1 text-body-md text-sky-muted">관리할 항목과 공간, 청소주기를 입력해요.</p>
+      <form className="flex flex-col gap-3 px-margin-screen pb-nav pt-header" onSubmit={handleSubmit}>
+        <section className="flex min-h-[88px] flex-col gap-2">
+          <h1 className="text-bb-heading text-sky-ink">돌볼 곳을 추가해요</h1>
+          <p className="text-bb-body text-sky-muted">나에게 맞는 이름과 주기를 정해요.</p>
         </section>
 
-        <section className="rounded-xl bg-sky-white p-space-md shadow-sm">
-          <label className="block text-label-md text-sky-muted" htmlFor="add-name">
-            명칭
-          </label>
-          <input id="add-name" required className="mt-space-xs h-12 w-full rounded-xl border border-art-line bg-sky-white px-space-sm text-body-md text-sky-ink outline-none transition-colors focus:border-sky-deep" value={name} maxLength={40} onChange={(event) => setName(event.target.value)} placeholder="예: 욕실 유리거울" />
-        </section>
+        <label className="flex flex-col gap-1.5 text-bb-label text-sky-ink">
+          항목 이름
+          <input className={fieldClass} maxLength={40} placeholder="예: 욕실 유리거울" required value={name} onChange={(event) => setName(event.target.value)} />
+        </label>
 
-        <section className="rounded-xl bg-sky-white p-space-md shadow-sm">
-          <label className="block text-label-md text-sky-muted" htmlFor="add-space">
-            공간 분류
-          </label>
-          <select
-            id="add-space"
-            required
-            className="mt-space-xs h-12 w-full rounded-xl border border-art-line bg-sky-white px-space-sm text-body-md text-sky-ink outline-none transition-colors focus:border-sky-deep"
-            value={space}
-            onChange={(event) => {
-              if (!isSpaceKey(event.target.value)) return;
-              setSpace(event.target.value);
-              setSpaceTouchedByUser(true);
-              setSpaceHint(null);
-            }}
-          >
-            {spaceOptions.map((option) => (
-              <option key={option.key} value={option.key}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          {spaceHint && <p className="mt-space-xs text-label-md text-sky-muted">AI 추천: {spaceToneLabels[spaceHint]} (확실하지 않아 직접 선택해주세요)</p>}
-        </section>
+        <p className="text-bb-label text-sky-ink">공간 선택</p>
+        <div aria-label="공간 선택" className="flex gap-[10px]" role="group">
+          {spaces.map((entry) => (
+            <Pill
+              key={entry.key}
+              className="min-w-0 flex-1 !px-[7px]"
+              icon={entry.icon}
+              iconClassName={spaceIconClass[entry.key]}
+              selected={space === entry.key}
+              onClick={() => {
+                setSpace(entry.key);
+                setSpaceTouchedByUser(true);
+                setSpaceHint(null);
+              }}
+            >
+              {entry.label}
+            </Pill>
+          ))}
+        </div>
+        {spaceHint ? <p className="text-bb-caption text-sky-muted">AI 추천: {getSpace(spaceHint).label} (확실하지 않아 직접 선택해주세요)</p> : null}
 
-        <section className="rounded-xl bg-sky-white p-space-md shadow-sm">
-          <label className="block text-label-md text-sky-muted" htmlFor="add-interval">
-            청소주기
-          </label>
-          <div className="mt-space-xs flex items-center gap-space-xs">
+        <label className="flex flex-col gap-1.5 text-bb-label text-sky-ink">
+          청소 주기
+          <span className={`${fieldClass} flex items-center focus-within:border-sky-brand`}>
             <input
-              id="add-interval"
-              required
-              min={1}
+              aria-label="청소 주기 (일)"
+              className="bg-transparent text-bb-body text-sky-ink outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+              style={{ width: `${Math.max(intervalDays.length, 1) + 0.6}ch` }}
               inputMode="numeric"
+              max={365}
+              min={1}
+              required
               type="number"
-              className="h-12 min-w-0 flex-1 rounded-xl border border-art-line bg-sky-white px-space-sm text-body-md text-sky-ink outline-none transition-colors focus:border-sky-deep"
               value={intervalDays}
               onChange={(event) => setIntervalDays(event.target.value)}
-              placeholder={suggestedIntervalDays !== null ? String(suggestedIntervalDays) : "7"}
             />
-            <span className="shrink-0 text-body-md text-sky-muted">일에 한번</span>
-          </div>
-        </section>
-      </form>
+            <span className="text-bb-body text-sky-ink">일에 한 번</span>
+          </span>
+        </label>
 
-      <div className="fixed bottom-16 left-1/2 z-40 w-full max-w-[430px] -translate-x-1/2 bg-sky-bg/90 px-margin-screen py-space-sm backdrop-blur-xl">
-        <button className="flex h-14 w-full items-center justify-center gap-2 rounded-full bg-sky-brand text-title-sm font-semibold text-onbrand shadow-md transition-transform duration-[120ms] active:scale-[0.98]" type="submit" form="item-add-form">
-          <Icon name="save" className="text-[20px]" />
-          {saved ? "저장했어요" : "저장"}
-        </button>
-      </div>
+        <section className="flex flex-col gap-2 rounded-3xl bg-sky-tint px-5 pb-4 pt-4">
+          <h2 className="text-bb-title text-sky-ink">주기는 가벼운 참고예요</h2>
+          <p className="text-bb-body text-sky-muted">
+            때가 됐다고 반드시 해야 하는 건 아니에요.
+            <br />내 생활에 맞게 언제든 바꿀 수 있어요.
+          </p>
+        </section>
+
+        <GlassButton disabled={!valid} type="submit">
+          항목 저장하기
+        </GlassButton>
+      </form>
     </PageShell>
   );
 }

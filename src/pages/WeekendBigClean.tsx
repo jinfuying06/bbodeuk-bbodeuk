@@ -1,307 +1,114 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
-import BottomNavigation from "../components/BottomNavigation";
+import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
-import { addRecord, formatRecency, getItem, lastRecord } from "../data/cleaning";
-import { spaceTones, type SpaceToneKey } from "../data/spaceTones";
+import PageShell from "../components/PageShell";
+import { addRecord, formatRecency, getActiveSpaces, getItems, itemStaleness, lastRecord, spaceColor, useRecords, type Item } from "../data/cleaning";
+import { spaceIconClass } from "./QuickRecord";
 
-type SpaceKey = SpaceToneKey;
+/** Per space: the 2 spots most worth a look — 숨은 관리 first, then the stalest. */
+const PICKS = 2;
 
-type CleanItem = {
-  id: string;
-  title: string;
-  lastText?: string;
-  status?: string;
-  tip: string;
-  icon: string;
-  priority: number;
-  hidden?: boolean;
-};
-
-type CleanSpace = {
-  key: SpaceKey;
-  title: string;
-  icon: string;
-  items: CleanItem[];
-};
-
-const setupSpaceMap: Record<string, SpaceKey[]> = {
-  현관: ["entry"],
-  욕실: ["bathroom"],
-  주방: ["kitchen"],
-  거실: ["living"],
-  "침실 / 방": ["bedroom"],
-  "베란다 / 다용도실": ["terrace"],
-};
-
-const spaceLabels: Record<SpaceKey, string> = {
-  entry: "현관",
-  bathroom: "욕실",
-  kitchen: "주방",
-  living: "거실",
-  bedroom: "방",
-  terrace: "테라스",
-};
-
-const spaces: CleanSpace[] = [
-  {
-    key: "entry",
-    title: "현관",
-    icon: "door_front",
-    items: [
-      { id: "entry-floor", title: "현관 바닥", tip: "먼지와 모래는 먼저 쓸어내면 좋아요.", icon: "door_front", priority: 8 },
-      { id: "entry-shoes", title: "신발장 손잡이", tip: "자주 닿는 손잡이만 닦아도 산뜻해요.", icon: "steps", priority: 12, hidden: true },
-    ],
-  },
-  {
-    key: "bathroom",
-    title: "욕실",
-    icon: "bathtub",
-    items: [
-      { id: "drain", title: "배수구", tip: "냄새가 나기 전에 거름망만 헹궈도 좋아요.", icon: "water_drop", priority: 1, hidden: true },
-      { id: "basin", title: "세면대", lastText: "6일 전", status: "슬슬 다시 볼 때", tip: "수전 주변 물기부터 가볍게 닦아보세요.", icon: "wash", priority: 3 },
-      { id: "mirror", title: "거울", lastText: "4일 전", tip: "마른 천으로 아래쪽 물자국을 먼저 훑어요.", icon: "auto_awesome", priority: 7 },
-      { id: "toilet", title: "변기", lastText: "1일 전", status: "최근 관리", tip: "오늘은 손잡이 주변만 확인해도 충분해요.", icon: "cleaning_services", priority: 10 },
-    ],
-  },
-  {
-    key: "kitchen",
-    title: "주방",
-    icon: "countertops",
-    items: [
-      { id: "hood", title: "후드 필터", lastText: "28일 전", tip: "기름때는 오래 두면 닦기 어려워져요.", icon: "filter_alt", priority: 2, hidden: true },
-      { id: "sink", title: "싱크대", lastText: "4일 전", status: "청소가 필요해요", tip: "거름망을 비우고 따뜻한 물로 헹궈요.", icon: "faucet", priority: 4 },
-      { id: "kit-fridge", title: "냉장고 손잡이", lastText: "12일 전", tip: "손이 자주 닿는 부분만 먼저 닦아도 좋아요.", icon: "kitchen", priority: 6, hidden: true },
-      { id: "countertop", title: "조리대", lastText: "어제", status: "최근 관리", tip: "상판에 남은 물기만 쓱 정리해요.", icon: "soup_kitchen", priority: 11 },
-    ],
-  },
-  {
-    key: "living",
-    title: "거실",
-    icon: "chair",
-    items: [
-      { id: "liv-window", title: "창틀", lastText: "18일 전", tip: "마른 티슈로 먼지를 먼저 걷어내요.", icon: "window", priority: 5, hidden: true },
-      { id: "living-floor", title: "바닥", lastText: "3일 전", status: "슬슬 다시 볼 때", tip: "눈에 보이는 먼지 구역만 밀어도 충분해요.", icon: "mop", priority: 9 },
-      { id: "shelf", title: "선반", tip: "위쪽 선반부터 아래로 털면 다시 쌓이지 않아요.", icon: "shelves", priority: 13 },
-    ],
-  },
-  {
-    key: "bedroom",
-    title: "방",
-    icon: "bed",
-    items: [
-      { id: "pillow", title: "베개 커버", lastText: "9일 전", tip: "커버 교체만 해도 잠자리가 개운해요.", icon: "hotel", priority: 14, hidden: true },
-      { id: "bedding", title: "침구", lastText: "어제", status: "최근 관리", tip: "오늘은 가볍게 털고 환기만 해도 좋아요.", icon: "bed", priority: 15 },
-      { id: "bedroom-floor", title: "바닥", tip: "머리카락이 모이는 모서리만 먼저 훑어요.", icon: "mop", priority: 16 },
-    ],
-  },
-  {
-    key: "terrace",
-    title: "테라스",
-    icon: "balcony",
-    items: [
-      { id: "rail", title: "난간", lastText: "21일 전", tip: "바깥 먼지는 젖은 천보다 마른 천으로 먼저 닦아요.", icon: "fence", priority: 17, hidden: true },
-      { id: "terrace-floor", title: "바닥", tip: "물청소 전 먼지를 먼저 쓸어내요.", icon: "balcony", priority: 18 },
-    ],
-  },
-];
-
+/** Figma 16 / 주말 대청소 (30:933). */
 export default function WeekendBigClean() {
   const navigate = useNavigate();
-  const setup = useMemo(() => {
-    try {
-      return JSON.parse(window.localStorage.getItem("bbodeuk.setup.v1") ?? "{}") as { spaces?: string[]; roomName?: string };
-    } catch {
-      return {};
-    }
-  }, []);
-  const availableSpaceKeys = useMemo(() => (setup.spaces ?? []).flatMap((item) => setupSpaceMap[item] ?? []), [setup.spaces]);
-  const visibleSpaces = availableSpaceKeys.length > 0 ? spaces.filter((space) => availableSpaceKeys.includes(space.key)) : spaces;
-  const visibleIds = visibleSpaces.flatMap((space) => space.items.map((item) => item.id));
-  const prioritySpaces = [...visibleSpaces]
-    .map((space) => ({
-      ...space,
-      hiddenCount: space.items.filter((item) => item.hidden).length,
-      revisitCount: space.items.filter((item) => item.status?.includes("필요") || item.status?.includes("슬슬")).length,
-      priorityScore: Math.min(...space.items.map((item) => item.priority)),
-    }))
-    .sort((a, b) => a.priorityScore - b.priorityScore)
-    .slice(0, 3);
-  const rankedSpaces = [...visibleSpaces].sort((a, b) => Math.min(...a.items.map((item) => item.priority)) - Math.min(...b.items.map((item) => item.priority)));
-  const [open, setOpen] = useState<Record<string, boolean>>(() => ({ [rankedSpaces[0]?.key ?? "bathroom"]: true }));
-  const [checked, setChecked] = useState<Record<string, boolean>>({});
-  const [flashItem, setFlashItem] = useState<string | null>(null);
+  const records = useRecords();
+  // Picks are fixed for the visit (don't reshuffle as records change).
+  const [groups] = useState(
+    () =>
+      getActiveSpaces().map((space) => ({
+        space,
+        items: getItems(space.key)
+          .map((item) => ({ item, score: (item.hiddenCare ? 100 : 0) + Math.min(itemStaleness(item, records), 50) }))
+          .sort((a, b) => b.score - a.score)
+          .slice(0, PICKS)
+          .map(({ item }) => item),
+      })),
+  );
+  const [open, setOpen] = useState<string | null>(groups[0]?.space.key ?? null);
+  const [checked, setChecked] = useState<Set<string>>(new Set());
 
-  const total = useMemo(() => visibleIds.filter((id) => checked[id]).length, [checked, visibleIds]);
-  const allSelected = total > 0 && total === visibleIds.length;
-
-  const countFor = (space: CleanSpace) => space.items.filter((item) => checked[item.id]).length;
-
-  const toggleItem = (id: string) => {
-    if (checked[id]) {
-      setChecked((current) => ({ ...current, [id]: false }));
-      setFlashItem(null);
-      return;
-    }
-
-    setChecked((current) => ({ ...current, [id]: true }));
-    setFlashItem(id);
-    window.setTimeout(() => setFlashItem((current) => (current === id ? null : current)), 1200);
-  };
-
-  const toggleAll = () => {
+  const toggle = (item: Item) =>
     setChecked((current) => {
-      const next = { ...current };
-      visibleIds.forEach((id) => {
-        next[id] = !allSelected;
-      });
+      const next = new Set(current);
+      if (!next.delete(item.id)) next.add(item.id);
       return next;
     });
-  };
 
-  const submit = () => {
-    // Checked items that exist in the shared catalog become real records (History/Home pick them up).
-    rankedSpaces.forEach((space) =>
-      space.items.forEach((item) => {
-        if (checked[item.id] && getItem(item.id)) addRecord(item.id);
-      }),
-    );
+  const finish = () => {
+    checked.forEach((id) => addRecord(id));
     navigate("/home");
   };
 
-  const itemMeta = (item: CleanItem) => {
-    // Catalog items show their real recency; the few extra 대청소-only spots keep their copy.
-    const recency = getItem(item.id) ? formatRecency(lastRecord(item.id)?.at) : item.lastText;
-    if (item.hidden) return `숨은 관리 · ${recency ?? "놓치기 쉬워요"}`;
-    if (!recency) return "";
-    return item.status ? `${recency} · ${item.status}` : recency;
-  };
-
   return (
-    <div className="phone-shell bg-surface text-on-surface">
-      <AppHeader title="대청소 하기" back />
+    <PageShell>
+      <AppHeader title="주말 대청소" back />
+      <main className="flex flex-col gap-3 px-margin-screen pb-[calc(76px+72px+24px+env(safe-area-inset-bottom,0px))] pt-header">
+        <h1 className="text-bb-heading text-sky-ink">여유 있는 날, 대청소</h1>
+        <p className="text-bb-body text-sky-muted">오래 안 본 곳과 숨은 관리를 가볍게 훑어요.</p>
+        <p className="rounded-xl bg-sky-tint p-3 text-bb-label text-sky-deep">먼지 털기 → 표면 닦기 → 바닥 정리</p>
 
-      <main className="flex flex-col bg-surface pb-[176px] pt-header">
-        <div className="flex w-full flex-col gap-space-lg px-margin-screen pb-space-md pt-space-md">
-          <section className="relative overflow-hidden rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
-            <div className="relative z-10">
-              <div className="min-w-0">
-                <span className="text-label-sm text-secondary">대청소 하기</span>
-                <h1 className="mt-1 text-headline-lg text-on-surface">오래 안 한 곳부터 훑어요</h1>
-                <p className="mt-1 text-body-md text-on-surface-variant">숨은 관리까지 한 번에 확인해요.</p>
-              </div>
-            </div>
-            <div className="relative z-10 mt-space-md border-t border-outline-variant/30 pt-space-sm">
-              <p className="mb-space-xs text-label-sm text-on-surface">이 순서로 청소하는 건 어때요?</p>
-              {prioritySpaces.map((space, index) => (
-                <div key={space.key} className="flex items-center gap-space-xs py-1">
-                  <span className="w-4 shrink-0 text-caption text-outline">{index + 1}</span>
-                  <span className="shrink-0 text-body-md font-semibold text-on-surface">{space.key === "bedroom" ? setup.roomName?.trim() || "방" : space.title}</span>
-                  <span className="min-w-0 truncate text-caption text-on-surface-variant">
-                    숨은 관리 {space.hiddenCount}곳 · 다시 볼 곳 {space.revisitCount}곳
+        {groups.map(({ space, items }) => {
+          const isOpen = open === space.key;
+          const panelId = `deep-clean-${space.key}`;
+          return (
+            <section key={space.key} className="flex flex-col gap-3">
+              <button
+                aria-controls={panelId}
+                aria-expanded={isOpen}
+                className="press flex h-16 items-center gap-3 rounded-[18px] bg-sky-white px-3 text-left"
+                type="button"
+                onClick={() => setOpen(isOpen ? null : space.key)}
+              >
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]" style={{ backgroundColor: spaceColor(space.key) }}>
+                  <Icon name={space.icon} className={`text-[24px] ${spaceIconClass[space.key]}`} />
+                </span>
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="text-bb-label text-sky-ink">
+                    {space.label} · {items.length}곳
                   </span>
-                </div>
-              ))}
-            </div>
-          </section>
+                  <span className="truncate text-bb-caption text-sky-muted">{isOpen && items[0] ? `${items[0].name}부터 가볍게 살펴봐요` : "눌러서 항목 펼치기"}</span>
+                </span>
+                <span aria-hidden="true" className={`w-11 text-center text-bb-title text-sky-deep transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
+                  ⌄
+                </span>
+              </button>
 
-          <div className="flex flex-col gap-space-sm">
-            {rankedSpaces.map((space) => {
-              const isOpen = Boolean(open[space.key]);
-              const count = countFor(space);
-              const tone = spaceTones[space.key];
-              const fillPercent = space.items.length === 0 ? 0 : Math.round((count / space.items.length) * 100);
-
-              const panelId = `deep-clean-panel-${space.key}`;
-
-              return (
-                <section key={space.key} className="overflow-hidden rounded-xl bg-surface-container-lowest shadow-sm">
-                  <button
-                    aria-expanded={isOpen}
-                    aria-controls={panelId}
-                    className="flex w-full items-center justify-between p-space-md text-left transition-colors active:bg-surface-container-low"
-                    type="button"
-                    onClick={() => setOpen((current) => ({ ...current, [space.key]: !current[space.key] }))}
-                  >
-                    <div className="flex min-w-0 items-center gap-space-sm">
-                      <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-container text-on-surface-variant">
-                        <span className="absolute inset-x-0 bottom-0 transition-all duration-300" style={{ height: `${fillPercent}%`, backgroundColor: tone.tint }} />
-                        <Icon name={space.icon} className={`relative z-10 text-[20px] ${count > 0 ? tone.text : "text-on-surface-variant"}`} />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-title-sm text-on-surface">{space.key === "bedroom" ? setup.roomName?.trim() || "방" : space.title}</span>
-                        {count > 0 ? <span className="ml-2 text-caption text-on-surface-variant">{count}곳</span> : null}
-                      </div>
-                    </div>
-                    <Icon name="keyboard_arrow_down" className={`text-[22px] text-on-surface-variant transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
-                  </button>
-
-                  <div id={panelId} className={`${isOpen ? "flex" : "hidden"} flex-col gap-space-xs px-space-md pb-space-md`}>
-                    {[...space.items].sort((a, b) => a.priority - b.priority).map((item) => {
-                      const isChecked = Boolean(checked[item.id]);
-                      const flashed = flashItem === item.id;
-                      const meta = itemMeta(item);
-
-                      return (
+              {isOpen ? (
+                <div id={panelId} className="flex flex-col gap-2">
+                  {items.map((item) => {
+                    const done = checked.has(item.id);
+                    const recency = formatRecency(lastRecord(item.id, records)?.at);
+                    return (
+                      <div key={item.id} className="flex flex-col gap-2">
                         <button
-                          key={item.id}
-                          aria-pressed={isChecked}
-                          className={`relative flex items-center justify-between overflow-hidden rounded-lg border p-space-sm text-left transition-all active:scale-[0.99] ${
-                            isChecked ? `${tone.fill} ${tone.border}` : "border-transparent bg-surface-container-low"
-                          }`}
+                          aria-pressed={done}
+                          className="press flex h-12 items-center gap-3 rounded-[20px] pl-3 text-left transition-colors duration-300"
+                          style={{ backgroundColor: done ? spaceColor(space.key) : "#ffffff" }}
                           type="button"
-                          onClick={() => toggleItem(item.id)}
+                          onClick={() => toggle(item)}
                         >
-                          <div className="flex min-w-0 items-center pr-space-xs">
-                            <div className="flex min-w-0 flex-col">
-                              <span className={`truncate text-body-md ${isChecked ? tone.text : "text-on-surface"}`}>{item.title}</span>
-                              {!isChecked && meta ? <span className="mt-0.5 truncate text-caption text-on-surface-variant">{meta}</span> : null}
-                              {!isChecked ? <span className="mt-0.5 line-clamp-1 text-caption text-outline">{item.tip}</span> : null}
-                            </div>
-                          </div>
-                          <span
-                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border shadow-sm transition-all duration-200 ${
-                              isChecked ? `${tone.border} bg-surface-container-lowest ${tone.text}` : "border-outline-variant/50 bg-surface-container-low text-on-surface-variant"
-                            }`}
-                          >
-                            <Icon name="check" className={`text-[20px] transition-transform duration-200 ${isChecked ? "scale-100" : "scale-0"}`} />
-                          </span>
-                          <div role="status" aria-live="polite" className={`pointer-events-none absolute inset-0 flex items-center justify-center ${tone.feedback} transition-opacity duration-500 ${flashed ? "opacity-100" : "opacity-0"}`}>
-                            {flashed ? (
-                              <span className={`rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-semibold ${tone.text} shadow-sm`}>
-                                이제 깨끗해요!
-                              </span>
-                            ) : null}
-                          </div>
+                          <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-xl text-bb-label ${done ? "bg-sky-brand text-onbrand" : "bg-sky-line"}`}>{done ? "✓" : null}</span>
+                          <span className="text-bb-label text-sky-ink">{item.name}</span>
                         </button>
-                      );
-                    })}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-        </div>
+                        <p className="text-bb-caption text-sky-muted">{item.hiddenCare ? `숨은 관리 · ${recency}` : recency}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </section>
+          );
+        })}
       </main>
 
-      <div className="fixed bottom-16 left-1/2 z-40 w-full max-w-[430px] -translate-x-1/2 bg-surface/90 px-margin-screen pt-space-sm backdrop-blur-xl">
-        <div className="mx-auto mb-space-xs flex max-w-md flex-col gap-space-xs">
-          <button
-            className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-primary-container text-title-sm font-semibold text-on-primary shadow-md transition-all active:scale-[0.98]"
-            type="button"
-            onClick={submit}
-          >
-            <Icon name="task_alt" className="text-[20px]" />
-            {total === 0 ? "오늘의 대청소 종료" : `${total}건 · 오늘의 대청소 종료`}
-          </button>
-          <button className="w-full py-2 text-center text-label-md text-secondary transition-colors active:opacity-75" type="button" onClick={toggleAll}>
-            {allSelected ? "전체 선택 해제" : "전체 선택"}
-          </button>
-        </div>
+      {/* Fixed 대청소 종료 bar, sitting right above the bottom nav (72px + safe area). */}
+      <div className="fixed bottom-[calc(60px+max(12px,env(safe-area-inset-bottom)))] left-1/2 z-40 w-full max-w-[430px] -translate-x-1/2 bg-sky-bg px-margin-screen py-3">
+        <GlassButton size={52} onClick={finish}>
+          오늘의 대청소 종료
+        </GlassButton>
       </div>
-
-      <BottomNavigation />
-    </div>
+    </PageShell>
   );
 }
