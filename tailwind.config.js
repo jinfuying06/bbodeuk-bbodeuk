@@ -4,40 +4,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        outline: "#6f7883",
-        "tertiary-container": "#00b17b",
-        "tertiary-fixed": "#6ffbbe",
-        "inverse-on-surface": "#edf1f6",
-        "primary-container": "#00a1ff",
-        "secondary-fixed": "#c4e7ff",
-        secondary: "#00668a",
-        "surface-container-highest": "#dfe3e8",
-        "on-tertiary-container": "#003b26",
-        "on-tertiary": "#ffffff",
-        "on-surface": "#171c20",
-        "primary-fixed": "#cfe5ff",
-        "on-secondary": "#ffffff",
-        "on-surface-variant": "#3f4852",
-        surface: "#f6faff",
-        background: "#f6faff",
-        "on-tertiary-fixed-variant": "#005236",
-        tertiary: "#006c49",
-        "inverse-surface": "#2c3135",
-        "surface-container-lowest": "#ffffff",
-        "on-secondary-fixed-variant": "#004c69",
-        "outline-variant": "#bec7d4",
-        "on-secondary-fixed": "#001e2c",
-        primary: "#00629e",
-        "on-primary-fixed-variant": "#004a79",
-        "primary-fixed-dim": "#9acbff",
-        "on-primary": "#ffffff",
-        "surface-container": "#eaeef3",
-        "surface-container-low": "#f0f4f9",
-        "surface-container-high": "#e4e9ee",
-
         // Sky/BB palette — from Figma design system (2026-09-17 UI upgrade, see AGENTS.md §6).
-        // Names mirror the Figma variables (--bb-*) as-is; replaces the MD3 blue palette above
-        // screen by screen during the upgrade loop rather than in one bulk swap.
+        // Names mirror the Figma variables (--bb-*) as-is. (The old MD3 blue palette was removed
+        // in the 2026-09-25 polish pass once nothing referenced it.)
         "sky-brand": "#56d9d2",
         "sky-deep": "#146b63",
         "sky-tint": "#e5f8f5",

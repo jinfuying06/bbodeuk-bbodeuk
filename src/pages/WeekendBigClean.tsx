@@ -58,7 +58,7 @@ export default function WeekendBigClean() {
               <button
                 aria-controls={panelId}
                 aria-expanded={isOpen}
-                className="press flex h-16 items-center gap-3 rounded-[18px] bg-sky-white px-3 text-left"
+                className="press flex h-16 items-center gap-3 rounded-row bg-sky-white px-3 text-left"
                 type="button"
                 onClick={() => setOpen(isOpen ? null : space.key)}
               >

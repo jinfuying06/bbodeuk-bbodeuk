@@ -127,11 +127,11 @@ export default function CareAction() {
 
         <ul aria-label="준비물" className="flex gap-[10px] pb-3">
           {guide.materials.map((label, index) => (
-            <li key={label} className="flex h-[104px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[18px] border bg-sky-white" style={{ borderColor: space.color }}>
-              <span className="flex h-[52px] w-[52px] items-center justify-center rounded-[16px]" style={{ backgroundColor: space.color }}>
+            <li key={label} className="flex h-[104px] flex-1 flex-col items-center justify-center gap-1.5 rounded-row border bg-sky-white" style={{ borderColor: space.color }}>
+              <span className="flex h-[52px] w-[52px] items-center justify-center rounded-row-sm" style={{ backgroundColor: space.color }}>
                 <Icon name={materialArt[index]} className="text-[34px]" />
               </span>
-              <span className="w-[88px] text-center text-[11px] font-medium leading-[17px] text-sky-ink">{label}</span>
+              <span className="w-[88px] text-center text-bb-caption font-medium text-sky-ink">{label}</span>
             </li>
           ))}
         </ul>
@@ -140,7 +140,7 @@ export default function CareAction() {
           {guide.steps.map(([stepTitle, desc], index) =>
             // 15 세면대 keeps its own (older) 78px step card; 40/41/42 use the 94px one.
             guide.id === "basin" ? (
-              <li key={stepTitle} className="flex min-h-[78px] items-center gap-3 rounded-[18px] bg-sky-white py-[10px] pl-4 pr-4">
+              <li key={stepTitle} className="flex min-h-[78px] items-center gap-3 rounded-row bg-sky-white py-[10px] pl-4 pr-4">
                 <span className="text-bb-title text-sky-deep">{`0${index + 1}`}</span>
                 <span className="flex min-w-0 flex-col gap-1 self-start">
                   <h2 className="text-bb-label text-sky-ink">{stepTitle}</h2>

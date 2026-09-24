@@ -2,11 +2,12 @@ import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
+import { SPACE_PRICE } from "../data/points";
 
 const faqs: Array<[string, string[]]> = [
   ["색이 옅어지는 건 무슨 뜻인가요?", ["시간이 흐르며 기록의 색이 옅어져요.", "청결 점수나 벌점은 아니에요."]],
   ["기록을 잘못 눌렀어요", ["청소 카드를 다시 누르면 취소할 수 있어요."]],
-  ["포인트는 어디에 쓰나요?", ["기본 공간은 무료예요. 추가 공간은", "1개당 300P로 열 수 있어요."]],
+  ["포인트는 어디에 쓰나요?", ["기본 공간은 무료예요. 추가 공간은", `1개당 ${SPACE_PRICE}P로 열 수 있어요.`]],
 ];
 
 /** Figma 31 / 도움말 (32:1263). */

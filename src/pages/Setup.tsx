@@ -14,7 +14,7 @@ import { DEFAULT_SPACES, writeSetup } from "../data/setup";
 const BASIC_SPACES = ["욕실", "주방", "거실", "침실 / 방"].map((key) => DEFAULT_SPACES.find((space) => space.key === key)!);
 
 const aiCardClass =
-  "press flex h-16 w-full items-center justify-between rounded-[16px] border border-sky-brand bg-sky-white px-[14px] text-left shadow-[0_3px_5px_rgba(0,0,0,0.08)]";
+  "press flex h-16 w-full items-center justify-between rounded-row-sm border border-sky-brand bg-sky-white px-[14px] text-left shadow-[0_3px_5px_rgba(0,0,0,0.08)]";
 
 function AiCardBody() {
   return (
@@ -24,8 +24,8 @@ function AiCardBody() {
           ✦
         </span>
         <span className="flex flex-col gap-px">
-          <span className="text-[13px] font-bold leading-[20px] text-sky-ink">내 공간 사진으로 맞춤 설정하기</span>
-          <span className="text-[11px] leading-[17px] text-sky-muted">AI가 사진 속 관리 항목을 추천해요</span>
+          <span className="text-bb-label-sm font-bold text-sky-ink">내 공간 사진으로 맞춤 설정하기</span>
+          <span className="text-bb-caption text-sky-muted">AI가 사진 속 관리 항목을 추천해요</span>
         </span>
       </span>
       <span aria-hidden="true" className="text-[22px] font-bold leading-[34px] text-sky-deep">

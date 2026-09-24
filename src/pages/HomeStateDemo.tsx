@@ -77,7 +77,7 @@ export default function HomeStateDemo() {
             <div aria-busy="true" aria-label="기록 불러오는 중" className="flex flex-col gap-3">
               {[0, 1, 2, 3].map((index) => (
                 <div key={index} className="flex h-[92px] animate-pulse items-center gap-[14px] rounded-2xl bg-sky-white pl-4">
-                  <span className="h-12 w-12 shrink-0 rounded-[16px] bg-sky-tint" />
+                  <span className="h-12 w-12 shrink-0 rounded-row-sm bg-sky-tint" />
                   <span className="flex flex-col gap-[10px]">
                     <span className="h-4 w-[174px] rounded-[8px] bg-sky-line" />
                     <span className="h-3 w-[120px] rounded-[6px] bg-sky-tint" />

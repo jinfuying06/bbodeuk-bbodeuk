@@ -46,7 +46,7 @@ export default function ItemHistory() {
         {itemRecords.length > 0 ? (
           <ol className="flex flex-col gap-3">
             {itemRecords.map((record) => (
-              <li key={record.id} className="flex h-[72px] items-center gap-3 rounded-[18px] bg-sky-white px-3">
+              <li key={record.id} className="flex h-[72px] items-center gap-3 rounded-row bg-sky-white px-3">
                 <SpaceTile space={item.space} />
                 <span className="flex min-w-0 flex-col">
                   <span className="text-bb-label text-sky-ink">{formatDay(record.at)}</span>

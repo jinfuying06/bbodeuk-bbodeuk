@@ -163,7 +163,7 @@ export default function QuickRecord() {
               ))}
             </div>
 
-            <p className="h-[62px] rounded-[16px] bg-sky-tint pl-4 pr-4 pt-[11px] text-[12px] font-medium leading-[22px] text-sky-deep">색이 채워진 항목을 한 번 더 누르면 기록을 취소해요.</p>
+            <p className="h-[62px] rounded-row-sm bg-sky-tint pl-4 pr-4 pt-[11px] text-[12px] font-medium leading-[22px] text-sky-deep">색이 채워진 항목을 한 번 더 누르면 기록을 취소해요.</p>
 
             <div aria-label="청소 항목" className="grid grid-cols-2 gap-[10px]">
               {items.map((item) => {
@@ -174,7 +174,7 @@ export default function QuickRecord() {
                   <button
                     key={item.id}
                     aria-pressed={recorded}
-                    className="press relative flex h-[122px] flex-col items-start overflow-hidden rounded-[20px] border pl-[14px] pt-2 text-left transition-colors duration-300"
+                    className="press relative flex h-[122px] flex-col items-start overflow-hidden rounded-2xl border pl-[14px] pt-2 text-left transition-colors duration-300"
                     style={{ borderColor: space.iconColor, backgroundColor: recorded ? spaceColor(item.space) : "#ffffff" }}
                     type="button"
                     onClick={() => record(item)}
@@ -204,7 +204,7 @@ export default function QuickRecord() {
                   <button
                     key={item.id}
                     aria-pressed={recorded}
-                    className="press relative flex h-20 items-center gap-3 overflow-hidden rounded-[20px] px-[14px] text-left transition-colors duration-300"
+                    className="press relative flex h-20 items-center gap-3 overflow-hidden rounded-2xl px-[14px] text-left transition-colors duration-300"
                     style={{ backgroundColor: recorded ? spaceColor(item.space) : "#ffffff" }}
                     type="button"
                     onClick={() => record(item)}

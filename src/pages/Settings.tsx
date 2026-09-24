@@ -5,7 +5,7 @@ import PageShell from "../components/PageShell";
 import SwitchRow from "../components/Switch";
 import { readPoints } from "../data/points";
 
-const navRow = "press flex h-[62px] items-center justify-between rounded-[16px] bg-sky-white px-4";
+const navRow = "press flex h-[62px] items-center justify-between rounded-row-sm bg-sky-white px-4";
 
 function NavRow({ to, label, value }: { to: string; label: string; value?: string }) {
   return (

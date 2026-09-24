@@ -34,7 +34,7 @@ export default function SpaceInfo() {
       <AppHeader title="공간 정보" back="/spaces" />
       <main className="flex flex-1 flex-col gap-3 px-margin-screen pb-nav pt-header">
         <section className="flex flex-col items-center gap-2 rounded-3xl bg-sky-white px-5 py-6 text-center">
-          <span className="flex h-16 w-16 items-center justify-center rounded-[20px]" style={{ backgroundColor: space.color, color: space.iconColor }}>
+          <span className="flex h-16 w-16 items-center justify-center rounded-2xl" style={{ backgroundColor: space.color, color: space.iconColor }}>
             <Icon name={space.icon} className="text-[40px]" />
           </span>
           <div className="flex items-center gap-2">
@@ -46,7 +46,7 @@ export default function SpaceInfo() {
           <p className="text-bb-body text-sky-muted">{DETAILS[key].detail}</p>
         </section>
 
-        <section className="flex h-[72px] items-center justify-between gap-3 rounded-[18px] bg-sky-white px-4" style={{ backgroundImage: `linear-gradient(${spaceColor(key, fade)}, ${spaceColor(key, fade)})` }}>
+        <section className="flex h-[72px] items-center justify-between gap-3 rounded-row bg-sky-white px-4" style={{ backgroundImage: `linear-gradient(${spaceColor(key, fade)}, ${spaceColor(key, fade)})` }}>
           <span className="flex flex-col">
             <span className="text-bb-label text-sky-ink">내 관리 상태</span>
             <span className="text-bb-caption text-sky-muted">주기 기준으로 공간의 관리 흐름을 보여줘요.</span>
@@ -54,7 +54,7 @@ export default function SpaceInfo() {
           <span className="shrink-0 rounded-full bg-sky-white px-3 py-1 text-bb-caption font-bold text-sky-deep">{statusFor(fade)}</span>
         </section>
 
-        <section className="flex flex-col gap-2 rounded-[18px] border bg-sky-white p-3" style={{ borderColor: space.color }}>
+        <section className="flex flex-col gap-2 rounded-row border bg-sky-white p-3" style={{ borderColor: space.color }}>
           <div className="flex h-7 items-center justify-between px-1">
             <h2 className="text-bb-label font-bold text-sky-ink">최근 청소 기록</h2>
             <Link className="-mr-1 flex h-11 items-center px-1 text-bb-caption text-sky-muted" to="/history">
@@ -66,8 +66,8 @@ export default function SpaceInfo() {
           ) : (
             recent.map(({ record, item }) => (
               <Link key={record.id} className="press flex h-11 items-center justify-between rounded-xl bg-sky-bg px-[10px]" to={`/item-history?item=${item?.id}`}>
-                <span className="truncate text-[14px] font-medium leading-5 text-sky-ink">{item?.name}</span>
-                <span className="shrink-0 pl-2 text-[11px] leading-[17px] text-sky-muted">{isToday(record.at) ? `오늘 ${formatTime(record.at)}` : formatDay(record.at)}</span>
+                <span className="truncate text-bb-label text-sky-ink">{item?.name}</span>
+                <span className="shrink-0 pl-2 text-bb-caption text-sky-muted">{isToday(record.at) ? `오늘 ${formatTime(record.at)}` : formatDay(record.at)}</span>
               </Link>
             ))
           )}

@@ -25,16 +25,16 @@ export default function Toast({ message, visible, pill = false }: ToastProps) {
     >
       {visible && message ? (
         pill ? (
-          <div className="flex h-12 items-center justify-center gap-2 rounded-3xl bg-sky-deep px-5 text-[13px] font-medium leading-[22px] text-sky-white shadow-[0_4px_12px_rgba(0,0,0,0.16)]">
+          <div className="flex h-12 items-center justify-center gap-2 rounded-3xl bg-sky-deep px-5 text-bb-label-sm text-sky-white shadow-[0_4px_12px_rgba(0,0,0,0.16)]">
             <span aria-hidden="true">✓</span>
             <span className="truncate">{message}</span>
           </div>
         ) : (
-          <div className="flex h-[52px] items-center justify-center gap-2 rounded-[18px] bg-sky-ink px-4 text-sky-white shadow-[0_8px_24px_rgba(0,0,0,0.16)]">
+          <div className="flex h-[52px] items-center justify-center gap-2 rounded-row bg-sky-ink px-4 text-sky-white shadow-[0_8px_24px_rgba(0,0,0,0.16)]">
             <span aria-hidden="true" className="text-[15px] font-bold leading-[21px]">
               ✓
             </span>
-            <span className="truncate text-[13px] font-medium leading-[19px]">{message}</span>
+            <span className="truncate text-bb-label-sm">{message}</span>
           </div>
         )
       ) : null}

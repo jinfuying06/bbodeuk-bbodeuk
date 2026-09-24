@@ -116,8 +116,8 @@ export default function Home() {
                   <span className="absolute right-4 top-[14px]" style={{ color: space.iconColor }}>
                     <Icon name={space.icon} className="block text-[43.2px]" />
                   </span>
-                  <span className="text-[14px] font-bold leading-[22px] text-sky-ink">{space.label}</span>
-                  <span className="text-[11px] leading-[18px] text-sky-muted">{cardRecency(space.key, records)}</span>
+                  <span className="text-bb-label font-bold text-sky-ink">{space.label}</span>
+                  <span className="text-bb-caption text-sky-muted">{cardRecency(space.key, records)}</span>
                 </Link>
               );
             })}
@@ -144,9 +144,9 @@ export default function Home() {
           </div>
           {recent.length === 0 ? (
             <Link className="press flex min-h-[120px] flex-col gap-2 rounded-2xl bg-sky-white p-[18px]" to="/quick-record">
-              <span className="text-[16px] font-bold leading-[22px] text-sky-ink">아직 남긴 청소 기록이 없어요</span>
-              <span className="text-[13px] leading-[19px] text-sky-muted">공간 카드를 보며 첫 청소를 가볍게 시작해보세요.</span>
-              <span className="text-[13px] font-bold leading-[19px] text-sky-deep">첫 청소 기록하기&nbsp;&nbsp;→</span>
+              <span className="text-bb-title text-sky-ink">아직 남긴 청소 기록이 없어요</span>
+              <span className="text-bb-label-sm font-normal text-sky-muted">공간 카드를 보며 첫 청소를 가볍게 시작해보세요.</span>
+              <span className="text-bb-label-sm font-bold text-sky-deep">첫 청소 기록하기&nbsp;&nbsp;→</span>
             </Link>
           ) : (
             recent.map((row) => (

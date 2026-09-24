@@ -175,12 +175,12 @@ export default function Welcome() {
               {FADE_TIERS.map((tier) => (
                 <li
                   key={tier.pct}
-                  className="flex h-14 items-center gap-[10px] rounded-[14px] px-3"
+                  className="flex h-14 items-center gap-[10px] rounded-tile px-3"
                   style={{ backgroundColor: mix(BATH.color, tier.pct) }}
                 >
                   <SpaceTile space="bathroom" />
                   <span className="flex min-w-0 flex-col gap-px">
-                    <span className="text-[16px] font-bold leading-[22px] text-sky-ink">
+                    <span className="text-bb-title text-sky-ink">
                       {tier.label} · {tier.pct}%
                     </span>
                     <span className="text-bb-caption text-sky-muted">{tier.desc}</span>
@@ -203,7 +203,7 @@ export default function Welcome() {
               title={["이제, 내 공간을", "가볍게 돌봐요."]}
             />
             <section className="flex h-[184px] flex-col gap-3 rounded-2xl bg-sky-white p-5">
-              <h2 className="text-[16px] font-bold leading-[22px] text-sky-ink">네 가지 기본 공간은 무료예요</h2>
+              <h2 className="text-bb-title text-sky-ink">네 가지 기본 공간은 무료예요</h2>
               <ul className="flex justify-between">
                 {START_SPACES.map((key) => {
                   const space = getSpace(key);
@@ -211,7 +211,7 @@ export default function Welcome() {
                     <li key={key} className="flex w-[60px] flex-col items-center gap-1">
                       {/* Figma draws 욕실 at full colour (r14) and the rest at 28% (r12). */}
                       <span
-                        className={`flex h-10 w-10 items-center justify-center ${key === "bathroom" ? "rounded-[14px]" : "rounded-xl"}`}
+                        className={`flex h-10 w-10 items-center justify-center ${key === "bathroom" ? "rounded-tile" : "rounded-xl"}`}
                         style={{ backgroundColor: key === "bathroom" ? space.color : mix(space.color, 28), color: space.iconColor }}
                       >
                         <Icon className="text-[24px]" name={space.icon} />

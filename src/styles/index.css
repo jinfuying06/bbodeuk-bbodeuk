@@ -132,7 +132,7 @@
   }
 
   /* Legacy Material Symbols fallback for <Icon name="..."> names not in the SVG
-     registry. Figma uses no Material glyphs — remove once no screen uses them. */
+     registry (SamplePaint + flagged-off AX only; font loads lazily from Icon.tsx). */
   .material-symbols-outlined {
     font-family: "Material Symbols Outlined";
     font-weight: normal;
