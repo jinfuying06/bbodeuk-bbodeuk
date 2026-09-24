@@ -55,7 +55,7 @@ export default function SpaceInfo() {
           <div className="flex h-7 items-center justify-between px-1">
             <h2 className="text-bb-label font-bold text-sky-ink">최근 청소 기록</h2>
             <Link className="-mr-1 flex h-11 items-center px-1 text-bb-caption text-sky-muted" to="/history">
-              히스토리 보기<Icon name="chevron-right" className="ml-1.5 text-[14px]" />
+              히스토리 보기<Icon name="chevron-right" className="ml-1 text-[12px]" />
             </Link>
           </div>
           {recent.length === 0 ? (

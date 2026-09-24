@@ -94,7 +94,7 @@ export default function Home() {
           <div className="flex h-7 items-center justify-between">
             <h2 className="text-bb-title text-sky-ink">내 공간</h2>
             <Link className="-mr-2 flex h-11 items-center px-2 text-bb-caption text-sky-muted" to="/space-manage">
-              공간 관리<Icon name="chevron-right" className="ml-1.5 text-[14px]" />
+              공간 관리<Icon name="chevron-right" className="ml-1 text-[12px]" />
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -136,7 +136,7 @@ export default function Home() {
           <div className="flex h-7 items-center justify-between">
             <h2 className="text-bb-title text-sky-ink">최근 돌본 흔적</h2>
             <Link className="-mr-2 flex h-11 items-center px-2 text-bb-caption text-sky-muted" to="/history">
-              전체 보기<Icon name="chevron-right" className="ml-1.5 text-[14px]" />
+              전체 보기<Icon name="chevron-right" className="ml-1 text-[12px]" />
             </Link>
           </div>
           {recent.length === 0 ? (
