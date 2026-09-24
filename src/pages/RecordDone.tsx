@@ -56,7 +56,10 @@ export default function RecordDone() {
               <Icon name={item.icon} className={`absolute left-1/2 top-3 -translate-x-1/2 ${item.icon.startsWith("object-") ? "text-[96px]" : "text-[88px] text-art-line"}`} />
             )}
           </div>
-          <p className="whitespace-pre text-bb-label text-sky-deep">{`✓  ${item.name} 기록 완료`}</p>
+          <p className="flex items-center gap-1.5 text-bb-label text-sky-deep">
+            <Icon name="check" className="text-[16px]" />
+            {item.name} 기록 완료
+          </p>
           <WaterSparkle />
         </div>
 

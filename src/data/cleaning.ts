@@ -289,14 +289,18 @@ export const isRecordedToday = (itemId: string, records = getRecords()) => recor
 
 export const todaysRecords = (records = getRecords()) => records.filter((record) => isToday(record.at));
 
-/** Figma recency copy: 방금 기록했어요 (<10 min) · 오늘 기록 · 어제 기록 · N일 전 기록 · 아직 기록 없음. */
-export function formatRecency(at: string | undefined, now = new Date()): string {
-  if (!at) return "아직 기록 없음";
-  if (now.getTime() - new Date(at).getTime() < 10 * 60_000) return "방금 기록했어요";
+/**
+ * Recency copy: 방금 돌봤어요 (<10 min) · 오늘 기록 · 어제 기록 · N일 전 기록 · 아직 기록 없음.
+ * `short` (내 공간 item rows, Figma 07): 오늘 · 어제 · N일 전 · 기록 없음.
+ */
+export function formatRecency(at: string | undefined, { short = false, now = new Date() }: { short?: boolean; now?: Date } = {}): string {
+  if (!at) return short ? "기록 없음" : "아직 기록 없음";
+  if (!short && now.getTime() - new Date(at).getTime() < 10 * 60_000) return "방금 돌봤어요";
   const days = daysAgo(at, now);
-  if (days <= 0) return "오늘 기록";
-  if (days === 1) return "어제 기록";
-  return `${days}일 전 기록`;
+  const suffix = short ? "" : " 기록";
+  if (days <= 0) return `오늘${suffix}`;
+  if (days === 1) return `어제${suffix}`;
+  return `${days}일 전${suffix}`;
 }
 
 const timeFormatter = new Intl.DateTimeFormat("ko-KR", { hour: "numeric", minute: "2-digit" });
@@ -331,6 +335,24 @@ export function fadeForStaleness(staleness: number): number {
     if (staleness <= s1) return f0 + ((f1 - f0) * (staleness - s0)) / (s1 - s0);
   }
   return FADE_STOPS[FADE_STOPS.length - 1][1];
+}
+
+/**
+ * The 4 fade stages with their one shared wording (PRODUCT_POLICY "Item 표현 기준": 60/85/110% of the cycle).
+ * Used by Welcome step 2 (explanation) and 공간 정보 (current state).
+ */
+export const FADE_STAGES = [
+  { pct: 100, label: "최근 관리했어요", desc: "방금 돌본 곳은 맑은 색으로 가득해요" },
+  { pct: 72, label: "잘 유지되고 있어요", desc: "관리 주기의 60%쯤 지나면 조금 옅어져요" },
+  { pct: 48, label: "슬슬 다시 볼 때예요", desc: "주기에 가까워지면 한 번 더 옅어져요" },
+  { pct: 28, label: "한번 관리해볼까요?", desc: "주기가 지나도 색이 사라지지는 않아요" },
+] as const;
+
+/** Stage label for a fade value (0 = never recorded). */
+export function fadeLabel(fade: number): string {
+  if (fade === 0) return "아직 기록 없음";
+  const stage = fade > 0.72 ? 0 : fade > 0.48 ? 1 : fade > 0.28 ? 2 : 3;
+  return FADE_STAGES[stage].label;
 }
 
 /** elapsed days ÷ intervalDays; Infinity if never recorded. */

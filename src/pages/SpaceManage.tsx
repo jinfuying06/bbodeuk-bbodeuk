@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import Icon from "../components/Icon";
 import GlassButton from "../components/GlassButton";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
@@ -75,7 +76,8 @@ export default function SpaceManage() {
 
         {nextExpansion ? (
           <GlassButton variant="secondary" className="w-full" onClick={() => setDialogOpen(true)}>
-            ＋ 추가 공간 살펴보기
+            <Icon name="plus" className="text-[16px]" />
+            추가 공간 살펴보기
           </GlassButton>
         ) : null}
       </main>

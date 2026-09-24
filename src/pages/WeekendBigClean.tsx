@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import Icon from "../components/Icon";
 import CheckRow from "../components/CheckRow";
 import GlassButton from "../components/GlassButton";
 import PageIntro from "../components/PageIntro";
@@ -69,8 +70,8 @@ export default function WeekendBigClean() {
                   </span>
                   <span className="truncate text-bb-caption text-sky-muted">{isOpen && items[0] ? `${items[0].name}부터 가볍게 살펴봐요` : "눌러서 항목 펼치기"}</span>
                 </span>
-                <span aria-hidden="true" className={`w-11 text-center text-bb-title text-sky-deep transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
-                  ⌄
+                <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center text-sky-deep">
+                  <Icon name="chevron-down" className={`text-[18px] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
                 </span>
               </button>
 

@@ -37,8 +37,8 @@ export default function Login() {
   return (
     <PageShell bottomNav={false}>
       <AppHeader back="/welcome" right={null} title={error ? "로그인 확인" : "로그인"} />
-      <main className="pt-header">
-        <form className="flex flex-col gap-3 px-margin-screen py-5" noValidate onSubmit={submit}>
+      <main className="pt-header-flow">
+        <form className="flex flex-col gap-3 px-margin-screen pb-5" noValidate onSubmit={submit}>
           <h1 className="text-bb-heading text-sky-ink">{error ? "입력한 정보를 확인해 주세요" : "다시 만나 반가워요"}</h1>
           <p className="text-bb-body text-sky-muted">
             {error ? "이메일 또는 비밀번호가 맞지 않아요. 다시 확인해 주세요." : "오늘의 작은 청소를 이어가요."}
@@ -114,7 +114,7 @@ export default function Login() {
           )}
         </form>
       </main>
-      <Toast message={toast} visible={Boolean(toast)} pill />
+      <Toast icon={false} message={toast} visible={Boolean(toast)} pill />
     </PageShell>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import Icon from "../components/Icon";
 import CheckRow from "../components/CheckRow";
 import GlassButton from "../components/GlassButton";
 import PageIntro from "../components/PageIntro";
@@ -20,17 +21,15 @@ function AiCardBody() {
   return (
     <>
       <span className="flex items-center gap-3">
-        <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-tint text-[20px] font-bold leading-[31px] text-sky-deep">
-          ✦
+        <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-tint text-sky-deep">
+          <Icon name="sparkle" className="text-[20px]" />
         </span>
         <span className="flex flex-col gap-px">
           <span className="text-bb-label-sm font-bold text-sky-ink">내 공간 사진으로 맞춤 설정하기</span>
           <span className="text-bb-caption text-sky-muted">AI가 사진 속 관리 항목을 추천해요</span>
         </span>
       </span>
-      <span aria-hidden="true" className="text-[22px] font-bold leading-[34px] text-sky-deep">
-        ›
-      </span>
+      <Icon name="chevron-right" className="shrink-0 text-[20px] text-sky-deep" />
     </>
   );
 }
@@ -91,7 +90,7 @@ export default function Setup() {
           {selected.length > 0 ? "이 공간으로 시작하기" : "공간을 하나 이상 선택해 주세요"}
         </GlassButton>
       </main>
-      <Toast message={toast} visible={Boolean(toast)} pill />
+      <Toast icon={false} message={toast} visible={Boolean(toast)} pill />
     </PageShell>
   );
 }

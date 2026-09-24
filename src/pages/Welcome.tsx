@@ -4,18 +4,10 @@ import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
 import SpaceTile from "../components/SpaceTile";
-import { getSpace, type SpaceKey } from "../data/cleaning";
+import { FADE_STAGES, getSpace, type SpaceKey } from "../data/cleaning";
 import { resetToGuest } from "../data/points";
 
 const BATH = getSpace("bathroom");
-
-// Figma 33:2296 — bath policy fill ladder (space colour mixed toward white).
-const FADE_TIERS = [
-  { pct: 100, label: "방금 돌본 공간", desc: "청소한 항목 비율이 충분해요" },
-  { pct: 72, label: "관리 상태가 좋아요", desc: "관리 주기에 맞춰 조금 옅어져요" },
-  { pct: 48, label: "슬슬 청소해볼까요?", desc: "지난 기록을 다시 확인할 때예요" },
-  { pct: 28, label: "청소가 필요해요", desc: "다시 돌볼 시점을 알려줘요" },
-];
 
 const START_SPACES: SpaceKey[] = ["bathroom", "kitchen", "living", "bedroom"];
 
@@ -61,7 +53,7 @@ function DemoCard() {
         <Icon className="text-[43px]" name="object-sink" />
       </span>
       <span className="text-bb-label text-sky-ink">세면대</span>
-      <span className="text-bb-caption text-sky-muted">{recorded ? "방금 기록했어요" : "여기를 톡 눌러보세요"}</span>
+      <span className="text-bb-caption text-sky-muted">{recorded ? "방금 돌봤어요" : "여기를 톡 눌러보세요"}</span>
       {shine ? (
         <>
           <span
@@ -166,13 +158,13 @@ export default function Welcome() {
         {step === 1 ? (
           <>
             <StepHead
-              body={["공간 색은 청소한 항목의 비율과 관리 주기를 함께 보여줘요."]}
+              body={["공간 색은 항목마다 마지막 청소 후 지난 시간을", "관리 주기와 비교해 보여줘요."]}
               label="공간의 색 변화  ·  2 / 3"
               size={26}
-              title={["돌본 비율만큼 채워지고,", "필요할 때 천천히 옅어져요."]}
+              title={["돌보면 맑게 채워지고,", "주기에 맞춰 천천히 옅어져요."]}
             />
             <ul aria-label="공간 색상 단계" className="mt-[22px] flex flex-col gap-2">
-              {FADE_TIERS.map((tier) => (
+              {FADE_STAGES.map((tier) => (
                 <li
                   key={tier.pct}
                   className="flex h-14 items-center gap-[10px] rounded-tile px-3"
@@ -188,7 +180,7 @@ export default function Welcome() {
                 </li>
               ))}
             </ul>
-            <Caption lines={["항목을 기록하면 공간의 완료 비율이 바뀌고,", "시간이 지나면 관리 주기에 맞춰 색이 옅어져요."]} />
+            <Caption lines={["항목을 기록하면 공간 색이 다시 채워지고,", "시간이 지나면 관리 주기에 맞춰 천천히 옅어져요."]} />
             <GlassButton size={52} onClick={() => setStep(2)}>
               이제 시작하기
             </GlassButton>

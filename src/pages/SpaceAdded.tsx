@@ -1,5 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import Icon from "../components/Icon";
 import GlassButton from "../components/GlassButton";
 import ItemRow from "../components/ItemRow";
 import PageIntro from "../components/PageIntro";
@@ -23,9 +24,7 @@ export default function SpaceAdded() {
         <PageIntro title={<>{subject} 생겼어요</>} body="내 집의 새로운 공간을 준비했어요." className="pb-6" />
 
         <div role="status" className="flex min-h-[140px] flex-col gap-2 rounded-2xl bg-sky-tint px-5 pb-[18px] pt-[18px]">
-          <span aria-hidden="true" className="text-bb-title text-sky-deep">
-            ✓
-          </span>
+          <Icon name="check" className="text-[22px] text-sky-deep" />
           <h2 className="text-bb-title text-sky-ink">새 공간을 추가했어요</h2>
           <p className="text-bb-body text-sky-muted">{space.label}의 작은 돌봄을 기록해보세요.</p>
         </div>

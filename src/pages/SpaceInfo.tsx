@@ -3,7 +3,7 @@ import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-import { formatDay, formatTime, getItem, getSpace, isSpaceKey, isToday, spaceColor, spaceFade, useRecords, type SpaceKey } from "../data/cleaning";
+import { fadeLabel, formatDay, formatTime, getItem, getSpace, isSpaceKey, isToday, spaceColor, spaceFade, useRecords, type SpaceKey } from "../data/cleaning";
 
 // No Figma frame for this screen — styled after 07/내 공간 + 17/공간 관리 (Sky/BB rows, space-color tiles).
 const DETAILS: Record<SpaceKey, { cycle: string; detail: string }> = {
@@ -13,9 +13,6 @@ const DETAILS: Record<SpaceKey, { cycle: string; detail: string }> = {
   bedroom: { cycle: "1~2주", detail: "침구와 베개 커버 기록이 이어지고 있어요. 바닥 모서리만 가끔 함께 보면 좋아요." },
   terrace: { cycle: "2~3주", detail: "바닥과 난간은 먼지가 쌓이기 쉬워 2~3주마다 가볍게 확인하면 좋아요." },
 };
-
-/** Same thresholds as the recency-fade stops (100/72/48/28). */
-const statusFor = (fade: number) => (fade === 0 ? "아직 기록 없음" : fade >= 0.72 ? "관리 중" : fade >= 0.48 ? "슬슬 확인" : "확인 필요");
 
 export default function SpaceInfo() {
   const [searchParams] = useSearchParams();
@@ -51,14 +48,14 @@ export default function SpaceInfo() {
             <span className="text-bb-label text-sky-ink">내 관리 상태</span>
             <span className="text-bb-caption text-sky-muted">주기 기준으로 공간의 관리 흐름을 보여줘요.</span>
           </span>
-          <span className="shrink-0 rounded-full bg-sky-white px-3 py-1 text-bb-caption font-bold text-sky-deep">{statusFor(fade)}</span>
+          <span className="shrink-0 rounded-full bg-sky-white px-3 py-1 text-bb-caption font-bold text-sky-deep">{fadeLabel(fade)}</span>
         </section>
 
         <section className="flex flex-col gap-2 rounded-row border bg-sky-white p-3" style={{ borderColor: space.color }}>
           <div className="flex h-7 items-center justify-between px-1">
             <h2 className="text-bb-label font-bold text-sky-ink">최근 청소 기록</h2>
             <Link className="-mr-1 flex h-11 items-center px-1 text-bb-caption text-sky-muted" to="/history">
-              히스토리 보기&nbsp;&nbsp;›
+              히스토리 보기<Icon name="chevron-right" className="ml-1.5 text-[14px]" />
             </Link>
           </div>
           {recent.length === 0 ? (
@@ -77,7 +74,8 @@ export default function SpaceInfo() {
           {space.label} 기록하기
         </GlassButton>
         <Link className="text-link" to={`/item-add?space=${key}`}>
-          ＋ 새 청소 항목
+          <Icon name="plus" className="mr-1.5 text-[16px]" />
+          새 청소 항목
         </Link>
       </main>
     </PageShell>

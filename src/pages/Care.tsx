@@ -43,7 +43,10 @@ export default function Care() {
             </span>
             <Icon name="object-sink" className="text-[72px]" />
           </span>
-          <span className="whitespace-pre text-bb-label text-sky-deep">{"청소 방법 보기  →"}</span>
+          <span className="flex items-center text-bb-label text-sky-deep">
+            청소 방법 보기
+            <Icon name="chevron-right" className="ml-1.5 text-[14px]" />
+          </span>
         </Link>
 
         <div aria-label="가이드 필터" className="flex gap-2" role="group">

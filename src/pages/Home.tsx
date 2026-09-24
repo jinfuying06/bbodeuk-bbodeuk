@@ -30,12 +30,8 @@ const LIGHT_CARE: Array<{ itemId: string; tip: string }> = [
   { itemId: "bedding", tip: "베개 커버만 바꿔도 좋아요" },
 ];
 
-/** Figma v2 card copy: "방금 돌봤어요" instead of the generic "방금 기록했어요". */
-const cardRecency = (key: SpaceKey, records: CleaningRecord[]) => {
-  const last = records.find((record) => getItem(record.itemId)?.space === key);
-  const text = formatRecency(last?.at);
-  return text === "방금 기록했어요" ? "방금 돌봤어요" : text;
-};
+/** Space card recency = its most recent item record. */
+const cardRecency = (key: SpaceKey, records: CleaningRecord[]) => formatRecency(records.find((record) => getItem(record.itemId)?.space === key)?.at);
 
 /** One row per item, newest first. */
 const recentRows = (records: CleaningRecord[], spaces: Set<string>) => {
@@ -98,7 +94,7 @@ export default function Home() {
           <div className="flex h-7 items-center justify-between">
             <h2 className="text-bb-title text-sky-ink">내 공간</h2>
             <Link className="-mr-2 flex h-11 items-center px-2 text-bb-caption text-sky-muted" to="/space-manage">
-              공간 관리&nbsp;&nbsp;›
+              공간 관리<Icon name="chevron-right" className="ml-1.5 text-[14px]" />
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -125,7 +121,8 @@ export default function Home() {
         </section>
 
         <div className="pb-4 pt-2">
-          <GlassButton to="/quick-record">청소 기록하기&nbsp;&nbsp;&nbsp;+</GlassButton>
+          <GlassButton to="/quick-record">청소 기록하기
+            <Icon name="plus" className="text-[16px]" /></GlassButton>
         </div>
         {hasRecords ? (
           <div className="pb-6">
@@ -139,14 +136,17 @@ export default function Home() {
           <div className="flex h-7 items-center justify-between">
             <h2 className="text-bb-title text-sky-ink">최근 돌본 흔적</h2>
             <Link className="-mr-2 flex h-11 items-center px-2 text-bb-caption text-sky-muted" to="/history">
-              전체 보기&nbsp;&nbsp;›
+              전체 보기<Icon name="chevron-right" className="ml-1.5 text-[14px]" />
             </Link>
           </div>
           {recent.length === 0 ? (
             <Link className="press flex min-h-[120px] flex-col gap-2 rounded-2xl bg-sky-white p-[18px]" to="/quick-record">
               <span className="text-bb-title text-sky-ink">아직 남긴 청소 기록이 없어요</span>
               <span className="text-bb-label-sm font-normal text-sky-muted">공간 카드를 보며 첫 청소를 가볍게 시작해보세요.</span>
-              <span className="text-bb-label-sm font-bold text-sky-deep">첫 청소 기록하기&nbsp;&nbsp;→</span>
+              <span className="flex items-center text-bb-label-sm font-bold text-sky-deep">
+                첫 청소 기록하기
+                <Icon name="chevron-right" className="ml-1.5 text-[14px]" />
+              </span>
             </Link>
           ) : (
             recent.map((row) => (

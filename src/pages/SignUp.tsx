@@ -56,8 +56,8 @@ export default function SignUp() {
   return (
     <PageShell bottomNav={false}>
       <AppHeader back="/login" right={null} title="회원가입" />
-      <main className="pt-header">
-        <form className="flex flex-col gap-2 px-margin-screen py-5" onSubmit={submit}>
+      <main className="pt-header-flow">
+        <form className="flex flex-col gap-2 px-margin-screen pb-5" onSubmit={submit}>
           <h1 className="text-bb-heading text-sky-ink">작은 청결 관리를 시작해요</h1>
           <p className="text-bb-body text-sky-muted">예시 입력 · 필수 항목에 동의하면 시작할 수 있어요.</p>
 
@@ -111,7 +111,7 @@ export default function SignUp() {
           </GlassButton>
         </form>
       </main>
-      <Toast message={toast} visible={Boolean(toast)} pill />
+      <Toast icon={false} message={toast} visible={Boolean(toast)} pill />
     </PageShell>
   );
 }

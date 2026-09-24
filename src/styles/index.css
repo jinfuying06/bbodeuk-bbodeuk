@@ -39,6 +39,21 @@
   a {
     touch-action: manipulation;
   }
+
+  /* Keyboard focus ring (sky-deep, follows border-radius). Inputs keep their border-swap focus. */
+  :focus-visible {
+    outline: 2px solid theme("colors.sky-deep");
+    outline-offset: 2px;
+  }
+  input:focus-visible,
+  select:focus-visible {
+    outline: none;
+  }
+
+  ::selection {
+    background: theme("colors.sky-sky");
+    color: theme("colors.sky-ink");
+  }
 }
 
 @layer components {
@@ -70,6 +85,11 @@
     padding-top: calc(54px + env(safe-area-inset-top, 0px));
   }
 
+  /* No-nav flow pages (로그인/회원가입/포인트 확인/항목 삭제 완료): header + Figma 20px top gap. */
+  .pt-header-flow {
+    padding-top: calc(54px + 20px + env(safe-area-inset-top, 0px));
+  }
+
   /* Clears the fixed BottomNavigation (72px + safe area) plus Figma's 24px
      end-of-content padding. Use on <main> of every screen that shows the nav. */
   .pb-nav {
@@ -99,6 +119,10 @@
     line-height: 22px;
     font-weight: 500;
     transition: box-shadow 120ms ease-out;
+  }
+  /* overflow:hidden clips an outside outline — draw the focus ring inside. */
+  .glass-btn:focus-visible {
+    outline-offset: -4px;
   }
   .glass-btn:active:not(:disabled):not([aria-disabled="true"]) {
     box-shadow: inset 0 2px 4px rgba(0, 77, 102, 0.12);

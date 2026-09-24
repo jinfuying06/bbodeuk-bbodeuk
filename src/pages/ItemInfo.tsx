@@ -49,7 +49,7 @@ function ItemInfoForm({ item }: { item: Item }) {
     return (
       <PageShell bottomNav={false}>
         <AppHeader title="항목 삭제 완료" back="/spaces" right={null} />
-        <main className="flex flex-col gap-3 px-margin-screen py-5 pt-[calc(54px+20px+env(safe-area-inset-top,0px))]">
+        <main className="flex flex-col gap-3 px-margin-screen pb-5 pt-header-flow">
           <h1 className="text-bb-heading text-sky-ink">항목을 목록에서 숨겼어요</h1>
           <p className="text-bb-body text-sky-muted">이전에 남긴 청소 기록은 히스토리에 보관돼요.</p>
           <GlassButton size={52} to="/history">

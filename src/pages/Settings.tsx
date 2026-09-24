@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
 import SwitchRow from "../components/Switch";
 import { readPoints } from "../data/points";
@@ -11,9 +12,9 @@ function NavRow({ to, label, value }: { to: string; label: string; value?: strin
   return (
     <Link className={navRow} to={to}>
       <span className="text-bb-label text-sky-ink">{label}</span>
-      <span className="whitespace-pre text-bb-body text-sky-muted">
-        {value ? `${value}  ` : ""}
-        <span aria-hidden="true">›</span>
+      <span className="flex items-center gap-1.5 text-bb-body text-sky-muted">
+        {value}
+        <Icon name="chevron-right" className="text-[16px]" />
       </span>
     </Link>
   );
@@ -48,10 +49,10 @@ export default function Settings() {
 
         <p className="text-bb-caption text-sky-muted">뽀득뽀득 · 버전 0.1.0</p>
         <Link className="-my-3 flex h-11 items-center self-start text-bb-caption text-sky-deep" to="/welcome">
-          터치·유리광 효과 체험&nbsp;&nbsp;›
+          터치·유리광 효과 체험<Icon name="chevron-right" className="ml-1.5 text-[12px]" />
         </Link>
         <Link className="text-link" to="/help">
-          기록·공간 이용 안내&nbsp;&nbsp;›
+          기록·공간 이용 안내<Icon name="chevron-right" className="ml-1.5 text-[14px]" />
         </Link>
       </main>
     </PageShell>

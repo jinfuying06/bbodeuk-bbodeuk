@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import Icon from "./Icon";
 
 type ToastProps = {
   message: string | null;
@@ -9,9 +10,11 @@ type ToastProps = {
    * true → Figma pill toast: 310×48 sky-deep, bottom over the nav (settings/item saved).
    */
   pill?: boolean;
+  /** Success check. Off for "준비 중" info notices. */
+  icon?: boolean;
 };
 
-export default function Toast({ message, visible, pill = false }: ToastProps) {
+export default function Toast({ message, visible, pill = false, icon = true }: ToastProps) {
   const position = pill
     ? "bottom-[calc(26px+env(safe-area-inset-bottom,0px))] w-[310px] max-w-[calc(100%-48px)]"
     : "top-[calc(62px+env(safe-area-inset-top,0px))] w-[calc(100%-48px)] max-w-[382px]";
@@ -26,14 +29,12 @@ export default function Toast({ message, visible, pill = false }: ToastProps) {
       {visible && message ? (
         pill ? (
           <div className="flex h-12 items-center justify-center gap-2 rounded-3xl bg-sky-deep px-5 text-bb-label-sm text-sky-white shadow-[0_4px_12px_rgba(0,0,0,0.16)]">
-            <span aria-hidden="true">✓</span>
+            {icon ? <Icon name="check" className="shrink-0 text-[16px]" /> : null}
             <span className="truncate">{message}</span>
           </div>
         ) : (
           <div className="flex h-[52px] items-center justify-center gap-2 rounded-row bg-sky-ink px-4 text-sky-white shadow-[0_8px_24px_rgba(0,0,0,0.16)]">
-            <span aria-hidden="true" className="text-[15px] font-bold leading-[21px]">
-              ✓
-            </span>
+            {icon ? <Icon name="check" className="shrink-0 text-[16px]" /> : null}
             <span className="truncate text-bb-label-sm">{message}</span>
           </div>
         )

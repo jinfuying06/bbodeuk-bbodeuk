@@ -46,13 +46,13 @@ export default function AppHeader({ title, back, right }: AppHeaderProps) {
   return (
     <header className={shell}>
       <div className="flex h-header items-center justify-between px-4">
-        <button aria-label="이전 화면으로" className="flex h-11 w-11 shrink-0 items-center justify-center text-[26px] font-bold leading-[36px] text-sky-deep transition-opacity active:opacity-60" type="button" onClick={goBack}>
-          ‹
+        <button aria-label="이전 화면으로" className="flex h-11 w-11 shrink-0 items-center justify-center text-sky-deep transition-opacity active:opacity-60" type="button" onClick={goBack}>
+          <Icon name="chevron-left" className="text-[22px]" />
         </button>
         <span className="min-w-0 flex-1 truncate text-center text-bb-label text-sky-ink">{title}</span>
         {right === undefined ? (
-          <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center text-bb-title text-sky-deep">
-            ⋯
+          <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center text-sky-deep">
+            <Icon name="more" className="text-[20px]" />
           </span>
         ) : (
           <div className="flex h-11 min-w-11 shrink-0 items-center justify-center">{right}</div>

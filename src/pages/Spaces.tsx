@@ -2,17 +2,11 @@ import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
+import Icon from "../components/Icon";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import SpaceTile from "../components/SpaceTile";
-import { daysAgo, getActiveSpaces, getItems, isSpaceKey, itemFade, lastRecord, spaceColor, useRecords, type SpaceKey } from "../data/cleaning";
-
-/** Figma 07 short recency: 오늘 · N일 전 · 기록 없음. */
-const shortRecency = (at: string | undefined) => {
-  if (!at) return "기록 없음";
-  const days = daysAgo(at);
-  return days <= 0 ? "오늘" : `${days}일 전`;
-};
+import { formatRecency, getActiveSpaces, getItems, isSpaceKey, itemFade, lastRecord, spaceColor, useRecords, type SpaceKey } from "../data/cleaning";
 
 export default function Spaces() {
   const records = useRecords();
@@ -43,9 +37,7 @@ export default function Spaces() {
                   <span className="truncate text-bb-label text-sky-ink">{space.label}</span>
                   <span className="text-bb-caption text-sky-muted">{items.length}개 항목</span>
                 </span>
-                <svg aria-hidden="true" className={`ml-auto mr-3 h-[18px] w-[18px] shrink-0 text-sky-deep transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} viewBox="0 0 24 24">
-                  <path d="M7 10l5 5 5-5" />
-                </svg>
+                <Icon name="chevron-down" className={`ml-auto mr-3 shrink-0 text-[18px] text-sky-deep transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
               </button>
 
               {expanded ? (
@@ -58,10 +50,10 @@ export default function Spaces() {
                       to={`/item-info?item=${item.id}`}
                     >
                       <span className="flex min-w-0 items-center gap-2">
-                        <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: space.color }} />
+                        <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: space.iconColor }} />
                         <span className="truncate text-bb-label text-sky-ink">{item.name}</span>
                       </span>
-                      <span className="shrink-0 pl-2 text-bb-caption text-sky-muted">{shortRecency(lastRecord(item.id, records)?.at)}</span>
+                      <span className="shrink-0 pl-2 text-bb-caption text-sky-muted">{formatRecency(lastRecord(item.id, records)?.at, { short: true })}</span>
                     </Link>
                   ))}
                   <Link className="press flex h-11 items-center justify-center rounded-tile text-bb-label font-bold text-sky-deep" style={{ backgroundColor: space.color }} to={`/quick-record?filter=space&space=${space.key}`}>
@@ -77,7 +69,8 @@ export default function Spaces() {
           공간 관리하기
         </GlassButton>
         <Link className="text-link" to="/item-add">
-          ＋ 새 청소 항목
+          <Icon name="plus" className="mr-1.5 text-[16px]" />
+          새 청소 항목
         </Link>
       </main>
     </PageShell>

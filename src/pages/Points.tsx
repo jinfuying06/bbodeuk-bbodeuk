@@ -5,6 +5,7 @@ import Dialog from "../components/Dialog";
 import GlassButton from "../components/GlassButton";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
+import Pill from "../components/Pill";
 import { readPoints, SPACE_PRICE } from "../data/points";
 import { hasCompletedSetup } from "../data/setup";
 
@@ -15,8 +16,8 @@ function PointsShort() {
   return (
     <PageShell bottomNav={false}>
       <AppHeader title="포인트 확인" back right={null} />
-      <main className="flex flex-col gap-3 px-margin-screen pb-5 pt-header">
-        <h1 className="pt-5 text-bb-heading text-sky-ink">포인트가 조금 모자라요</h1>
+      <main className="flex flex-col gap-3 px-margin-screen pb-5 pt-header-flow">
+        <h1 className="text-bb-heading text-sky-ink">포인트가 조금 모자라요</h1>
         <p className="text-bb-body text-sky-muted">새 공간에 필요한 포인트와 보유 포인트를 확인해 주세요. 포인트는 차감되지 않았어요.</p>
         <p className="text-bb-label text-sky-deep">
           필요 {SPACE_PRICE}P&nbsp;&nbsp;·&nbsp;&nbsp;보유 {readPoints().toLocaleString()}P
@@ -63,15 +64,9 @@ export default function Points() {
         <h2 className="text-bb-title text-sky-ink">포인트 충전</h2>
         <div aria-label="충전 패키지" className="flex gap-[9px]" role="group">
           {packages.map((amount) => (
-            <button
-              key={amount}
-              aria-pressed={selectedPackage === amount}
-              className={`h-[72px] flex-1 rounded-full text-bb-label transition-colors duration-150 ${selectedPackage === amount ? "bg-sky-brand text-onbrand" : "bg-sky-white text-sky-muted"}`}
-              type="button"
-              onClick={() => setSelectedPackage(amount)}
-            >
+            <Pill key={amount} className="flex-1" selected={selectedPackage === amount} size={72} onClick={() => setSelectedPackage(amount)}>
               {amount.toLocaleString()}P
-            </button>
+            </Pill>
           ))}
         </div>
 

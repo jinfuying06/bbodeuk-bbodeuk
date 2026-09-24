@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import Icon from "../components/Icon";
 import GlassButton from "../components/GlassButton";
 import ItemRow from "../components/ItemRow";
 import PageIntro from "../components/PageIntro";
@@ -23,7 +24,7 @@ const PREVIEW_ROWS = [
 const PREVIEW_LINKS = [
   ["로그인 · 가입 흐름", "/welcome"],
   ["연결 없는 로그인", "/home/error"],
-  ["기록 저장 실패", "/home/error"],
+  ["기록 저장이 안 될 때", "/home/error"],
   ["포인트 부족", "/points?intent=short"],
   ["기록·공간 이용 정책", "/help"],
 ] as const;
@@ -112,7 +113,8 @@ export default function HomeStateDemo() {
             <div className="flex flex-col gap-3">
               {PREVIEW_LINKS.map(([label, to]) => (
                 <Link key={label} className="text-link" to={to}>
-                  {label}&nbsp;&nbsp;›
+                  {label}
+                  <Icon name="chevron-right" className="ml-1.5 text-[14px]" />
                 </Link>
               ))}
             </div>

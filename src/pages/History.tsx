@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import AppHeader from "../components/AppHeader";
+import Icon from "../components/Icon";
 import ItemRow from "../components/ItemRow";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
@@ -63,12 +64,12 @@ export default function History() {
   const arrow = (dir: -1 | 1, enabled: boolean) => (
     <button
       aria-label={dir < 0 ? "이전 달" : "다음 달"}
-      className={`-my-1.5 flex h-11 w-11 items-center justify-center text-bb-title ${enabled ? "text-sky-muted" : "text-sky-line"}`}
+      className={`-my-1.5 flex h-11 w-11 items-center justify-center ${enabled ? "text-sky-muted" : "text-sky-line"}`}
       disabled={!enabled}
       type="button"
       onClick={() => shift(dir)}
     >
-      {dir < 0 ? "‹" : "›"}
+      <Icon name={dir < 0 ? "chevron-left" : "chevron-right"} className="text-[18px]" />
     </button>
   );
 
@@ -110,13 +111,16 @@ export default function History() {
                         onClick={() => setSelected(key)}
                       >
                         {date.getDate()}
-                        {recordedDays.has(key) ? <span aria-hidden="true" className="-mt-1 h-2 text-[10px] font-medium leading-[8px] text-sky-deep">•</span> : null}
+                        {recordedDays.has(key) ? <span aria-hidden="true" className="mt-0.5 h-1 w-1 rounded-full bg-sky-deep" /> : null}
                       </button>
                     );
                   })}
                 </div>
               ))}
-              <p className="text-center text-bb-caption text-sky-muted">●&nbsp;&nbsp;공간을 돌본 날</p>
+              <p className="flex items-center justify-center gap-1.5 text-bb-caption text-sky-muted">
+                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-sky-deep" />
+                공간을 돌본 날
+              </p>
             </section>
 
             <h2 className="text-bb-title text-sky-ink">{formatDay(`${selected}T00:00:00`)}</h2>
