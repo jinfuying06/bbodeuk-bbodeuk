@@ -1,182 +1,162 @@
+import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-import { formatRecency, lastRecord, useRecords } from "../data/cleaning";
-import { spaceTones, type SpaceToneKey } from "../data/spaceTones";
+import Toast, { useToast } from "../components/Toast";
+import { addRecord, getSpace, removeRecord, type SpaceKey } from "../data/cleaning";
 
-type SpaceKey = Extract<SpaceToneKey, "bathroom" | "kitchen" | "living" | "entry">;
-type CareStatus = "확인 필요" | "슬슬 확인" | "관리 중" | "아직 기록 없음";
-
-type GuideItem = {
+export type Guide = {
+  /** Catalog item id this guide records. */
   id: string;
   space: SpaceKey;
-  spaceLabel: string;
+  /** Header/heading after "{space} · ". */
   title: string;
-  icon: string;
-  description: string;
-  status: CareStatus;
-  interval: string;
-  lastRecord: string;
-  steps: string[];
-  related: Array<{ title: string; description: string; icon: string }>;
-  records: Array<{ date: string; result: string }>;
+  /** Care list row (14 / 청소 가이드). */
+  listTitle: string;
+  /** Care filter pill. */
+  filter: "욕실" | "주방" | "생활 팁";
+  intro: string;
+  materials: [string, string, string];
+  steps: Array<[string, string]>;
 };
 
-const spaceIcons: Record<SpaceKey, string> = {
-  bathroom: "bathtub",
-  kitchen: "countertops",
-  living: "chair",
-  entry: "door_front",
-};
-
-const guides: GuideItem[] = [
+// Figma 15 / 40 / 41 / 42. 준비물: first 3 (AGENTS.md "준비물 3종").
+export const GUIDES: Guide[] = [
   {
     id: "basin",
     space: "bathroom",
-    spaceLabel: "욕실",
-    title: "세면대",
-    icon: "wash",
-    description: "수전과 볼 주변의 물기, 비누 자국을 가볍게 정리하는 관리예요.",
-    status: "슬슬 확인",
-    interval: "7일",
-    lastRecord: "최근 청소 · 오늘 오후 8:30",
-    steps: ["물기를 먼저 닦아요.", "수전 주변 얼룩을 부드럽게 닦아요.", "마른 수건으로 남은 물기를 정리해요."],
-    related: [
-      { title: "욕실 유리 거울", description: "물자국이 같이 남기 쉬워요.", icon: "auto_awesome" },
-      { title: "바닥 배수구 유가 거름망", description: "세면대 주변 관리 후 함께 보기 좋아요.", icon: "water_drop" },
-    ],
-    records: [
-      { date: "오늘 오후 8:30", result: "청소 완료" },
-      { date: "8월 29일", result: "청소 완료" },
+    title: "세면대 청소법",
+    listTitle: "세면대부터 산뜻하게",
+    filter: "욕실",
+    intro: "약 3분 · 부드러운 천부터 준비해요.",
+    materials: ["마른 천", "중성 세정제", "스퀴지"],
+    steps: [
+      ["주변 물기를 먼저 닦아요", "수전과 볼 주변의 물기를 천으로 닦아요."],
+      ["얼룩을 부드럽게 닦아요", "표면에 맞는 세정제를 소량 사용해요."],
+      ["남은 물기를 정리해요", "깨끗이 헹군 뒤 마른 천으로 마무리해요."],
     ],
   },
   {
-    id: "hood",
-    space: "kitchen",
-    spaceLabel: "주방",
-    title: "레인지 후드 필터",
-    icon: "filter_alt",
-    description: "조리 중 생긴 기름때가 필터에 쌓이지 않도록 확인하는 관리예요.",
-    status: "아직 기록 없음",
-    interval: "2~4주",
-    lastRecord: "최근 청소 기록이 없어요.",
-    steps: ["필터를 분리해요.", "미지근한 물에 잠시 불려요.", "부드럽게 닦아요.", "완전히 말린 뒤 다시 장착해요."],
-    related: [
-      { title: "인덕션 상판 및 조리대", description: "조리 후 같이 닦기 좋아요.", icon: "countertops" },
-      { title: "싱크대 거름망", description: "주방 마무리 관리로 이어져요.", icon: "faucet" },
-    ],
-    records: [],
-  },
-  {
-    id: "drain",
+    id: "mirror",
     space: "bathroom",
-    spaceLabel: "욕실",
-    title: "바닥 배수구 유가 거름망",
-    icon: "water_drop",
-    description: "머리카락과 비누 찌꺼기가 쌓이기 쉬운 곳을 확인하는 관리예요.",
-    status: "아직 기록 없음",
-    interval: "1~2주",
-    lastRecord: "최근 청소 기록이 없어요.",
-    steps: ["거름망을 분리해요.", "쌓인 이물질을 제거해요.", "물로 가볍게 헹궈요.", "주변 물기를 정리해요."],
-    related: [
-      { title: "세면대", description: "욕실 물때 관리와 함께 보기 좋아요.", icon: "wash" },
-      { title: "양변기 안팎", description: "욕실 기본 관리 항목이에요.", icon: "cleaning_services" },
+    title: "거울 청소법",
+    listTitle: "거울 얼룩, 말끔하게",
+    filter: "욕실",
+    intro: "가벼운 청소 · 약 3분",
+    materials: ["마른 천", "유리 세정제", "극세사 천"],
+    steps: [
+      ["먼지를 먼저 걷어내요", "부드러운 마른 천으로 먼지를 닦아요."],
+      ["물자국을 가볍게 닦아요", "살짝 적신 천으로 얼룩을 닦아요."],
+      ["마른 천으로 마무리해요", "남은 물기가 없도록 한 번 더 닦아요."],
     ],
-    records: [],
   },
   {
-    id: "door-handle",
-    space: "entry",
-    spaceLabel: "현관",
-    title: "문손잡이",
-    icon: "sensor_door",
-    description: "손이 자주 닿는 부분을 짧게 닦아두는 관리예요.",
-    status: "슬슬 확인",
-    interval: "1~2주",
-    lastRecord: "최근 청소 · 8월 24일",
-    steps: ["마른 천으로 먼지를 닦아요.", "자주 닿는 면을 한 번 더 닦아요.", "주변 스위치까지 가볍게 확인해요."],
-    related: [
-      { title: "현관 바닥", description: "생활 동선에 함께 있는 관리 항목이에요.", icon: "door_front" },
-      { title: "신발장", description: "가끔 같이 확인하면 좋아요.", icon: "steps" },
+    id: "sink",
+    space: "kitchen",
+    title: "싱크대 청소법",
+    listTitle: "싱크대에 남은 물기 닦기",
+    filter: "주방",
+    intro: "가벼운 청소 · 약 3분",
+    materials: ["수세미", "주방 세정제", "고무장갑"],
+    steps: [
+      ["남은 찌꺼기를 비워요", "거름망에 남은 음식물을 분리해요."],
+      ["표면을 부드럽게 닦아요", "소재에 맞는 세정제로 가볍게 닦아요."],
+      ["헹군 뒤 물기를 닦아요", "마른 천으로 모서리까지 정리해요."],
     ],
-    records: [{ date: "8월 24일", result: "청소 완료" }],
+  },
+  {
+    id: "bedding",
+    space: "bedroom",
+    title: "침구 정돈하기",
+    listTitle: "침구를 가볍게 정돈하기",
+    filter: "생활 팁",
+    intro: "가벼운 청소 · 약 3분",
+    materials: ["돌돌이", "여분 커버", "세탁망"],
+    steps: [
+      ["침구를 가볍게 털어요", "구김을 펴고 이불을 가지런히 놓아요."],
+      ["커버 상태를 살펴봐요", "교체가 필요하면 여분 커버를 준비해요."],
+      ["방 안 공기를 환기해요", "창을 열어 잠시 공기를 바꿔주세요."],
+    ],
   },
 ];
 
+// Figma reuses bath object art as placeholder 준비물 tiles (바닥/배수구/거울).
+const materialArt = ["object-floor", "object-drain", "object-mirror"];
+
 export default function CareAction() {
   const [searchParams] = useSearchParams();
-  const itemId = searchParams.get("item") ?? "basin";
-  const guide = guides.find((item) => item.id === itemId) ?? guides[0];
-  const tone = spaceTones[guide.space];
-  const records = useRecords();
-  const last = lastRecord(guide.id, records);
+  const guide = GUIDES.find((entry) => entry.id === searchParams.get("item")) ?? GUIDES[0];
+  const space = getSpace(guide.space);
+  const title = `${space.label} · ${guide.title}`;
+  const [recordId, setRecordId] = useState<string | null>(null);
+  const [toast, showToast] = useToast();
+
+  const record = () => {
+    // One record per visit; a repeat tap just re-confirms.
+    if (!recordId) setRecordId(addRecord(guide.id).id);
+    showToast("청소 기록이 저장됐어요");
+  };
+
+  const undo = () => {
+    if (!recordId) return;
+    removeRecord(recordId);
+    setRecordId(null);
+    showToast("공간 기록이 취소되었어요");
+  };
 
   return (
     <PageShell>
-      <AppHeader title="가이드 상세" back="/care" />
-      <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[156px] pt-header">
-        <section className="rounded-xl bg-surface-container-lowest p-space-lg text-center shadow-sm">
-          <span className={`mx-auto mb-space-sm flex h-16 w-16 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
-            <Icon name={spaceIcons[guide.space]} className="text-[30px]" />
-          </span>
-          <div className="mt-space-sm flex items-center justify-center gap-space-xs">
-            <h1 className="text-headline-lg">{guide.title}</h1>
-            <span className={`rounded-full px-2.5 py-1 text-label-sm ${tone.fill} ${tone.text}`}>{guide.interval}</span>
-          </div>
-          <p className="mt-1 text-body-md text-on-surface-variant">{guide.description}</p>
-          <p className="mt-space-xs text-caption text-on-surface-variant">{last ? formatRecency(last.at) : "최근 청소 기록이 없어요."}</p>
+      <AppHeader title={title} back="/care" />
+      <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
+        <section className="flex min-h-[88px] flex-col gap-2">
+          <h1 className="text-bb-heading text-sky-ink">{title}</h1>
+          <p className="text-bb-body text-sky-muted">{guide.intro}</p>
         </section>
 
-        <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-          <h2 className="text-title-sm">기본 관리 방법</h2>
-          <ol className="mt-space-sm flex flex-col gap-space-xs">
-            {guide.steps.map((step, index) => (
-              <li key={step} className="flex gap-space-xs rounded-lg bg-surface-container-low p-space-sm text-body-md text-on-surface-variant">
-                <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${tone.fill} text-label-sm ${tone.text}`}>{index + 1}</span>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-          <h2 className="text-title-sm">함께 관리하면 좋아요</h2>
-          <div className="mt-space-sm flex flex-col gap-space-xs">
-            {guide.related.map((item) => {
-              // Only link related items that have their own guide here; others render as plain rows.
-              const target = guides.find((entry) => entry.title === item.title);
-              const content = (
-                <div className="flex min-w-0 items-center gap-space-sm">
-                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${tone.fill} ${tone.text}`}>
-                    <Icon name={spaceIcons[guide.space]} className="text-[20px]" />
-                  </span>
-                  <div className="min-w-0">
-                    <h3 className="truncate text-body-md font-semibold">{item.title}</h3>
-                    <p className="mt-0.5 truncate text-caption text-on-surface-variant">{item.description}</p>
-                  </div>
-                </div>
-              );
-              return target ? (
-                <Link key={item.title} className="flex min-h-[64px] items-center justify-between rounded-lg bg-surface-container-low p-space-sm transition-transform active:scale-[0.99]" to={`/care-action?item=${target.id}&space=${target.space}`}>
-                  {content}
-                  <Icon name="chevron_right" className="ml-space-sm shrink-0 text-[20px] text-outline-variant" />
-                </Link>
-              ) : (
-                <div key={item.title} className="flex min-h-[64px] items-center justify-between rounded-lg bg-surface-container-low p-space-sm">
-                  {content}
-                </div>
-              );
-            })}
+        {guide.id === "basin" ? (
+          <div className="flex h-[116px] items-center justify-center rounded-[22px]" style={{ backgroundColor: space.color }}>
+            <Icon name="object-sink" className="text-[70px]" />
           </div>
-        </section>
+        ) : null}
+
+        <ul aria-label="준비물" className="flex gap-[10px] pb-3">
+          {guide.materials.map((label, index) => (
+            <li key={label} className="flex h-[104px] flex-1 flex-col items-center justify-center gap-1.5 rounded-[18px] border bg-sky-white" style={{ borderColor: space.color }}>
+              <span className="flex h-[52px] w-[52px] items-center justify-center rounded-[16px]" style={{ backgroundColor: space.color }}>
+                <Icon name={materialArt[index]} className="text-[34px]" />
+              </span>
+              <span className="w-[88px] text-center text-[11px] font-medium leading-[17px] text-sky-ink">{label}</span>
+            </li>
+          ))}
+        </ul>
+
+        <ol className="flex flex-col gap-3">
+          {guide.steps.map(([stepTitle, desc], index) => (
+            <li key={stepTitle} className="flex min-h-[94px] flex-col gap-2 rounded-3xl bg-sky-white px-5 pb-4 pt-4">
+              <h2 className="whitespace-pre text-bb-title text-sky-ink">{`0${index + 1}  ${stepTitle}`}</h2>
+              <p className="text-bb-body text-sky-muted">{desc}</p>
+            </li>
+          ))}
+        </ol>
+
+        <GlassButton onClick={record}>청소했어요 · 기록하기</GlassButton>
+        <button
+          className="flex h-11 items-center justify-center text-[13px] font-medium leading-[19px] text-sky-deep disabled:text-sky-muted disabled:opacity-60"
+          disabled={!recordId}
+          type="button"
+          onClick={undo}
+        >
+          기록 취소하기
+        </button>
+        {guide.id === "basin" ? (
+          <Link className="flex h-11 items-center justify-center text-bb-label text-sky-deep" to="/care">
+            다른 청소법 보기
+          </Link>
+        ) : null}
       </main>
-      <div className="fixed bottom-16 left-1/2 z-40 w-full max-w-[430px] -translate-x-1/2 bg-surface/90 px-margin-screen py-space-sm backdrop-blur-xl">
-        <Link className="flex h-[52px] items-center justify-center gap-2 rounded-full bg-primary-container text-title-sm font-semibold text-on-primary shadow-md transition-transform active:scale-[0.98]" to={`/quick-record?filter=space&space=${guide.space}`}>
-          <Icon name="format_paint" className="text-[20px]" />
-          청소 기록하러 가기
-        </Link>
-      </div>
+      <Toast message={toast} visible={Boolean(toast)} />
     </PageShell>
   );
 }
