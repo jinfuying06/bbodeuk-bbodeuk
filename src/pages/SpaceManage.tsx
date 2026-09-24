@@ -1,11 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
-import Icon from "../components/Icon";
+import GlassButton from "../components/GlassButton";
 import PageShell from "../components/PageShell";
-import Toast from "../components/Toast";
-import { isMember, readPoints, spendPoints } from "../data/points";
+import SpaceExpansionDialog from "../components/SpaceExpansionDialog";
+import { SPACES } from "../data/cleaning";
+import { spendPoints } from "../data/points";
 import { DEFAULT_SPACES, EXPANSION_CATALOG, hasCompletedSetup, readSetup, writeSetup, type SetupData } from "../data/setup";
+
+const SPACE_PRICE = 300;
+// Figma 17 row order: 욕실, 주방, 거실, 방.
+const ROWS = ["욕실", "주방", "거실", "침실 / 방"].map((key) => DEFAULT_SPACES.find((space) => space.key === key)!);
 
 function withRequiredSpaces(setup: SetupData): SetupData {
   const requiredKeys = DEFAULT_SPACES.filter((space) => space.required).map((space) => space.key);
@@ -16,167 +21,87 @@ function withRequiredSpaces(setup: SetupData): SetupData {
   return normalized;
 }
 
+/** Sky / Switch (25:136): Off · On · Locked (tint track, "–" thumb, not interactive). */
+function Switch({ label, on, locked, onToggle }: { label: string; on: boolean; locked: boolean; onToggle: () => void }) {
+  return (
+    <button
+      aria-checked={on}
+      aria-disabled={locked}
+      aria-label={locked ? `${label} (기본 관리 공간)` : label}
+      className={`flex h-8 w-[52px] shrink-0 items-center rounded-full px-1 transition-colors duration-200 ${on ? "justify-end" : "justify-start"} ${locked ? "bg-sky-tint" : on ? "bg-sky-brand" : "bg-sky-line"}`}
+      role="switch"
+      type="button"
+      onClick={locked ? undefined : onToggle}
+    >
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-literal-white text-bb-label text-sky-muted">{locked ? "–" : null}</span>
+    </button>
+  );
+}
+
 export default function SpaceManage() {
   const navigate = useNavigate();
   // Only normalize (and persist) an existing setup; before Setup is completed, show the defaults without writing.
   const [setup, setSetup] = useState<SetupData>(() =>
     hasCompletedSetup() ? withRequiredSpaces(readSetup()) : { spaces: DEFAULT_SPACES.map((space) => space.key), roomName: "방" },
   );
-  const [expandedKey, setExpandedKey] = useState<string | null>(null);
-  const [toastMessage, setToastMessage] = useState("");
-  const [showToast, setShowToast] = useState(false);
-  const toastTimerRef = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(toastTimerRef.current), []);
-  const member = isMember();
-  const balance = readPoints();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-  const notify = (message: string) => {
-    setToastMessage(message);
-    setShowToast(true);
-    window.clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = window.setTimeout(() => setShowToast(false), 2400);
-  };
-
-  const toggleSpace = (key: string, required: boolean) => {
-    if (required) return;
-    const isOn = setup.spaces.includes(key);
-    const next = { ...setup, spaces: isOn ? setup.spaces.filter((space) => space !== key) : [...setup.spaces, key] };
+  const save = (next: SetupData) => {
     setSetup(next);
     writeSetup(next);
   };
+  const toggle = (key: string) => save({ ...setup, spaces: setup.spaces.includes(key) ? setup.spaces.filter((space) => space !== key) : [...setup.spaces, key] });
 
-  const purchaseSpace = (key: string, label: string, price: number) => {
-    if (!spendPoints(price)) return;
-    const next = { ...setup, spaces: [...setup.spaces, key] };
-    setSetup(next);
-    writeSetup(next);
-    setExpandedKey(null);
-    notify(`${label} 공간이 추가됐어요!`);
+  const owned = EXPANSION_CATALOG.filter((item) => setup.spaces.includes(item.key));
+  const nextExpansion = EXPANSION_CATALOG.find((item) => !setup.spaces.includes(item.key));
+  const nextSpace = nextExpansion ? SPACES.find((space) => space.setupKeys.includes(nextExpansion.key)) : undefined;
+
+  const purchase = () => {
+    if (!nextExpansion || !spendPoints(SPACE_PRICE)) return;
+    save({ ...setup, spaces: [...setup.spaces, nextExpansion.key] });
+    setDialogOpen(false);
+    navigate(`/space-added?space=${nextSpace?.key ?? "terrace"}`);
   };
 
-  const ownedExpansions = EXPANSION_CATALOG.filter((item) => setup.spaces.includes(item.key));
-  const availableExpansions = EXPANSION_CATALOG.filter((item) => !setup.spaces.includes(item.key));
-
-  const renderToggle = (key: string, label: string, active: boolean, required: boolean) => (
-    <button
-      aria-pressed={active}
-      aria-label={`${label} ${active ? "끄기" : "켜기"}`}
-      disabled={required}
-      className={`flex h-7 w-12 shrink-0 items-center rounded-full p-1 transition-colors disabled:opacity-50 ${
-        active ? "justify-end bg-primary-container" : "justify-start bg-surface-container"
-      }`}
-      type="button"
-      onClick={() => toggleSpace(key, required)}
-    >
-      <span className="block h-5 w-5 rounded-full bg-white shadow-sm" />
-    </button>
-  );
+  const rows = [
+    ...ROWS.map((space) => ({ key: space.key, label: space.key === "침실 / 방" ? setup.roomName : space.label, locked: space.required })),
+    ...owned.map((space) => ({ key: space.key, label: space.label, locked: false })),
+  ];
 
   return (
     <PageShell>
       <AppHeader title="공간 관리" back="/spaces" />
-      <main className="flex flex-col gap-space-md bg-surface px-margin-screen pb-[88px] pt-header">
-        <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-          <h1 className="text-headline-md text-on-surface">내 공간</h1>
-          <p className="mt-1 text-body-md text-on-surface-variant">필요 없는 공간은 꺼둘 수 있어요. 주방·욕실은 핵심 관리 공간이라 항상 켜져 있어요.</p>
-          <div className="mt-space-md flex flex-col gap-space-md">
-            {DEFAULT_SPACES.map((space) => {
-              const active = setup.spaces.includes(space.key);
-              const label = space.key === "침실 / 방" ? setup.roomName : space.label;
-              return (
-                <div key={space.key} className="flex items-center justify-between gap-space-sm">
-                  <div className="flex min-w-0 items-center gap-space-sm">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-container-low text-primary">
-                      <Icon name={space.icon} className="text-[22px]" />
-                    </span>
-                    <div className="min-w-0">
-                      <span className="block truncate text-title-sm text-on-surface">{label}</span>
-                      {space.required ? <span className="text-caption text-secondary">필수 공간</span> : null}
-                    </div>
-                  </div>
-                  {renderToggle(space.key, label, active, space.required)}
-                </div>
-              );
-            })}
-            {ownedExpansions.map((space) => {
-              const active = setup.spaces.includes(space.key);
-              return (
-                <div key={space.key} className="flex items-center justify-between gap-space-sm">
-                  <div className="flex min-w-0 items-center gap-space-sm">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-container-low text-primary">
-                      <Icon name={space.icon} className="text-[22px]" />
-                    </span>
-                    <span className="block truncate text-title-sm text-on-surface">{space.label}</span>
-                  </div>
-                  {renderToggle(space.key, space.label, active, false)}
-                </div>
-              );
-            })}
+      <main className="flex flex-1 flex-col gap-3 px-margin-screen pb-nav pt-header">
+        <div className="flex flex-col gap-2 pb-6">
+          <h1 className="text-bb-heading text-sky-ink">내 집에 맞게 관리해요</h1>
+          <p className="text-bb-body text-sky-muted">필요한 공간만 켜두세요.</p>
+        </div>
+
+        {rows.map((row) => (
+          <div key={row.key} className="flex h-[62px] items-center justify-between rounded-[16px] bg-sky-white px-4">
+            <span className="truncate text-bb-label text-sky-ink">{row.label}</span>
+            <Switch label={row.label} locked={row.locked} on={row.locked || setup.spaces.includes(row.key)} onToggle={() => toggle(row.key)} />
           </div>
+        ))}
+
+        <p className="text-bb-caption text-sky-muted">* 욕실과 주방은 기본 관리 공간이에요.</p>
+
+        <section className="flex flex-col gap-2 rounded-3xl bg-sky-tint px-5 pb-4 pt-4">
+          <h2 className="text-bb-title text-sky-ink">공간을 조금 더 넓혀볼까요?</h2>
+          <p className="text-bb-body text-sky-muted">
+            베란다·드레스룸 같은 추가 공간은
+            <br />
+            1개당 300P로 열 수 있어요.
+          </p>
         </section>
 
-        {availableExpansions.length > 0 ? (
-          <section className="flex flex-col gap-space-sm">
-            <h2 className="text-title-sm">공간 추가하기</h2>
-            {availableExpansions.map((space) => {
-              const expanded = expandedKey === space.key;
-              const panelId = `expansion-panel-${space.key}`;
-
-              return (
-                <section key={space.key} className="overflow-hidden rounded-xl bg-surface-container-lowest shadow-sm">
-                  <button
-                    aria-expanded={expanded}
-                    aria-controls={panelId}
-                    className="flex w-full items-center justify-between p-space-md text-left transition-colors active:bg-surface-container-low"
-                    type="button"
-                    onClick={() => setExpandedKey(expanded ? null : space.key)}
-                  >
-                    <div className="flex min-w-0 items-center gap-space-sm">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-fixed text-primary">
-                        <Icon name={space.icon} className="text-[22px]" />
-                      </span>
-                      <div className="min-w-0">
-                        <span className="block truncate text-title-sm text-on-surface">{space.label}</span>
-                        <span className="text-caption text-on-surface-variant">{space.price}P</span>
-                      </div>
-                    </div>
-                    <Icon name="keyboard_arrow_down" className={`text-[22px] text-on-surface-variant transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
-                  </button>
-                  {expanded ? (
-                    <div id={panelId} className="flex flex-col gap-space-sm px-space-md pb-space-md">
-                      <div>
-                        <p className="text-label-sm text-on-surface-variant">제공되는 관리 항목</p>
-                        <ul className="mt-1 flex flex-col gap-1">
-                          {space.previewItems.map((item) => (
-                            <li key={item} className="flex items-center gap-1.5 text-body-md text-on-surface">
-                              <Icon name="check" className="text-[16px] text-outline" />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      {!member ? (
-                        <button className="flex h-11 w-full items-center justify-center rounded-full bg-primary-container text-label-md text-on-primary" type="button" onClick={() => navigate("/signup")}>
-                          회원가입 하러 가기
-                        </button>
-                      ) : balance >= space.price ? (
-                        <button className="flex h-11 w-full items-center justify-center rounded-full bg-primary-container text-label-md text-on-primary" type="button" onClick={() => purchaseSpace(space.key, space.label, space.price)}>
-                          {space.price}P로 추가하기
-                        </button>
-                      ) : (
-                        <button className="flex h-11 w-full items-center justify-center rounded-full bg-primary-container text-label-md text-on-primary" type="button" onClick={() => navigate("/points?intent=charge")}>
-                          포인트 충전하러 가기
-                        </button>
-                      )}
-                    </div>
-                  ) : null}
-                </section>
-              );
-            })}
-          </section>
+        {nextExpansion ? (
+          <GlassButton variant="secondary" className="w-full" onClick={() => setDialogOpen(true)}>
+            ＋ 추가 공간 살펴보기
+          </GlassButton>
         ) : null}
       </main>
-      <Toast message={toastMessage} visible={showToast} pill />
+      <SpaceExpansionDialog open={dialogOpen} spaceLabel={nextSpace?.label ?? nextExpansion?.label} onClose={() => setDialogOpen(false)} onConfirm={purchase} />
     </PageShell>
   );
 }

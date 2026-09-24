@@ -1,117 +1,144 @@
-import { Link, useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
 
-const stateCopy = {
-  empty: {
-    label: "새로운 시작",
-    title: "오늘 청소한 곳 하나만 기록해도 괜찮아요",
-    body: "대단한 대청소가 아니어도 좋아요. 세면대, 싱크대, 바닥처럼 눈에 들어온 한 곳만 남겨보세요.",
-    cta: "첫 청소 기록하기",
-    icon: "format_paint",
-  },
-  maintained: {
-    label: "관리 중인 집",
-    title: "슬슬 다시 볼 곳이 있어요",
-    body: "마지막 기록과 기본 권장 주기를 비교해 가볍게 다시 볼 곳만 골라봤어요.",
-    cta: "추천 항목 기록하기",
-    icon: "water_drop",
-  },
-  active: {
-    label: "방금 이어진 기록",
-    title: "오늘 벌써 3곳을 관리했어요",
-    body: "오늘 기록한 항목을 이어서 확인할 수 있어요.",
-    cta: "계속 기록하기",
-    icon: "auto_awesome",
-  },
-} as const;
+/**
+ * Figma state screens (`/home/:state`): 21 연결 확인 (error), 22 기록 불러오는 중 (loading),
+ * 23 아직 없는 기록 (empty), 44 상태 미리보기 (preview, default).
+ */
 
-const suggestions = [
-  ["shower", "욕실 배수구", "아직 기록이 없어요", "숨은 관리 추천"],
-  ["countertops", "주방 싱크대", "마지막 기록 5일 전", "한번 관리해볼까요?"],
-  ["air", "거실 환기", "오늘 아침 기록", "최근 관리했어요"],
-];
+const PREVIEW_ROWS = [
+  ["첫 기록 전 홈", "아직 기록이 없는 시작", "/home?state=empty"],
+  ["기록 없는 히스토리", "비어 있는 달력과 기록 안내", "/home/empty"],
+  ["연결 오류와 재시도", "다시 불러오기 → 로딩 → 기록", "/home/error"],
+  ["로그인 입력 오류", "잘못된 이메일 형식 안내", "/login"],
+  ["가벼운 추천 홈", "지나간 기록을 다시 살펴보기", "/home"],
+  ["터치와 유리광", "컴포넌트의 상태 전환 체험", "/quick-record"],
+] as const;
 
-const canvas = [
-  ["욕실", "bathtub", "세면대 맑음", "bg-secondary-fixed/60 text-secondary"],
-  ["주방", "restaurant", "싱크대 돌봄 전", "bg-primary-fixed/60 text-primary"],
-  ["거실", "chair", "환기 완료 전", "bg-surface-container-high text-on-surface-variant"],
-  ["방", "bed", "침구 정리 전", "bg-surface-container-high text-on-surface-variant"],
-];
+const PREVIEW_LINKS = [
+  ["로그인 · 가입 흐름", "/welcome"],
+  ["연결 없는 로그인", "/home/error"],
+  ["기록 저장 실패", "/home/error"],
+  ["포인트 부족", "/points"],
+  ["기록·공간 이용 정책", "/help"],
+] as const;
+
+const TITLES: Record<string, string> = { error: "연결 확인", loading: "기록 불러오는 중", empty: "아직 없는 기록", preview: "상태 미리보기" };
+
+function Intro({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <h1 className="text-bb-heading text-sky-ink">{title}</h1>
+      <p className="text-bb-body text-sky-muted">{body}</p>
+    </div>
+  );
+}
+
+function Feedback({ glyph, title, body }: { glyph: string; title: string; body: string }) {
+  return (
+    <div className="flex min-h-[140px] flex-col gap-2 rounded-2xl bg-sky-white pb-[18px] pl-5 pr-5 pt-[18px]">
+      <span aria-hidden="true" className="text-bb-title text-sky-deep">
+        {glyph}
+      </span>
+      <h2 className="text-bb-title text-sky-ink">{title}</h2>
+      <p className="text-bb-body text-sky-muted">{body}</p>
+    </div>
+  );
+}
+
+const textLink = "flex h-11 items-center justify-center text-bb-label text-sky-deep";
 
 export default function HomeStateDemo() {
-  const { state = "empty" } = useParams();
-  const copy = stateCopy[(state as keyof typeof stateCopy) in stateCopy ? (state as keyof typeof stateCopy) : "empty"];
+  const { state = "preview" } = useParams();
+  const navigate = useNavigate();
+  const view = state in TITLES ? state : "preview";
+
+  // 22 → 기록: the fake load finishes and lands on the history screen.
+  useEffect(() => {
+    if (view !== "loading") return;
+    const timer = window.setTimeout(() => navigate("/history", { replace: true }), 1500);
+    return () => window.clearTimeout(timer);
+  }, [view, navigate]);
 
   return (
     <PageShell>
-      <AppHeader title="뽀득뽀득" />
-      <main className="flex flex-col bg-surface pb-[88px] pt-header">
-        <div className="flex flex-col gap-space-lg px-margin-screen pb-space-2xl">
-          <section className="relative mt-space-sm overflow-hidden rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
-            <div className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-primary-fixed/40 blur-2xl" />
-            <span className="inline-flex items-center rounded-full px-2.5 py-1 text-caption font-semibold mb-space-sm bg-secondary-fixed text-secondary">{copy.label}</span>
-            <h1 className="max-w-[88%] text-headline-lg">{copy.title}</h1>
-            <p className="mt-space-xs text-body-md text-on-surface-variant">{copy.body}</p>
-            <Link className="mt-space-lg flex h-12 items-center justify-center gap-2 rounded-full bg-primary-container text-title-sm text-on-primary shadow-md" to="/quick-record">
-              <Icon name={copy.icon} className="text-[20px]" />
-              {copy.cta}
+      <AppHeader title={TITLES[view]} back />
+      <main className="flex flex-1 flex-col gap-3 px-margin-screen pb-nav pt-header">
+        {view === "error" ? (
+          <>
+            <div aria-hidden="true" className="h-[108px] shrink-0" />
+            <Feedback glyph="!" title="기록을 불러오지 못했어요" body="잠시 후 다시 시도해주세요." />
+            <GlassButton className="w-full" onClick={() => navigate("/home/loading")}>
+              다시 불러오기
+            </GlassButton>
+            <Link className={textLink} to="/home">
+              홈으로 돌아가기
             </Link>
-          </section>
+          </>
+        ) : null}
 
-          <section className="flex flex-col gap-space-sm">
-            <h2 className="text-title-sm">오늘 눈에 들어온 곳</h2>
-            {suggestions.map(([icon, title, meta, badge]) => (
-              <Link key={title} className="flex items-center justify-between rounded-xl bg-surface-container-lowest p-space-md shadow-sm" to="/care-action">
-                <div className="flex min-w-0 items-center gap-space-sm">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-fixed text-primary">
-                    <Icon name={icon} className="text-[20px]" />
+        {view === "loading" ? (
+          <>
+            <Intro title="기록을 가져오고 있어요" body="잠시만 기다려주세요." />
+            <div aria-busy="true" aria-label="기록 불러오는 중" className="flex flex-col gap-3">
+              {[0, 1, 2, 3].map((index) => (
+                <div key={index} className="flex h-[92px] animate-pulse items-center gap-[14px] rounded-2xl bg-sky-white pl-4">
+                  <span className="h-12 w-12 shrink-0 rounded-[16px] bg-sky-tint" />
+                  <span className="flex flex-col gap-[10px]">
+                    <span className="h-4 w-[174px] rounded-[8px] bg-sky-line" />
+                    <span className="h-3 w-[120px] rounded-[6px] bg-sky-tint" />
                   </span>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="truncate text-title-sm">{title}</span>
-                      <span className="inline-flex items-center rounded-full px-2.5 py-1 text-caption font-semibold bg-secondary-fixed text-on-secondary-fixed-variant">{badge}</span>
-                    </div>
-                    <span className="text-caption text-on-surface-variant">{meta}</span>
-                  </div>
-                </div>
-                <Icon name="chevron_right" className="text-[20px] text-outline-variant" />
-              </Link>
-            ))}
-          </section>
-
-          <section className="flex flex-col gap-space-sm">
-            <div className="flex items-center justify-between">
-              <h2 className="text-title-sm">우리 집 청소 캔버스</h2>
-              <span className="text-caption text-on-surface-variant">{state === "empty" ? "0 / 4 채색" : "3 / 4 채색"}</span>
-            </div>
-            <div className="grid grid-cols-2 gap-space-sm">
-              {canvas.map(([room, icon, text, tone]) => (
-                <div key={room} className="rounded-xl bg-surface-container-lowest p-space-md shadow-sm">
-                  <span className={`mb-space-sm flex h-9 w-9 items-center justify-center rounded-xl ${tone}`}>
-                    <Icon name={icon} className="text-[20px]" />
-                  </span>
-                  <h3 className="text-title-sm">{room}</h3>
-                  <p className="text-caption text-on-surface-variant">{text}</p>
                 </div>
               ))}
             </div>
-          </section>
+          </>
+        ) : null}
 
-          <Link className="flex items-center justify-between rounded-xl bg-surface-container-highest/60 p-space-md shadow-sm" to="/deep-clean">
-            <div className="flex items-center gap-space-sm">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-container text-on-primary">
-                <Icon name="brush" className="text-[20px]" />
-              </span>
-              <div>
-                <span className="block text-title-sm">집 전체를 한번에 훑기</span>
-                <span className="block text-caption text-on-surface-variant">대청소 모드로 여러 공간을 가볍게 기록</span>
-              </div>
+        {view === "empty" ? (
+          <>
+            <Intro title="기록이 쌓일 자리예요" body="빈 날도 괜찮아요. 내 속도로 시작해요." />
+            <Feedback glyph="○" title="첫 기록을 기다리고 있어요" body="작은 청소 하나부터 남겨보세요." />
+            <GlassButton className="w-full" to="/quick-record">
+              청소 기록하러 가기
+            </GlassButton>
+            <Link className={textLink} to="/history">
+              전체 기록 보기
+            </Link>
+          </>
+        ) : null}
+
+        {view === "preview" ? (
+          <>
+            <Intro title="예외 상황도 같은 톤으로" body="빈 화면·오류·로딩 상태를 확인해요." />
+            <div className="mt-6 flex flex-col gap-3">
+              {PREVIEW_ROWS.map(([title, sub, to]) => (
+                <Link key={title} className="press flex h-[72px] items-center gap-3 rounded-[18px] bg-sky-white px-3" to={to}>
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-sky-bath text-space-bath-icon">
+                    <Icon name="space-bath" className="text-[24px]" />
+                  </span>
+                  <span className="flex min-w-0 flex-col">
+                    <span className="truncate text-bb-label text-sky-ink">{title}</span>
+                    <span className="truncate text-bb-caption text-sky-muted">{sub}</span>
+                  </span>
+                  <span aria-hidden="true" className="ml-auto shrink-0 pl-2 pr-2 text-bb-title text-sky-deep">
+                    ›
+                  </span>
+                </Link>
+              ))}
             </div>
-            <Icon name="chevron_right" className="text-[20px] text-outline" />
-          </Link>
-        </div>
+            <div className="mt-3 flex flex-col">
+              {PREVIEW_LINKS.map(([label, to]) => (
+                <Link key={label} className={textLink} to={to}>
+                  {label}&nbsp;&nbsp;›
+                </Link>
+              ))}
+            </div>
+          </>
+        ) : null}
       </main>
     </PageShell>
   );

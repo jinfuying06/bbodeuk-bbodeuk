@@ -16,6 +16,7 @@ import Settings from "./pages/Settings";
 import Setup from "./pages/Setup";
 import SignUp from "./pages/SignUp";
 import SignUpDone from "./pages/SignUpDone";
+import SpaceAdded from "./pages/SpaceAdded";
 import SpaceInfo from "./pages/SpaceInfo";
 import SpaceManage from "./pages/SpaceManage";
 import Spaces from "./pages/Spaces";
@@ -45,6 +46,7 @@ export default function App() {
       <Route path="/item-info" element={<ItemInfo />} />
       <Route path="/space-info" element={<SpaceInfo />} />
       <Route path="/space-manage" element={<SpaceManage />} />
+      <Route path="/space-added" element={<SpaceAdded />} />
       <Route path="/spaces" element={<Spaces />} />
       <Route path="/quick-record" element={<QuickRecord />} />
       <Route path="/points" element={<Points />} />

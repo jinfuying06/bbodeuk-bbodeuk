@@ -1,302 +1,196 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-import { formatRecency, getActiveSpaces, getItem, isRecordedToday, spaceFade, todaysRecords, useRecords, type CleaningRecord } from "../data/cleaning";
-import { getSpaceTone } from "../data/spaceTones";
+import {
+  formatRecency,
+  getActiveSpaces,
+  getItem,
+  getItems,
+  getSpace,
+  isRecordedToday,
+  itemStaleness,
+  lastRecord,
+  spaceColor,
+  spaceFade,
+  todaysRecords,
+  useRecords,
+  type CleaningRecord,
+  type SpaceKey,
+} from "../data/cleaning";
 
-const recommendations = [
-  {
-    id: "basin",
-    spaceKey: "bathroom",
-    title: "세면대",
-    meta: "최근 관리 기록이 오래된 곳이에요.",
-    elapsedRatio: 0.86,
-    icon: "wash",
-  },
-  {
-    id: "sink",
-    spaceKey: "kitchen",
-    title: "싱크대",
-    meta: "슬슬 다시 확인해볼 때예요.",
-    elapsedRatio: 1.33,
-    icon: "faucet",
-  },
-  {
-    id: "drain",
-    spaceKey: "bathroom",
-    title: "배수구",
-    meta: "숨은 관리 · 거름망만 헹궈도 좋아요",
-    elapsedRatio: 0.95,
-    icon: "object-drain",
-  },
+/** "오늘 가볍게 돌볼 곳" candidates (Figma 77:2262) — the 2 stalest ones not recorded today are shown. */
+const LIGHT_CARE: Array<{ itemId: string; tip: string }> = [
+  { itemId: "sink", tip: "물기부터 가볍게" },
+  { itemId: "drain", tip: "거름망만 헹궈도 좋아요" },
+  { itemId: "basin", tip: "수전 물때만 닦아도 좋아요" },
+  { itemId: "living-floor", tip: "눈에 띄는 곳만 밀어도 좋아요" },
+  { itemId: "bedding", tip: "베개 커버만 바꿔도 좋아요" },
 ];
 
-const spaceIcons: Record<string, string> = {
-  bathroom: "space-bath",
-  kitchen: "space-kitchen",
-  living: "space-living",
-  bedroom: "space-bed",
-  entry: "door_front",
-  terrace: "space-terrace",
+/** Figma v2 card copy: "방금 돌봤어요" instead of the generic "방금 기록했어요". */
+const cardRecency = (key: SpaceKey, records: CleaningRecord[]) => {
+  const last = records.find((record) => getItem(record.itemId)?.space === key);
+  const text = formatRecency(last?.at);
+  return text === "방금 기록했어요" ? "방금 돌봤어요" : text;
 };
 
-type CanvasCard = {
-  spaceKey: string;
-  room: string;
-  /** Recency fade 0…1 from src/data/cleaning (avg of per-item policy fades). */
-  fade: number;
-  layout: string;
-};
-
-const canvasLayouts: Record<string, string> = {
-  bathroom: "h-[88px]",
-  kitchen: "h-[96px]",
-  bedroom: "h-[110px]",
-  living: "h-[120px] flex-1",
-  terrace: "h-[70px]",
-};
-
-/** The 5 most recently cared-for items (one row per item). */
-const getRecentRecords = (records: CleaningRecord[]) => {
-  const rows: Array<{ id: string; spaceKey: string; title: string; lastText: string }> = [];
+/** One row per item, newest first. */
+const recentRows = (records: CleaningRecord[], spaces: Set<string>) => {
+  const seen = new Set<string>();
+  const rows: Array<{ id: string; space: SpaceKey; name: string; at: string }> = [];
   for (const record of records) {
     const item = getItem(record.itemId);
-    if (!item || rows.some((row) => row.id === item.id)) continue;
-    rows.push({ id: item.id, spaceKey: item.space, title: item.name, lastText: formatRecency(record.at) });
-    if (rows.length === 5) break;
+    if (!item || seen.has(item.id) || !spaces.has(item.space)) continue;
+    seen.add(item.id);
+    rows.push({ id: item.id, space: item.space, name: item.name, at: record.at });
+    if (rows.length === 2) break;
   }
   return rows;
 };
 
-const getCanvasTone = (spaceKey: string, fade: number) => {
-  const [r, g, b] = getSpaceTone(spaceKey).rgb;
-  return {
-    backgroundColor: `rgba(${r}, ${g}, ${b}, ${fade})`,
-    borderColor: `rgba(${r}, ${g}, ${b}, ${Math.min(fade + 0.12, 0.95)})`,
-  };
-};
+const chevron = <span aria-hidden="true" className="ml-auto shrink-0 pl-2 text-bb-title text-sky-muted">›</span>;
 
-const getSpaceStatusLabel = (fade: number) => {
-  if (fade <= 0.28) return "확인 필요";
-  if (fade <= 0.48) return "슬슬 확인";
-  return "관리 중";
-};
-
-const getCanvasColumns = (cards: CanvasCard[]) => ({
-  left: cards.filter((card) => ["bathroom", "bedroom", "terrace"].includes(card.spaceKey)),
-  right: cards.filter((card) => ["kitchen", "living"].includes(card.spaceKey)),
-});
-
-const getHomeStatus = (cards: CanvasCard[], sessionRecordCount: number, target?: (typeof recommendations)[number]) => {
-  const hasManagedItems = cards.length > 0;
-  const mostStaleSpace = [...cards].sort((a, b) => a.fade - b.fade)[0];
-
-  if (!hasManagedItems) {
-    return {
-      icon: "info",
-      title: "최근 기록이 없는 곳이 있어요",
-      description: "청소를 기록하면 공간 상태가 조금씩 채워져요.",
-      tone: "bg-sky-line",
-    };
-  }
-
-  if (sessionRecordCount >= 2) {
-    return {
-      icon: "check_circle",
-      title: `오늘 ${sessionRecordCount}곳을 관리했어요`,
-      description: mostStaleSpace ? `${mostStaleSpace.room} 상태도 함께 확인해보세요.` : "방금 관리한 공간이 캔버스에 반영됐어요.",
-      tone: "bg-sky-tint",
-    };
-  }
-
-  if (target) {
-    return {
-      icon: "manage_search",
-      title: `${target.title} 청소는 어때요?`,
-      description: target.meta,
-      tone: "bg-sky-brand/25",
-    };
-  }
-
-  return {
-    icon: "check_circle",
-    title: "최근 자주 관리한 곳이에요",
-    description: "공간 상태가 전반적으로 안정적으로 유지되고 있어요.",
-    tone: "bg-sky-tint",
-  };
-};
+function SpaceTile({ space }: { space: SpaceKey }) {
+  const { icon, iconColor } = getSpace(space);
+  return (
+    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px]" style={{ backgroundColor: spaceColor(space), color: iconColor }}>
+      <Icon name={icon} className="text-[24px]" />
+    </span>
+  );
+}
 
 export default function Home() {
-  const records = useRecords();
-  const activeSpaces = getActiveSpaces();
-  const enabledSpaceKeys = new Set<string>(activeSpaces.map((space) => space.key));
-  const effectiveCanvasCards: CanvasCard[] = activeSpaces.map((space) => ({
-    spaceKey: space.key,
-    room: space.label,
-    fade: spaceFade(space.key, records),
-    layout: canvasLayouts[space.key] ?? "h-[70px]",
-  }));
-  const allRecentRecords = getRecentRecords(records).filter((record) => enabledSpaceKeys.has(record.spaceKey));
-  const maxRecentRecords = 4;
-  const visibleRecentRecords = allRecentRecords.slice(0, maxRecentRecords);
-  const visibleRecommendations = recommendations.filter((item) => enabledSpaceKeys.has(item.spaceKey));
-  const activeRecommendations = visibleRecommendations.filter((item) => !isRecordedToday(item.id, records));
-  const heroTarget = [...activeRecommendations].sort((a, b) => b.elapsedRatio - a.elapsedRatio)[0];
-  const homeStatus = getHomeStatus(effectiveCanvasCards, todaysRecords(records).length, heroTarget);
-  const canvasColumns = getCanvasColumns(effectiveCanvasCards);
+  const allRecords = useRecords();
+  // `?state=empty` previews Figma 31:791 (첫 기록 전 홈) from 44/상태 미리보기 without touching real records.
+  const [params] = useSearchParams();
+  const records = params.get("state") === "empty" ? [] : allRecords;
+  const spaces = getActiveSpaces();
+  const spaceKeys = new Set<string>(spaces.map((space) => space.key));
+  const hasRecords = records.some((record) => spaceKeys.has(getItem(record.itemId)?.space ?? ""));
+  const todayCount = new Set(todaysRecords(records).map((record) => record.itemId)).size;
+  const items = getItems().filter((item) => spaceKeys.has(item.space));
+  const anyOverdue = items.some((item) => itemStaleness(item, records) >= 1);
+
+  // Headline variants: 31:1630 기록 직후 · 31:1495 가벼운 추천 · 29:136 / 31:791 default.
+  const headline = todayCount > 0 ? ["오늘도,", "내 공간이 산뜻해요"] : hasRecords && anyOverdue ? ["오늘 눈에 들어온", "한 곳부터"] : ["오늘도,", "내 공간을 맑게."];
+  const message = !hasRecords
+    ? "아직 기록은 없지만, 내 공간은 여기에서 시작해요."
+    : todayCount > 0
+      ? `오늘 ${todayCount}곳을 돌봤어요`
+      : "오늘은 아직 돌본 곳이 없어요";
+
+  const recent = recentRows(records, spaceKeys);
+  const lightCare = LIGHT_CARE.flatMap(({ itemId, tip }) => {
+    const item = getItem(itemId);
+    return item && spaceKeys.has(item.space) && !isRecordedToday(item.id, records) ? [{ item, tip }] : [];
+  })
+    .sort((a, b) => itemStaleness(b.item, records) - itemStaleness(a.item, records))
+    .slice(0, 2);
 
   return (
     <PageShell>
       <AppHeader title="뽀득뽀득" />
-      <main className="flex flex-1 flex-col bg-sky-bg pb-[88px] pt-header">
-        <div className="flex w-full flex-col gap-space-xl px-margin-screen pb-space-2xl">
-          <Link className="relative block w-full overflow-hidden rounded-xl bg-sky-white p-space-lg shadow-sm transition-transform active:scale-[0.99]" to={`/quick-record?filter=space&space=${heroTarget?.spaceKey ?? effectiveCanvasCards[0]?.spaceKey ?? "bathroom"}`}>
-            <div className="flex items-start justify-between">
-              <div className="relative z-10 flex max-w-[78%] flex-col gap-space-xxs">
-                <h1 className="text-headline-lg text-sky-ink">{homeStatus.title}</h1>
-                <p className="text-body-md text-sky-muted">{homeStatus.description}</p>
-              </div>
-              <div className={`relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${homeStatus.tone} shadow-sm`} aria-hidden="true">
-                <Icon name={homeStatus.icon} className="text-[24px] text-sky-deep" />
-              </div>
-            </div>
-          </Link>
+      <main className="flex flex-1 flex-col px-margin-screen pb-nav pt-header">
+        <section className="flex flex-col gap-1 pt-1">
+          <h1 className="text-bb-heading text-sky-ink">
+            {headline[0]}
+            <br />
+            {headline[1]}
+          </h1>
+          <p className="text-bb-body text-sky-muted">{message}</p>
+        </section>
 
-          <section className="flex flex-col gap-space-sm">
-            <div className="flex items-center gap-1.5">
-              <Icon name="bubble_chart" className="text-[18px] text-sky-deep" />
-              <span className="text-title-sm text-sky-ink">청소 캔버스</span>
-            </div>
-            <div className="relative overflow-hidden rounded-xl bg-sky-white p-space-md shadow-sm">
-              <p className="mb-space-sm text-caption text-sky-muted">각 공간을 누르면 공간별 기록으로 이동해요.</p>
-              <div className="flex h-[304px] gap-1.5 rounded-lg bg-sky-bg p-1.5">
-                {[canvasColumns.left, canvasColumns.right].map((column, index) => (
-                  <div key={index === 0 ? "left" : "right"} className={`${index === 0 ? "w-[43%]" : "flex-1"} flex min-w-0 flex-col gap-1.5`}>
-                    {column.map((card) => {
-                      const tone = getSpaceTone(card.spaceKey);
-                      const style = getCanvasTone(card.spaceKey, card.fade);
-
-                      return (
-                        <Link
-                          key={card.room}
-                          aria-label={`${card.room} 관리 상태 ${getSpaceStatusLabel(card.fade)}`}
-                          className={`flex min-h-[52px] items-center justify-center gap-1.5 rounded-lg border px-2 py-space-xs text-center transition-transform active:scale-[0.98] ${card.layout}`}
-                          style={style}
-                          to={`/quick-record?filter=space&space=${card.spaceKey}`}
-                        >
-                          <Icon name={spaceIcons[card.spaceKey]} className={`shrink-0 text-[17px] ${tone.text}`} />
-                          <span className="block max-w-full truncate text-label-md font-bold text-sky-ink">{card.room}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <Link className="flex min-h-11 items-center justify-center gap-space-xs rounded-xl border border-dashed border-art-line bg-sky-white px-space-md text-label-md text-sky-deep" to="/space-manage">
-              <Icon name="add" className="text-[20px]" />
-              공간을 추가하고 싶나요?
+        <section className="flex flex-col gap-3 pb-3 pt-4">
+          <div className="flex h-7 items-center justify-between">
+            <h2 className="text-bb-title text-sky-ink">내 공간</h2>
+            <Link className="-mr-2 flex h-11 items-center px-2 text-bb-caption text-sky-muted" to="/space-manage">
+              공간 관리&nbsp;&nbsp;›
             </Link>
-          </section>
-
-          <section className="flex flex-col gap-space-sm">
-            <div className="flex items-center gap-1.5">
-              <Icon name="check_circle" className="text-[18px] text-sky-deep" />
-              <span className="text-title-sm text-sky-ink">최근 관리 흔적</span>
-            </div>
-            {visibleRecentRecords.length <= 1 ? (
-              <div className="rounded-xl bg-sky-white p-space-lg shadow-sm">
-                <p className="text-title-sm text-sky-ink">아직 최근 청소 기록이 많지 않아요.</p>
-                <p className="mt-1 text-body-md text-sky-muted">작은 청소부터 하나씩 기록해보세요.</p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {spaces.map((space, index) => {
+              const fill = spaceColor(space.key, spaceFade(space.key, records));
+              // Odd count (e.g. 테라스 added) → last card spans the row so no empty cell is left.
+              const wide = spaces.length % 2 === 1 && index === spaces.length - 1;
+              return (
                 <Link
-                  className="mt-space-md inline-flex min-h-11 items-center rounded-lg bg-sky-brand px-space-md text-label-md font-semibold text-onbrand transition-transform duration-[120ms] active:scale-[0.98]"
-                  to="/quick-record"
+                  key={space.key}
+                  className={`press relative flex h-[110px] flex-col justify-end gap-[3px] overflow-hidden rounded-2xl bg-sky-white px-4 py-[14px] ${wide ? "col-span-2" : ""}`}
+                  style={{ backgroundImage: `linear-gradient(${fill}, ${fill})` }}
+                  to={`/quick-record?filter=space&space=${space.key}`}
                 >
-                  청소 기록하기
+                  <span className="absolute right-4 top-[14px]" style={{ color: space.iconColor }}>
+                    <Icon name={space.icon} className="block text-[43.2px]" />
+                  </span>
+                  <span className="text-[14px] font-bold leading-[22px] text-sky-ink">{space.label}</span>
+                  <span className="text-[11px] leading-[18px] text-sky-muted">{cardRecency(space.key, records)}</span>
                 </Link>
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-2 gap-space-xs">
-                  {visibleRecentRecords.map((record) => (
-                    <Link key={`${record.spaceKey}-${record.title}-${record.lastText}`} className="block rounded-xl bg-sky-white p-space-sm shadow-sm transition-transform active:scale-[0.99]" to={`/item-history?item=${record.id}`}>
-                      <div className="mb-space-xs flex items-center gap-space-xs">
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${getSpaceTone(record.spaceKey).fill} ${getSpaceTone(record.spaceKey).text}`}>
-                          <Icon name={spaceIcons[record.spaceKey]} className="text-[18px]" />
-                        </span>
-                        <span className="min-w-0 truncate text-body-md font-semibold text-sky-ink">{record.title}</span>
-                      </div>
-                      <p className="text-caption text-sky-muted">최근 관리 {record.lastText}</p>
-                    </Link>
-                  ))}
-                  {visibleRecentRecords.length > 1 && visibleRecentRecords.length < maxRecentRecords ? (
-                    <Link className="flex min-h-[92px] flex-col justify-between rounded-xl bg-sky-white p-space-sm shadow-sm transition-transform active:scale-[0.99]" to="/care">
-                      <span className="text-body-md font-semibold text-sky-ink">다음에 관리할 곳을 찾아보세요</span>
-                      <span className="text-caption font-semibold text-sky-deep">청소가이드 보기</span>
-                    </Link>
-                  ) : null}
-                </div>
-                {allRecentRecords.length > maxRecentRecords ? (
-                  <Link className="self-center px-space-sm py-space-xs text-label-md text-sky-deep transition-opacity active:opacity-70" to="/history">
-                    청소 기록 더보기
-                  </Link>
-                ) : null}
-              </>
-            )}
-          </section>
+              );
+            })}
+          </div>
+        </section>
 
-          {activeRecommendations.length > 0 ? (
-            <section className="flex flex-col gap-space-sm">
-              <div className="flex items-center gap-1.5">
-                <Icon name="lightbulb" className="text-[18px] text-sky-deep" />
-                <span className="text-title-sm text-sky-ink">여기 청소는 어때요?</span>
-              </div>
-              <div className="flex flex-col gap-space-sm">
-                {activeRecommendations.map((item) => {
-                  const tone = getSpaceTone(item.spaceKey);
-
-                  return (
-                    <Link
-                      key={item.id}
-                      className="relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-sky-white p-space-md text-left shadow-sm transition-transform active:scale-[0.99]"
-                      to={`/quick-record?filter=space&space=${item.spaceKey}`}
-                    >
-                      <div className="flex items-center justify-between gap-space-sm">
-                        <div className="flex min-w-0 items-center gap-space-sm">
-                          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone.fill} ${tone.text}`}>
-                            <Icon name={spaceIcons[item.spaceKey]} className="text-[22px]" />
-                          </div>
-                          <div className="flex min-w-0 flex-col">
-                            <span className="truncate text-title-sm text-sky-ink">{item.title}</span>
-                            <span className="mt-0.5 text-caption text-sky-muted">{item.meta}</span>
-                          </div>
-                        </div>
-                        <Icon name="chevron_right" className="ml-space-sm shrink-0 text-[20px] text-sky-muted" />
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </section>
-          ) : null}
-
-          <Link
-            className="relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-sky-white p-space-md shadow-sm transition-transform active:scale-[0.99]"
-            to="/deep-clean"
-          >
-            <div className="flex min-w-0 items-center gap-space-sm">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-tint text-sky-deep">
-                <Icon name="cleaning_services" className="text-[20px]" />
-              </div>
-              <div className="flex min-w-0 flex-col">
-                <span className="truncate text-title-sm text-sky-ink">대청소 어떠세요?</span>
-                <span className="truncate text-caption text-sky-muted">오래 안 한 곳과 숨은 관리까지 훑어봐요.</span>
-              </div>
-            </div>
-            <Icon name="chevron_right" className="ml-2 shrink-0 text-[20px] text-sky-muted" />
-          </Link>
+        <div className="pt-2">
+          <GlassButton to="/quick-record">청소 기록하기&nbsp;&nbsp;&nbsp;+</GlassButton>
         </div>
+        {hasRecords ? (
+          <div className="pt-6">
+            <GlassButton variant="secondary" size={52} className="w-full" to="/history">
+              기록 모아보기
+            </GlassButton>
+          </div>
+        ) : null}
+
+        <section className={`flex flex-col pt-8 ${hasRecords ? "gap-1.5" : "gap-3"}`}>
+          <div className="flex h-7 items-center justify-between">
+            <h2 className="text-bb-title text-sky-ink">최근 돌본 흔적</h2>
+            <Link className="-mr-2 flex h-11 items-center px-2 text-bb-caption text-sky-muted" to="/history">
+              전체 보기&nbsp;&nbsp;›
+            </Link>
+          </div>
+          {recent.length === 0 ? (
+            <Link className="press flex flex-col gap-2 rounded-2xl bg-sky-white p-[18px]" to="/quick-record">
+              <span className="text-[16px] font-bold leading-[22px] text-sky-ink">아직 남긴 청소 기록이 없어요</span>
+              <span className="text-[13px] leading-[19px] text-sky-muted">공간 카드를 보며 첫 청소를 가볍게 시작해보세요.</span>
+              <span className="text-[13px] font-bold leading-[19px] text-sky-deep">첫 청소 기록하기&nbsp;&nbsp;→</span>
+            </Link>
+          ) : (
+            recent.map((row) => (
+              <Link key={row.id} className="press flex h-[62px] items-center gap-3 rounded-[16px] bg-sky-white pl-3 pr-4" to={`/item-history?item=${row.id}`}>
+                <SpaceTile space={row.space} />
+                <span className="flex min-w-0 flex-col">
+                  <span className="truncate text-bb-label text-sky-ink">{row.name}</span>
+                  <span className="truncate text-bb-caption text-sky-muted">{formatRecency(row.at)}</span>
+                </span>
+                {chevron}
+              </Link>
+            ))
+          )}
+        </section>
+
+        <section className="flex flex-col gap-3 pt-6">
+          <div>
+            <h2 className="text-bb-title text-sky-ink">오늘 가볍게 돌볼 곳</h2>
+            <p className="text-bb-caption text-sky-muted">눈에 들어오는 한 곳만 골라도 괜찮아요.</p>
+          </div>
+          {lightCare.map(({ item, tip }) => (
+            <Link key={item.id} className="press flex h-16 items-center gap-3 rounded-[18px] bg-sky-white px-3" to={`/quick-record?filter=space&space=${item.space}`}>
+              <SpaceTile space={item.space} />
+              <span className="flex min-w-0 flex-col">
+                <span className="truncate text-bb-label text-sky-ink">{item.name}</span>
+                <span className="truncate text-bb-caption text-sky-muted">
+                  {item.hiddenCare ? "숨은 관리" : formatRecency(lastRecord(item.id, records)?.at)} · {tip}
+                </span>
+              </span>
+              <span aria-hidden="true" className="ml-auto shrink-0 pl-2 text-bb-title text-sky-deep">›</span>
+            </Link>
+          ))}
+          <GlassButton size={52} className="w-full" to="/deep-clean">
+            여유 있는 날, 대청소 둘러보기
+          </GlassButton>
+        </section>
       </main>
     </PageShell>
   );
