@@ -10,6 +10,7 @@ import ItemHistory from "./pages/ItemHistory";
 import ItemInfo from "./pages/ItemInfo";
 import Login from "./pages/Login";
 import QuickRecord from "./pages/QuickRecord";
+import RecordDone from "./pages/RecordDone";
 import Points from "./pages/Points";
 import Settings from "./pages/Settings";
 import Setup from "./pages/Setup";
@@ -44,6 +45,7 @@ export default function App() {
       <Route path="/space-manage" element={<SpaceManage />} />
       <Route path="/spaces" element={<Spaces />} />
       <Route path="/quick-record" element={<QuickRecord />} />
+      <Route path="/record-done" element={<RecordDone />} />
       <Route path="/points" element={<Points />} />
       <Route path="/deep-clean" element={<WeekendBigClean />} />
       <Route path="/weekend-bigclean" element={<WeekendBigClean />} />
