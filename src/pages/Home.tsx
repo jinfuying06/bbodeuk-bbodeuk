@@ -112,7 +112,7 @@ export default function Home() {
           <div className="grid grid-cols-2 gap-3">
             {spaces.map((space, index) => {
               const fill = spaceColor(space.key, spaceFade(space.key, records));
-              // Odd count (e.g. 테라스 added) → last card spans the row so no empty cell is left.
+              // Odd count (e.g. 베란다 added) → last card spans the row so no empty cell is left.
               const wide = spaces.length % 2 === 1 && index === spaces.length - 1;
               return (
                 <Link

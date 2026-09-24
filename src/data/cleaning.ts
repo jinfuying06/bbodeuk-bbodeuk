@@ -31,7 +31,7 @@ export const SPACES: Space[] = [
   { key: "living", label: "거실", icon: "space-living", color: "#e9e1fa", iconColor: "#766095", setupKeys: ["거실"] },
   { key: "bedroom", label: "방", icon: "space-bed", color: "#e2efda", iconColor: "#5e7d4f", setupKeys: ["침실 / 방", "방"] },
   // Paid expansion space. Figma 43/공간 추가 완료 draws it with sky-bed + sky-deep icon.
-  { key: "terrace", label: "테라스", icon: "space-terrace", color: "#e2efda", iconColor: "#146b63", setupKeys: ["베란다 / 다용도실", "테라스"] },
+  { key: "terrace", label: "베란다", icon: "space-terrace", color: "#e2efda", iconColor: "#146b63", setupKeys: ["베란다 / 다용도실", "테라스"] },
 ];
 
 const FREE_SPACES: SpaceKey[] = ["bathroom", "kitchen", "living", "bedroom"];
@@ -94,7 +94,7 @@ const CATALOG: CatalogItem[] = [
   { id: "bedding", name: "침구", space: "bedroom", intervalDays: 7 },
   { id: "pillow", name: "베개 커버", space: "bedroom", intervalDays: 7 },
   { id: "bedroom-floor", name: "바닥", fullName: "방 바닥", space: "bedroom", intervalDays: 7 },
-  { id: "terrace-floor", name: "바닥", fullName: "테라스 바닥", space: "terrace", intervalDays: 14 },
+  { id: "terrace-floor", name: "바닥", fullName: "베란다 바닥", space: "terrace", intervalDays: 14 },
   { id: "rail", name: "난간", space: "terrace", intervalDays: 21 },
   { id: "laundry", name: "빨래 공간", space: "terrace", intervalDays: 14 },
 ];

@@ -42,9 +42,9 @@ export const DEFAULT_SPACES: Array<{ key: string; label: string; icon: string; r
 export const EXPANSION_CATALOG: Array<{ key: string; label: string; icon: string; price: number; previewItems: string[] }> = [
   {
     key: "베란다 / 다용도실",
-    label: "테라스",
+    label: "베란다",
     icon: "balcony",
     price: 300,
-    previewItems: ["테라스 바닥", "난간", "빨래 공간"],
+    previewItems: ["베란다 바닥", "난간", "빨래 공간"],
   },
 ];
