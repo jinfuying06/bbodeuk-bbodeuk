@@ -7,7 +7,7 @@ import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
 import ItemRow from "../components/ItemRow";
 import { getSpace } from "../data/cleaning";
-import { GUIDES, type Guide } from "./CareAction";
+import { GUIDES, type Guide } from "../data/guides";
 
 type Filter = "전체" | Guide["filter"];
 

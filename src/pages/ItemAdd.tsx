@@ -6,7 +6,6 @@ import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
 import { addItem, getActiveSpaces, getSpace, isSpaceKey, type SpaceKey } from "../data/cleaning";
-import { spaceIconClass } from "./QuickRecord";
 
 export default function ItemAdd() {
   const navigate = useNavigate();
@@ -83,7 +82,7 @@ export default function ItemAdd() {
               key={entry.key}
               className="min-w-0 flex-1 !px-[7px]"
               icon={entry.icon}
-              iconClassName={spaceIconClass[entry.key]}
+              iconColor={entry.iconColor}
               selected={space === entry.key}
               onClick={() => {
                 setSpace(entry.key);

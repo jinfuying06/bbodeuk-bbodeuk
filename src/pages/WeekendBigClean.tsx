@@ -47,7 +47,7 @@ export default function WeekendBigClean() {
   return (
     <PageShell>
       <AppHeader title="주말 대청소" back />
-      <main className="flex flex-col gap-3 px-margin-screen pb-[calc(76px+72px+24px+env(safe-area-inset-bottom,0px))] pt-header">
+      <main className="flex flex-col gap-3 px-margin-screen pb-nav-cta pt-header">
         <PageIntro title="여유 있는 날, 대청소" body="오래 안 본 곳과 숨은 관리를 가볍게 훑어요." />
         <p className="rounded-xl bg-sky-tint p-3 text-bb-label text-sky-deep">먼지 털기 → 표면 닦기 → 바닥 정리</p>
 
@@ -95,7 +95,7 @@ export default function WeekendBigClean() {
       </main>
 
       {/* Fixed 대청소 종료 bar, sitting right above the bottom nav (72px + safe area). */}
-      <div className="fixed bottom-[calc(60px+max(12px,env(safe-area-inset-bottom)))] left-1/2 z-40 w-full max-w-[430px] -translate-x-1/2 bg-sky-bg px-margin-screen py-3">
+      <div className="bottom-nav fixed left-1/2 z-40 w-full max-w-[430px] -translate-x-1/2 bg-sky-bg px-margin-screen py-3">
         <GlassButton size={52} onClick={finish}>
           오늘의 대청소 종료
         </GlassButton>

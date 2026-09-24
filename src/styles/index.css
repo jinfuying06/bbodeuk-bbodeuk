@@ -21,8 +21,8 @@
     overflow-x: hidden;
     overscroll-behavior-y: none;
     /* Outside the phone column on desktop; the column itself is sky-bg. */
-    background: #e3e6e8;
-    color: #23282b;
+    background: theme("colors.sky-line");
+    color: theme("colors.sky-ink");
     font-family:
       "Pretendard Variable",
       Pretendard,
@@ -96,6 +96,15 @@
     padding-bottom: calc(72px + 24px + env(safe-area-inset-bottom, 0px));
   }
 
+  /* Screens with a fixed CTA bar (76px) sitting on top of the nav (주말 대청소). */
+  .pb-nav-cta {
+    padding-bottom: calc(76px + 72px + 24px + env(safe-area-inset-bottom, 0px));
+  }
+  /* Bottom edge of the nav's tab row: 48 tabs + 12 top pad + max(12px, safe area). */
+  .bottom-nav {
+    bottom: calc(60px + max(12px, env(safe-area-inset-bottom, 0px)));
+  }
+
   /* Card press (Figma Motion / Press 124:2988): scale .97 for 120ms. */
   .press {
     transition: transform 120ms ease-out;
@@ -113,7 +122,7 @@
     justify-content: center;
     gap: 8px;
     overflow: hidden;
-    border: 1px solid #ffffff;
+    border: 1px solid theme("colors.sky-white");
     border-radius: 20px;
     font-size: 14px;
     line-height: 22px;
@@ -141,8 +150,8 @@
   }
   .glass-btn:disabled,
   .glass-btn[aria-disabled="true"] {
-    background: #e3e6e8;
-    color: #60676b;
+    background: theme("colors.sky-line");
+    color: theme("colors.sky-muted");
     cursor: default;
   }
 
@@ -208,8 +217,8 @@
   width: 100%;
   max-width: 430px;
   margin: 0 auto;
-  background: #f6f7f8;
-  color: #23282b;
+  background: theme("colors.sky-bg");
+  color: theme("colors.sky-ink");
   position: relative;
   overflow-x: hidden;
   box-shadow: 0 0 0 1px rgba(227, 230, 232, 0.6);

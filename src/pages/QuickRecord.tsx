@@ -24,15 +24,6 @@ const intro: Record<Filter, [string, string]> = {
   space: ["어디를 청소했나요?", "청소한 곳을 톡 눌러 기록해요."],
 };
 
-/** Static class names so Tailwind keeps them (space icon colors). */
-export const spaceIconClass: Record<SpaceKey, string> = {
-  bathroom: "text-space-bath-icon",
-  kitchen: "text-space-kitchen-icon",
-  living: "text-space-living-icon",
-  bedroom: "text-space-bed-icon",
-  terrace: "text-sky-deep",
-};
-
 const isFilter = (value: string | null): value is Filter => value === "recent" || value === "fav" || value === "space";
 
 const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -153,7 +144,7 @@ export default function QuickRecord() {
                   key={space.key}
                   className="min-w-0 flex-1 !px-[7px]"
                   icon={space.icon}
-                  iconClassName={spaceIconClass[space.key]}
+                  iconColor={space.iconColor}
                   selected={currentSpace === space.key}
                   size={38}
                   onClick={() => setView("space", space.key)}
@@ -174,8 +165,8 @@ export default function QuickRecord() {
                   <button
                     key={item.id}
                     aria-pressed={recorded}
-                    className="press relative flex h-[122px] flex-col items-start overflow-hidden rounded-2xl border pl-[14px] pt-2 text-left transition-colors duration-300"
-                    style={{ borderColor: space.iconColor, backgroundColor: recorded ? spaceColor(item.space) : "#ffffff" }}
+                    className="press relative flex h-[122px] flex-col items-start overflow-hidden rounded-2xl border bg-sky-white pl-[14px] pt-2 text-left transition-colors duration-300"
+                    style={{ borderColor: space.iconColor, backgroundColor: recorded ? spaceColor(item.space) : undefined }}
                     type="button"
                     onClick={() => record(item)}
                   >
@@ -183,7 +174,9 @@ export default function QuickRecord() {
                       {objectArt ? (
                         <Icon name={item.icon} className="ml-3 mt-1 text-[46px]" />
                       ) : (
-                        <Icon name={item.icon} className={`mt-1 text-[24px] ${spaceIconClass[item.space]}`} />
+                        <span className="mt-1 flex" style={{ color: space.iconColor }}>
+                          <Icon name={item.icon} className="text-[24px]" />
+                        </span>
                       )}
                     </span>
                     <span className="text-bb-label text-sky-ink">{item.name}</span>
@@ -204,8 +197,8 @@ export default function QuickRecord() {
                   <button
                     key={item.id}
                     aria-pressed={recorded}
-                    className="press relative flex h-20 items-center gap-3 overflow-hidden rounded-2xl px-[14px] text-left transition-colors duration-300"
-                    style={{ backgroundColor: recorded ? spaceColor(item.space) : "#ffffff" }}
+                    className="press relative flex h-20 items-center gap-3 overflow-hidden rounded-2xl bg-sky-white px-[14px] text-left transition-colors duration-300"
+                    style={{ backgroundColor: recorded ? spaceColor(item.space) : undefined }}
                     type="button"
                     onClick={() => record(item)}
                   >

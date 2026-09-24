@@ -9,9 +9,9 @@ import { getItem, getSpace, isRecordedToday, todaysRecords, toggleTodayRecord, u
 function CleanSink() {
   return (
     <svg aria-hidden="true" className="absolute left-[45px] top-[18.5px] h-[104px] w-[97px]" fill="none" viewBox="0 0 99.5 106.532">
-      <g stroke="#64807A" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.3">
-        <path d="M1.15 49.4305H98.35V65.6744C98.35 92.7476 1.15 92.7476 1.15 65.6744V49.4305Z" fill="white" />
-        <path d="M49.75 67.4793C76.591 67.4793 98.35 59.3986 98.35 49.4305C98.35 39.4624 76.591 31.3817 49.75 31.3817C22.909 31.3817 1.15 39.4624 1.15 49.4305C1.15 59.3986 22.909 67.4793 49.75 67.4793Z" fill="#E5F8F5" />
+      <g className="stroke-art-line" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.3">
+        <path d="M1.15 49.4305H98.35V65.6744C98.35 92.7476 1.15 92.7476 1.15 65.6744V49.4305Z" className="fill-sky-white" />
+        <path d="M49.75 67.4793C76.591 67.4793 98.35 59.3986 98.35 49.4305C98.35 39.4624 76.591 31.3817 49.75 31.3817C22.909 31.3817 1.15 39.4624 1.15 49.4305C1.15 59.3986 22.909 67.4793 49.75 67.4793Z" className="fill-sky-tint" />
         <path d="M49.75 34.9915V13.3329C49.75 -2.91098 80.35 -2.91098 80.35 13.3329V22.3573M44.35 78.3085V105.382H67.75" />
       </g>
     </svg>
@@ -22,9 +22,9 @@ function CleanSink() {
 function WaterSparkle() {
   return (
     <svg aria-hidden="true" className="absolute left-[236px] top-[33px] h-[66px] w-[52px]" fill="none" viewBox="0 0 52 66">
-      <path d="M27 4L31 16L43 20L31 24L27 36L23 24L11 20L23 16L27 4Z" fill="white" stroke="#64807A" strokeWidth="1.8" />
-      <circle cx="9" cy="48" fill="white" r="6" stroke="#64807A" strokeWidth="1.5" />
-      <circle cx="43" cy="50" fill="#8DE3DB" r="3" />
+      <path d="M27 4L31 16L43 20L31 24L27 36L23 24L11 20L23 16L27 4Z" className="fill-sky-white stroke-art-line" strokeWidth="1.8" />
+      <circle cx="9" cy="48" className="fill-sky-white stroke-art-line" r="6" strokeWidth="1.5" />
+      <circle className="fill-sky-sky" cx="43" cy="50" r="3" />
     </svg>
   );
 }

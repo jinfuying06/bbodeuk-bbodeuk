@@ -44,8 +44,8 @@ function DemoCard() {
   return (
     <button
       aria-pressed={recorded}
-      className="press relative flex h-[210px] w-[250px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-sky-line pl-[14px] pt-2 transition-[background-color,transform] duration-300"
-      style={{ backgroundColor: recorded ? BATH.color : "#ffffff" }}
+      className="press relative flex h-[210px] w-[250px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-sky-line bg-sky-white pl-[14px] pt-2 transition-[background-color,transform] duration-300"
+      style={{ backgroundColor: recorded ? BATH.color : undefined }}
       type="button"
       onClick={tap}
     >

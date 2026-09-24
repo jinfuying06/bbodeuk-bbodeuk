@@ -5,16 +5,16 @@ type PillProps = {
   children: ReactNode;
   selected?: boolean;
   onClick?: () => void;
-  /** Optional 16px space icon (e.g. "space-bath"); keeps its own space color via `iconClassName`. */
+  /** Optional 16px space icon (e.g. "space-bath") in its own space color (`iconColor`). */
   icon?: string;
-  iconClassName?: string;
+  iconColor?: string;
   /** 44 = Sky / Chip (segmented, default), 38 = space/filter pill (radius 19), 72 = 포인트 package. */
   size?: 44 | 38 | 72;
   className?: string;
 };
 
 /** Sky / Chip (Figma 25:146) and space pill: white/muted ↔ sky-brand/onbrand. */
-export default function Pill({ children, selected = false, onClick, icon, iconClassName = "", size = 44, className = "" }: PillProps) {
+export default function Pill({ children, selected = false, onClick, icon, iconColor, size = 44, className = "" }: PillProps) {
   return (
     <button
       aria-pressed={selected}
@@ -24,7 +24,11 @@ export default function Pill({ children, selected = false, onClick, icon, iconCl
       type="button"
       onClick={onClick}
     >
-      {icon ? <Icon name={icon} className={`text-[16px] ${iconClassName}`} /> : null}
+      {icon ? (
+        <span className="flex" style={{ color: iconColor }}>
+          <Icon name={icon} className="text-[16px]" />
+        </span>
+      ) : null}
       {children}
     </button>
   );
