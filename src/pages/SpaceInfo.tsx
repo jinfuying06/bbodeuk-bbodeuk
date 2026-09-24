@@ -44,7 +44,7 @@ export default function SpaceInfo() {
         </section>
 
         <section className="flex h-[72px] items-center justify-between gap-3 rounded-row bg-sky-white px-4" style={{ backgroundImage: `linear-gradient(${spaceColor(key, fade)}, ${spaceColor(key, fade)})` }}>
-          <span className="flex flex-col">
+          <span className="flex min-w-0 flex-col">
             <span className="text-bb-label text-sky-ink">내 관리 상태</span>
             <span className="text-bb-caption text-sky-muted">주기 기준으로 공간의 관리 흐름을 보여줘요.</span>
           </span>

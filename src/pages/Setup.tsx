@@ -15,7 +15,7 @@ import { DEFAULT_SPACES, writeSetup } from "../data/setup";
 const BASIC_SPACES = ["욕실", "주방", "거실", "침실 / 방"].map((key) => DEFAULT_SPACES.find((space) => space.key === key)!);
 
 const aiCardClass =
-  "press flex h-16 w-full items-center justify-between rounded-row-sm border border-sky-brand bg-sky-white px-[14px] text-left shadow-[0_3px_5px_rgba(0,0,0,0.08)]";
+  "press flex h-16 w-full items-center justify-between rounded-row-sm border border-sky-brand bg-sky-white px-[14px] text-left";
 
 function AiCardBody() {
   return (

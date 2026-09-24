@@ -2,7 +2,7 @@ type SwitchRowProps = {
   label: string;
   on: boolean;
   onToggle: () => void;
-  /** Locked on (tint track, "–" thumb) — e.g. required spaces. */
+  /** Locked on (tint track, dash-marked thumb) — e.g. required spaces. */
   locked?: boolean;
 };
 
@@ -21,9 +21,9 @@ export default function SwitchRow({ label, on, onToggle, locked = false }: Switc
       <span className="truncate text-bb-label text-sky-ink">{label}</span>
       <span className={`flex h-8 w-[52px] shrink-0 items-center rounded-full px-1 transition-colors duration-200 ${locked ? "bg-sky-tint" : on ? "bg-sky-brand" : "bg-sky-line"}`}>
         <span
-          className={`flex h-6 w-6 items-center justify-center rounded-full bg-sky-white text-bb-label text-sky-muted transition-transform duration-200 ease-out ${on ? "translate-x-5" : ""}`}
+          className={`flex h-6 w-6 items-center justify-center rounded-full bg-sky-white transition-transform duration-200 ease-out ${on ? "translate-x-5" : ""}`}
         >
-          {locked ? "–" : null}
+          {locked ? <span className="h-0.5 w-2.5 rounded-full bg-sky-muted" /> : null}
         </span>
       </span>
     </button>

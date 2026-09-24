@@ -154,7 +154,7 @@ export default function QuickRecord() {
               ))}
             </div>
 
-            <p className="h-[62px] rounded-row-sm bg-sky-tint pl-4 pr-4 pt-[11px] text-[12px] font-medium leading-[22px] text-sky-deep">색이 채워진 항목을 한 번 더 누르면 기록을 취소해요.</p>
+            <p className="flex h-[62px] items-center rounded-row-sm bg-sky-tint px-4 text-bb-caption text-sky-deep">색이 채워진 항목을 한 번 더 누르면 기록을 취소해요.</p>
 
             <div aria-label="청소 항목" className="grid grid-cols-2 gap-[10px]">
               {items.map((item) => {

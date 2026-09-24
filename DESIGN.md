@@ -1,237 +1,353 @@
-# Ohouse (오늘의집) Reference Design System
-
-<!-- design-md:section experience -->
-## 1. Experience
-
-### Visual Theme & Atmosphere
-
-Ohouse is Bucketplace’s lifestyle service for taking an envisioned life into a real space. Its official account joins user-made home content, a community, commerce, and home-related O2O services; the consumer site snapshot shows the corresponding product expression: image-led commerce and a relatively quiet text-and-control layer. The captured desktop home uses a white canvas, dark neutral copy, a bright blue action color, and compact controls rather than a published visual system. The current corporate story also extends the service beyond online discovery to purchase, installation, offline showrooms, and renovation consultation. This reference therefore records a live product snapshot rather than treating the corporate site or a historic app icon as a token export. ([Bucketplace About](https://www.bucketplace.com/en/))
-
-**Evidence boundary.** Three consumer URLs were captured, but only the home yielded a populated UI tree; `/experts` and `/customer_center` are recorded as product-surface attempts, not a basis for generalising their chrome. No official public design-system or brand-token export was found in this run.
-
-**Observed characteristics:**
-
-- White `#ffffff` control surfaces and dark `#424242` / `#2f3438` body text dominate the populated home capture.
-- `#00a1ff` appears as a compact filled action and as a text-action color; it is an observed action role, not an asserted immutable brand color.
-- The loaded UI face is `Pretendard Variable`; the home’s computed stack includes declared fallbacks but only the first family is loaded and visibly used.
-- The representative product-list articles are visually unframed at their outer element: transparent background, zero radius, and zero padding. Their child composition was not separately measured.
-- Captured radii are mostly `0px`, with observed `4px` utility/action corners and a `24px` circular control.
-
-### Do's and Don'ts
-
-### Do
-
-- Keep the observed action blue (`#00a1ff`) scoped to action treatments unless new product evidence establishes broader use.
-- Use `Pretendard Variable` only when its supplied Ohouse-hosted product source can be loaded; do not silently substitute it.
-- Preserve the measured outer-card boundary when adapting the home product-list article: transparent, square, and padding-free.
-
-### Don't
-
-- Don't resurrect `#35c5f0` as a current Ohouse token from historic or secondary descriptions.
-- Don't convert declared-only font faces into visible UI-family claims.
-- Don't invent state variants, badge treatments, price styles, or mobile chrome from the static home capture.
-
-### Brand Narrative
-
-Bucketplace was incorporated in 2014 and launched Ohouse Store in 2016. Its current first-party account frames Ohouse as an integrated lifestyle service: people encounter real-user content, connect through a community, discover products, and can continue into home-remodeling, moving, cleaning, installation, and consultation services. The company’s own timeline records expansion from the store to O2O remodeling, its original brand Ohouse layer, the Ohouse Bukchon showroom, Ohouse Kitchen, and the Ohouse Interior Pangyo Lounge. ([Bucketplace About](https://www.bucketplace.com/en/))
-
-The visual reference should therefore keep its claims at two distinct levels: the product snapshot above is live consumer-web evidence, while the service arc and mission are corporate context. The corporate presentation does not publish a corresponding public component library, token set, or interaction specification.
-
-### Principles
-
-1. **Connect inspiration to action.** Ohouse says it connects inspiring user content and community to commerce so people can bring ideas to life. *UI implication:* Preserve the relationship between discovered content and the next practical action; do not claim a particular card or interaction pattern unless observed. ([About](https://www.bucketplace.com/en/))
-2. **Serve the whole space journey.** The official service description includes purchase, installation, renovation, moving, cleaning, and consultation. *UI implication:* Treat these as distinct service contexts rather than collapsing them into an unsupported marketplace-only UI. ([About](https://www.bucketplace.com/en/))
-3. **Aim for a meaningful customer change.** The team-culture page defines the “O! Moment” as a positive, meaningful change in a customer’s life. *UI implication:* This is a product principle, not evidence for a specific color, animation, or copy treatment. ([Team culture](https://www.bucketplace.com/en/team-culture/))
-
-### Personas
-
-The first-party material identifies stakeholder groups rather than individual user personas:
-
-- **People sharing a home or everyday-life story:** official user content is described as a source of inspiration for others.
-- **People discovering and purchasing products for a space:** commerce is described as connecting product discovery, shopping, and delivery.
-- **People undertaking a space-related service:** official scope includes remodeling, moving, cleaning, installation, and consultation.
-
-No age, location, frequency, preference, or conversion behavior is assigned to these groups without product research.
-
-<!-- design-md:section foundations -->
-## 2. Foundations
-
-<!-- design-md:claim foundations kind=rules-or-constraints lang=en -->
-### Color Palette & Roles
-
-The values below are representative computed values from the populated consumer-home capture. They are not a public Ohouse palette and should not be expanded into semantic states without new evidence.
-
-### Observed action and surfaces
-
-- **Action blue** (`#00a1ff`): Filled compact action background; text-action and border color on separate home controls.
-- **Canvas white** (`#ffffff`): Filled compact action text and circular control background.
-- **Foreground** (`#2f3438`): Outlined utility-control text.
-- **Body neutral** (`#424242`): Repeated list, card, badge, and text color.
-- **Muted neutral** (`#828c94`): Repeated text color in the home capture.
-- **Hairline** (`#e0e0e0`): Observed 1px outline on a utility control.
-
-### Unresolved roles
-
-- No published sale, error, success, hover, pressed, focus, disabled, overlay, or selected-state color was collected.
-- `#35c5f0` is not retained as a current token: it was not present in the supplied computed-style evidence, and no first-party token source was found.
-<!-- design-md:claim-end -->
-
-### Depth & Elevation
-
-One repeated floating-control shadow was observed: `0px 2px 5px rgba(63, 71, 77, 0.15)`. The outer product-list article has no shadow. No elevation scale, modal shadow, or hover-lift rule was captured.
-
-### Motion & Easing
-
-No timing, easing, reduced-motion behavior, or animated-state evidence was collected. Motion guidance is unresolved.
-
-The earlier `#35c5f0` and inferred semantic, state, layout, and motion claims were resolved by removing them because the supplied evidence did not corroborate them.
-
-<!-- design-md:section typography-assets -->
-## 3. Typography & Assets
-
-### Typography Rules
-
-### Font evidence classes
-
-- **Live computed and loaded product UI:** `Pretendard Variable`. It is the first computed family on 286 captured home elements across headings, body text, cards, buttons, badges, and input; the collector also matched it in `document.fonts` and recorded 92 Ohouse-hosted dynamic-subset sources under `assets.ohou.se`.
-- **Official font distribution and license:** Pretendard’s maintainer documents `Pretendard Variable` dynamic subsets and its SIL Open Font License 1.1 terms. This is font-project evidence, not an assertion that Ohouse commissioned or owns the face. ([Pretendard documentation](https://github.com/orioncactus/pretendard/blob/main/packages/pretendard/docs/en/README.md), [license](https://github.com/orioncactus/pretendard/blob/main/LICENSE))
-- **Declared-only fallbacks/assets:** `Noto Sans KR`, `Open Sans`, `FontAwesome`, and `OhouseIcon` have `@font-face` declarations but no visible matched usage in the capture. They are not UI-family tokens.
-- **Not established:** `Times` appeared on two text elements without a matching loaded FontFace or system mapping; it is not a UI-family token.
-
-### Observed hierarchy
-
-| Role | Family | Size | Weight | Line height | Tracking | Capture scope |
-|------|--------|------|--------|-------------|----------|---------------|
-| Home h1 | Pretendard Variable | 30px | 400 | 30px | -0.3px | 10 elements, home |
-| Body/list/card | Pretendard Variable | 15px | 400 | 15px | -0.3px | 113 combined elements, home |
-| Body large | Pretendard Variable | 16px | 400 | 24px | -0.3px | 7 elements, home |
-| Body large emphasis | Pretendard Variable | 16px | 700 | 24px | -0.3px | 7 elements, home |
-| Text action | Pretendard Variable | 16px | 700 | 20px | -0.3px | 6 elements, home |
-| Compact action | Pretendard Variable | 14px | 400 | 18px | -0.3px | 1 element, home |
-
-<!-- design-md:section components-states -->
-## 4. Components & States
-
-### Component Stylings
-
-These are only the representative controls directly preserved by the collector. Each use line carries its product-surface selector and no interaction-state variants are claimed because `interactionCount` is `0`.
-
-### Buttons
-
-**Compact blue action**
-- Background: `#00a1ff`
-- Text: `#ffffff`
-- Border: `0px`
-- Radius: `4px`
-- Padding: `0px 16px`
-- Font: `14px / 400 / Pretendard Variable`
-- Use: Home `home::[captured element]`, `button[role="button"]`, 91×40px; one captured occurrence.
-
-**Circular floating control**
-- Background: `#ffffff`
-- Text: `#ffffff`
-- Border: `0px`
-- Radius: `24px`
-- Padding: `0px`
-- Shadow: `0px 2px 5px rgba(63, 71, 77, 0.15)`
-- Font: `16px / 700 / Pretendard Variable`
-- Use: Home `home::[captured element]`, `button`, 48×48px; seven captured occurrences. The captured control has no text content.
-
-**Outlined utility control**
-- Background: `transparent`
-- Text: `#2f3438`
-- Border: `1px solid #e0e0e0`
-- Radius: `4px`
-- Padding: `0px 8px`
-- Font: `14px / 400 / Pretendard Variable`
-- Use: Home `home::[captured element]`, `button`, 182×32px; one captured occurrence.
-
-**Text action**
-- Background: `transparent`
-- Text: `#00a1ff`
-- Border: `0px`
-- Radius: `0px`
-- Font: `16px / 700 / Pretendard Variable`
-- Use: Home `home::[captured element]`, `button`, 41×20px; six captured occurrences.
-
-### Inputs
-
-**Top-navigation text input**
-- Background: `transparent`
-- Text: `#141414`
-- Border: `0px`
-- Radius: `0px`
-- Font: `14px / 400 / Pretendard Variable`
-- Use: Home `home::[captured element]`, `input[type="text"]`, 255×20px; one captured occurrence.
-
-### Content shells
-
-**Product-list article shell**
-- Background: `transparent`
-- Text: `#424242`
-- Border: `0px`
-- Radius: `0px`
-- Padding: `0px`
-- Font: `15px / 400 / Pretendard Variable`
-- Use: Home `home::article.today-deal-item`, representative 269px-wide articles; 4+ captured occurrences. This describes the outer article only, not unmeasured child image, price, badge, or metadata styles.
-
-### Not observed
-
-- No hover, pressed, focus, disabled, validation, dialog, menu, tab, toast, or responsive component state was captured.
-- Badge class names were present, but a standalone badge fill/text treatment was not measured with sufficient provenance; no badge variant is specified.
-
-### States
-
-The collector recorded no interaction expansions or state transitions (`interactionKinds: 0`, `interactionCount: 0`). Empty, loading, error, success, disabled, and validation treatments are unresolved and intentionally omitted rather than reconstructed from generic commerce patterns.
-
-<!-- design-md:section layout-platforms -->
-## 5. Layout & Platforms
-
-### Layout Principles
-
-The populated home capture provides spacing clusters rather than a documented layout scale: 6px (39 occurrences), 12px (27), 20px (24), 5px (13), and 9px (11). The representative content articles are 269px wide in this 1440×900 desktop capture. No mobile, breakpoint, container, grid, or global-gutter rule is asserted from these data.
-
-### Responsive Behavior
-
-No responsive sweep was included in the supplied collector evidence. The only measured viewport is 1440×900; responsive behavior is unresolved.
-
-<!-- design-md:section content-locales -->
-## 6. Content & Locales
-
-### Voice & Tone
-
-Bucketplace describes Ohouse in practical, aspirational language: it helps people make the everyday life they envision real within a space, through content, community, commerce, and related services. The official team-culture page pairs that customer outcome with “Customer’s O! Moment,” growth, excellence, and long-term ownership. These are company statements; they do not establish UI microcopy samples or a formal content-style guide. ([About](https://www.bucketplace.com/en/), [Team culture](https://www.bucketplace.com/en/team-culture/))
-
-<!-- design-md:section governance -->
-## 7. Governance
-
-### Agent Prompt Guide
-
-Use a prompt bounded to the evidence, for example: “Create a desktop Ohouse-inspired home-section control using `Pretendard Variable`, white canvas, `#424242` body text, and one 91×40px `#00a1ff` action with 4px radius. Do not infer hover or mobile behavior.” Do not request a complete Ohouse design system from this snapshot.
-
-<!-- design-md:claim authority kind=evidence-backed-reconstruction lang=en -->
-### Authority
-
-This document is an evidence-backed reconstruction, not authority for an unrelated target project.
-<!-- design-md:claim-end -->
-
-<!-- design-md:claim application-priority order=prompt-fact,repository-fact,system-contract,reference-inspiration lang=en -->
-### Application priority
-
-1. Direct user instructions for the requested scope.
-2. Repository facts.
-3. This system contract.
-4. Reference inspiration.
-<!-- design-md:claim-end -->
-
-<!-- design-md:claim unknowns policy=absent-at-smallest-unresolved-boundary lang=en -->
-### Unknowns
-
-Omit only the smallest unresolved value or group. Do not replace it with a plausible default.
-<!-- design-md:claim-end -->
-
-<!-- design-md:claim changes policy=review-record-validate-before-adoption lang=en -->
-### Changes
-
-Record, review, and validate changes before adoption.
-<!-- design-md:claim-end -->
+---
+name: 뽀득뽀득
+description: A mobile cleaning record where tapping an item paints its space in pastel, and the color fades gently instead of scoring you.
+colors:
+  sky-brand: "#56d9d2"
+  sky-deep: "#146b63"
+  sky-tint: "#e5f8f5"
+  sky-sky: "#8de3db"
+  onbrand: "#123c36"
+  sky-ink: "#23282b"
+  sky-muted: "#60676b"
+  sky-line: "#e3e6e8"
+  sky-bg: "#f6f7f8"
+  sky-white: "#ffffff"
+  art-line: "#64807a"
+  scrim: "rgba(20, 26, 24, 0.7)"
+  sky-bath: "#dceefe"
+  space-bath-icon: "#41758e"
+  sky-kitchen: "#fbe8d4"
+  space-kitchen-icon: "#95613c"
+  sky-living: "#e9e1fa"
+  space-living-icon: "#766095"
+  sky-bed: "#e2efda"
+  space-bed-icon: "#5e7d4f"
+typography:
+  bb-display:
+    fontFamily: "Pretendard Variable, Pretendard, -apple-system, BlinkMacSystemFont, Malgun Gothic, Apple SD Gothic Neo, system-ui, sans-serif"
+    fontSize: "32px"
+    fontWeight: 700
+    lineHeight: "42px"
+    letterSpacing: "0"
+  bb-heading:
+    fontFamily: "Pretendard Variable, Pretendard, system-ui, sans-serif"
+    fontSize: "26px"
+    fontWeight: 700
+    lineHeight: "36px"
+    letterSpacing: "0"
+  bb-title:
+    fontFamily: "Pretendard Variable, Pretendard, system-ui, sans-serif"
+    fontSize: "18px"
+    fontWeight: 700
+    lineHeight: "28px"
+    letterSpacing: "0"
+  bb-label:
+    fontFamily: "Pretendard Variable, Pretendard, system-ui, sans-serif"
+    fontSize: "14px"
+    fontWeight: 500
+    lineHeight: "22px"
+    letterSpacing: "0"
+  bb-body:
+    fontFamily: "Pretendard Variable, Pretendard, system-ui, sans-serif"
+    fontSize: "14px"
+    fontWeight: 400
+    lineHeight: "22px"
+    letterSpacing: "0"
+  bb-label-sm:
+    fontFamily: "Pretendard Variable, Pretendard, system-ui, sans-serif"
+    fontSize: "13px"
+    fontWeight: 500
+    lineHeight: "19px"
+    letterSpacing: "0"
+  bb-caption:
+    fontFamily: "Pretendard Variable, Pretendard, system-ui, sans-serif"
+    fontSize: "12px"
+    fontWeight: 400
+    lineHeight: "18px"
+    letterSpacing: "0"
+  bb-small:
+    fontFamily: "Pretendard Variable, Pretendard, system-ui, sans-serif"
+    fontSize: "10px"
+    fontWeight: 500
+    lineHeight: "16px"
+    letterSpacing: "0"
+rounded:
+  DEFAULT: "4px"
+  lg: "8px"
+  xl: "12px"
+  tile: "14px"
+  row-sm: "16px"
+  row: "18px"
+  2xl: "20px"
+  3xl: "24px"
+  full: "9999px"
+spacing:
+  space-xxs: "4px"
+  space-xs: "8px"
+  space-sm: "12px"
+  space-md: "16px"
+  space-lg: "20px"
+  space-xl: "24px"
+  space-2xl: "32px"
+  margin-screen: "24px"
+  header: "54px"
+components:
+  button-primary:
+    backgroundColor: "{colors.sky-brand}"
+    textColor: "{colors.onbrand}"
+    typography: "{typography.bb-label}"
+    rounded: "{rounded.2xl}"
+    height: "56px"
+  button-secondary:
+    backgroundColor: "{colors.sky-tint}"
+    textColor: "{colors.sky-deep}"
+    typography: "{typography.bb-label}"
+    rounded: "{rounded.2xl}"
+    height: "52px"
+  button-disabled:
+    backgroundColor: "{colors.sky-line}"
+    textColor: "{colors.sky-muted}"
+  text-link:
+    textColor: "{colors.sky-deep}"
+    typography: "{typography.bb-label}"
+    height: "44px"
+  chip:
+    backgroundColor: "{colors.sky-white}"
+    textColor: "{colors.sky-muted}"
+    typography: "{typography.bb-label}"
+    rounded: "{rounded.full}"
+    height: "44px"
+    padding: "0 16px"
+  chip-selected:
+    backgroundColor: "{colors.sky-brand}"
+    textColor: "{colors.onbrand}"
+  item-row:
+    backgroundColor: "{colors.sky-white}"
+    rounded: "{rounded.row}"
+    height: "64px"
+    padding: "0 0 0 12px"
+  switch-row:
+    backgroundColor: "{colors.sky-white}"
+    rounded: "{rounded.row-sm}"
+    height: "62px"
+    padding: "0 16px"
+  check-row:
+    backgroundColor: "{colors.sky-white}"
+    rounded: "{rounded.2xl}"
+    height: "48px"
+    padding: "0 16px 0 12px"
+  space-tile:
+    rounded: "{rounded.tile}"
+    size: "40px"
+  info-card:
+    backgroundColor: "{colors.sky-tint}"
+    rounded: "{rounded.3xl}"
+    padding: "16px 20px"
+  dialog:
+    backgroundColor: "{colors.sky-white}"
+    rounded: "{rounded.2xl}"
+    width: "342px"
+    padding: "22px 20px 20px"
+  text-field:
+    backgroundColor: "{colors.sky-white}"
+    textColor: "{colors.sky-ink}"
+    typography: "{typography.bb-body}"
+    rounded: "{rounded.xl}"
+    height: "52px"
+    padding: "0 16px"
+  header:
+    backgroundColor: "{colors.sky-bg}"
+    height: "54px"
+  bottom-nav:
+    backgroundColor: "{colors.sky-white}"
+    typography: "{typography.bb-small}"
+    height: "72px"
+  toast-ink:
+    backgroundColor: "{colors.sky-ink}"
+    textColor: "{colors.sky-white}"
+    typography: "{typography.bb-label-sm}"
+    rounded: "{rounded.row}"
+    height: "52px"
+  toast-pill:
+    backgroundColor: "{colors.sky-deep}"
+    textColor: "{colors.sky-white}"
+    typography: "{typography.bb-label-sm}"
+    rounded: "{rounded.3xl}"
+    height: "48px"
+    width: "310px"
+---
+
+# Design System: 뽀득뽀득
+
+## Overview
+
+**Creative North Star: "The Room That Stays Painted"**
+
+뽀득뽀득 records cleaning as color, not as a checklist. Tapping an item fills its card with the space's pastel; over the item's recommended cycle that fill thins in four soft stages but never disappears. Everything else stays quiet: a cool off-white page, white rounded surfaces, one mint-teal accent, and deep teal for anything that navigates. The atmosphere is ambient and non-punitive: nothing scores, warns, or scolds.
+
+Density is a single calm column on a phone: 24px gutters, 12px between blocks, rows of 62-72px, generous touch targets. Depth comes from white-on-off-white tonal layering, not shadows. Motion is small and tactile: cards press to 0.97, the primary button throws one glass-like specular sweep per tap, and fades interpolate rather than step.
+
+Sources of truth, in order: Figma page `02 · 전체 앱 — Light` (primary visual reference) and `01 · 디자인 시스템`, then this file, then shipped code. Figma also defines a full dark palette; it is deliberately not implemented. This system is light mode only until that decision changes.
+
+**Key Characteristics:**
+- Color means "cared for recently"; its absence never means failure.
+- One accent (mint `sky-brand`) for primary action and selection; deep teal (`sky-deep`) for links, active nav, header titles, focus.
+- Four space pastels, each paired with a darker icon ink that never fades.
+- Flat tonal layering; shadow only on transient toasts.
+- Pretendard Variable throughout, Korean-first, zero letter-spacing.
+
+## Colors
+
+A cool neutral field with a single mint-teal accent family and four room pastels that carry the record itself.
+
+### Primary
+- **Mint Glass** (`sky-brand`): fill of the primary Glass Button, selected chips, switch-on track, check-on circle, text-field focus border.
+- **Deep Teal** (`sky-deep`): tab-root header title, back chevron, active nav tab, text links, trailing row chevrons, balance numbers, focus ring, pill toast fill. The "this goes somewhere" color.
+- **Mint Mist** (`sky-tint`): secondary button fill, info/tip cards, locked switch track, hint strips.
+- **On-Brand Ink** (`onbrand`): text and icons on Mint Glass (AA 7.1:1).
+- **Sea Glass** (`sky-sky`): text selection highlight and small illustration accents.
+
+### Secondary: Space pastels (the record)
+Each space has a fill and an icon ink. Fill paints tiles and recorded cards; icon ink stays at 100% on every fade stage.
+- **Bath Sky** (`sky-bath`) with **Bath Slate** (`space-bath-icon`) for 욕실.
+- **Kitchen Apricot** (`sky-kitchen`) with **Kitchen Umber** (`space-kitchen-icon`) for 주방.
+- **Living Lilac** (`sky-living`) with **Living Plum** (`space-living-icon`) for 거실.
+- **Bedroom Sage** (`sky-bed`) with **Bedroom Moss** (`space-bed-icon`) for 방. (Expansion space 베란다 reuses the sage fill with `sky-deep` as its icon ink.)
+
+### Neutral
+- **Charcoal Ink** (`sky-ink`): headings, row titles, ink toast fill.
+- **Slate Muted** (`sky-muted`): body copy, subtitles, meta, inactive nav, unselected chip text (AA ≥4.8:1 on white and on every space fill).
+- **Hairline** (`sky-line`): borders, switch-off track, check-off circle, disabled button fill, and the desktop backdrop outside the phone column.
+- **Porcelain Page** (`sky-bg`): app/page and header background.
+- **White** (`sky-white`): every card, row, nav bar, dialog and field surface.
+- **Art Line** (`art-line`): strokes in exported illustrations only.
+- **Scrim** (`scrim`): full-screen dialog backdrop over header and nav.
+
+### Named Rules
+**The Fade, Never Vanish Rule.** A recorded item's fill = space color at 100 / 72 / 48 / 28% as elapsed ÷ recommended cycle crosses 0 / 0.6 / 0.85 / ≥1.1, linearly interpolated between stops. It floors at 28%. A never-recorded item is white (0), not 28%. A space's fill is the average of its items' fades. Icons and text never fade. Implemented in `fadeForStaleness` / `itemFade` / `spaceFade` in `src/data/cleaning.ts`; do not reimplement.
+
+**The Neutral Field Rule.** Page, header and surfaces stay neutral; pastels appear only on space tiles, recorded/selected cards and the home canvas.
+
+**The Tokens Only Rule.** No raw hex in TSX or CSS; space colors come from `getSpace(key)` / `spaceColor(key, alpha)`. Exception: exported illustration fills and sweep gradients.
+
+## Typography
+
+**Body Font:** Pretendard Variable (fallbacks: Pretendard, -apple-system, BlinkMacSystemFont, Malgun Gothic, Apple SD Gothic Neo, system-ui, sans-serif), loaded from the jsDelivr Pretendard v1.3.9 variable stylesheet.
+
+**Character:** One neutral Korean grotesque for everything; hierarchy is size and weight (400/500/700), never letter-spacing or case. Figma's `Noto Sans KR` text styles are intentionally replaced by Pretendard (user decision).
+
+### Hierarchy
+- **Display** (`bb-display`): point balance numbers only, in Deep Teal.
+- **Heading** (`bb-heading`): page intro h1 (`PageIntro`), Charcoal Ink.
+- **Title** (`bb-title`): section h2, info-card and dialog titles; tab-root header title in Deep Teal.
+- **Label** (`bb-label`): row/card titles, field labels, chips, button labels, text links, sub-page header title.
+- **Body** (`bb-body`): intro sub-copy, card and dialog body, field text; usually Slate Muted.
+- **Label Small** (`bb-label-sm`): toasts, small text links, empty-card copy.
+- **Caption** (`bb-caption`): row subtitles, meta, section links ("공간 관리 ›").
+- **Small** (`bb-small`): bottom-nav labels.
+
+The older non-`bb` tokens in `tailwind.config.js` (`headline-*`, `title-*`, `body-*`, `label-*`, `caption`) remain for legacy screens; new work uses `bb-*`. The `fontSize` token values themselves are frozen (AGENTS.md §6); per-screen heading size choices (e.g. Welcome 28/26) are allowed.
+
+### Named Rules
+**The Weight Not Tracking Rule.** Letter-spacing is 0 everywhere; emphasis is weight 700 or Deep Teal color.
+
+## Layout
+
+- **Frame:** designed at 390×844. The phone column is `max-width: 430px`, centered, on Porcelain Page; outside it on desktop the body shows Hairline.
+- **Gutter:** 24px (`margin-screen`) on every screen. Main column gap 12px is dominant.
+- **Chrome:** fixed header 54px + top safe area; content starts flush beneath it (`pt-header`). No-nav flow pages (login, sign-up, point check, delete-done) add a 20px top gap (`pt-header-flow`).
+- **Bottom nav:** fixed, 12px top pad + 48px tab row + max(12px, bottom safe area). Screens with nav end with 24px of clearance (`pb-nav`); the one fixed CTA bar (76px, 주말 대청소) stacks above it (`pb-nav-cta`).
+- **Touch:** every interactive target is at least 44×44 (icon buttons, text links, chips, chevron slots); whole rows are the target for switches and checks.
+- **Stacking:** fixed CTA bar 40 · header/nav 50 · dialog 60 · toast 70 (feedback stays visible over dialogs).
+- **Home canvas:** 2-column grid of 110px space cards; an odd last card spans both columns.
+
+## Elevation & Depth
+
+Flat by default. Depth is tonal: white surfaces on the Porcelain page, scrim for modals. Shadows exist only on transient feedback and in press states.
+
+### Shadow Vocabulary
+- **Ink toast lift** (`box-shadow: 0 8px 24px rgba(0,0,0,0.16)`): top ink toast.
+- **Pill toast lift** (`box-shadow: 0 4px 12px rgba(0,0,0,0.16)`): bottom pill toast.
+- **Glass press** (`box-shadow: inset 0 2px 4px rgba(0,77,102,0.12)`): Glass Button while pressed.
+
+### Named Rules
+**The Flat Surface Rule.** Cards, rows, tiles and dialogs carry no drop shadow; separation is white-on-off-white plus radius.
+
+## Shapes
+
+Soft, consistently rounded rectangles, scaled to the element: 40px space tile 14px (`tile`), switch/nav row 16px (`row-sm`), item row and ink toast 18px (`row`), cards, record cards, check rows, dialogs and the Glass Button 20px (`2xl`), info cards and pill toast 24px (`3xl`), text fields 12px (`xl`), chips and switches fully round. Borders are rare: 1px Hairline on fields, 1px white on the Glass Button, and on QuickRecord item cards a 1px border in the space's icon ink.
+
+Icons are a single SVG registry (`src/components/icons`): UI glyphs on a 24px grid at 2.4 stroke (chevron, check, plus, more, account, sparkle), plus nav-, space- and object- sets. Space icons render in their icon ink.
+
+## Components
+
+### Buttons (Glass Button)
+Tactile and bright: a mint slab that catches light when tapped.
+- **Shape:** 20px radius, 1px white border, full width, `overflow: hidden`, 56px tall for main CTAs, 52px for secondary/in-list/flow buttons.
+- **Primary:** Mint Glass fill, On-Brand Ink label (`bb-label`). **Secondary:** Mint Mist fill, Deep Teal label.
+- **Press:** inset Glass press shadow (120ms ease-out) plus one specular sweep per tap: a 90×130 white band (0→0.65→0 alpha) rotated 18° travels left→right in 480ms `cubic-bezier(0.2,0.7,0.2,1)`, remounted on each press.
+- **Disabled:** Hairline fill, Slate Muted label, no sweep.
+- **Focus:** 2px Deep Teal ring drawn inset (-4px) because the button clips.
+- **Text link:** Deep Teal `bb-label` (or `bb-label-sm`) in a 44px-tall box; used for 취소, secondary navigation and "기록 취소".
+
+### Chips (Pill)
+- **Style:** fully round, `bb-label`. Unselected White / Slate Muted; selected Mint Glass / On-Brand Ink; 150ms color transition.
+- **Sizes:** 44px segmented chip, 38px space/filter pill (optional 16px space icon in its icon ink), 72px point package.
+
+### Cards / Containers
+- **Item row:** White, 18px radius, 64 or 72px tall, 12px left pad, 12px gap: 40px space tile, title `bb-label` Ink over subtitle `bb-caption` Muted, chevron in a 44px trailing slot (Deep Teal, or Muted for recent-record rows). Presses to 0.97.
+- **Space tile:** 40px, 14px radius, space fill with icon ink (24px icon); on an already-filled row it becomes 70% white.
+- **Home space card:** White 20px card, 110px tall, with the space color laid in at its current fade; label/icon stay full strength.
+- **Record card (QuickRecord):** White 20px card bordered in space icon ink; tapping fills it with the space color (300ms), tapping again the same day clears it.
+- **Info card:** 24px radius, 16px/20px padding, 8px gap; Mint Mist for tips/points, White for FAQ.
+
+### Inputs / Fields
+- **Style:** 52px, 12px radius, White, 1px Hairline, `bb-body` Ink, Muted placeholder, 16px side padding.
+- **Focus:** border shifts to Mint Glass; no outline ring (fields are the one exception to the global focus ring).
+
+### Switch & Check rows
+- **Switch row:** whole 62px White row (16px radius) is the `role="switch"`. Track 52×32: Mint Glass on, Hairline off, Mint Mist when locked; 24px white thumb slides 20px in 200ms ease-out.
+- **Check row:** 48px White row (20px radius), 24px circle: Hairline off, Mint Glass with On-Brand check on, Mint Mist with Deep Teal check when locked. May fill with the space color when on (대청소).
+
+### Navigation
+- **Header:** Porcelain Page, 54px. Tab-root variant: Deep Teal `bb-title` left, account icon (Muted, 44px) right to 내 정보. Sub-page variant: Deep Teal back chevron (44px, falls back to /home on direct entry), centered Ink `bb-label` title, decorative "more" or an empty 44px spacer on the right.
+- **Bottom nav:** White, five tabs 홈 / 공간 / 기록 / 히스토리 / 가이드, each 64×48 with a 22px icon over a `bb-small` label, 3px gap. Active Deep Teal, inactive Slate Muted; sub-pages light their parent tab.
+
+### Dialog
+Scrim over everything; White 342px card, 20px radius, 16px gap: `bb-title` Ink title, `bb-body` Muted body, primary Glass Button 56, 취소 text link. Focus moves to 취소; Escape and scrim tap close; body scroll locks.
+
+### Toasts
+- **Ink toast (top):** record events. Charcoal Ink, 52px, 18px radius, check icon + `bb-label-sm` white, 62px below the top edge.
+- **Pill toast (bottom):** settings/item saved and "준비 중" notices (no icon). Deep Teal, 310×48, 24px radius, 26px above the bottom.
+- **Motion:** fade + 8px slide in 200ms ease-out; auto-hide after 2s. Route hand-offs carry the message in router state and clear it so refresh does not replay.
+
+### Motion summary
+- **Press:** `scale(0.97)` for 120ms ease-out on tappable cards/rows.
+- **Glass sweep:** as above, 480ms.
+- **Fill:** record fill and tile color transition 300ms; fades interpolate continuously between the four stages.
+- **Soft bob:** 6px float, 1.8s loop, for onboarding illustration only.
+- **Reduced motion:** press scale, sweep and bob are removed; color changes remain.
+
+### Content & voice
+Korean, soft 해요체, short. Color and copy describe care, never judgment.
+- **Canonical phrases:** save toast `청소 기록을 저장했어요`; undo toast `청소 기록을 취소했어요`; undo action `기록 취소`; just-now (<10 min) `방금 돌봤어요`; recency `오늘 기록 · 어제 기록 · N일 전 기록 · 아직 기록 없음` (short form `오늘 · 어제 · N일 전 · 기록 없음`); coming-soon `준비 중이에요`.
+- **Fade stage labels (from `FADE_STAGES`, one wording app-wide):** 100% `최근 관리했어요`, 72% `잘 유지되고 있어요`, 48% `슬슬 다시 볼 때예요`, 28% `한번 관리해볼까요?`.
+- **Banned words:** 미완료, 실패, 지연, overdue, 위험, 더러움. No cleanliness scores or completion percentages shown to users.
+- **Price:** the one expansion price comes from `SPACE_PRICE` (300P); never hard-code it in copy.
+
+## Do's and Don'ts
+
+### Do:
+- **Do** use `GlassButton` for every filled CTA (56 primary / 52 secondary), and the 44px Deep Teal text link for everything lighter.
+- **Do** derive every space fill from `getSpace` / `spaceColor` and every fade from `spaceFade` / `itemFade`, keeping icons and text at 100%.
+- **Do** keep 24px gutters, 12px block gaps, 44px minimum targets, and `pb-nav` on every screen with the bottom nav.
+- **Do** reuse `ItemRow`, `SpaceTile`, `SwitchRow`, `CheckRow`, `PageIntro`, `Pill`, `Dialog`, `Toast`/`useRouteToast` before writing a new row, card or modal.
+- **Do** take icons from the SVG registry and fade-stage wording from `FADE_STAGES`.
+
+### Don't:
+- **Don't** let a fill drop below 28% or render "stale" as a warning color; there is no red/amber state in this system.
+- **Don't** use the banned words or show a cleanliness score.
+- **Don't** add drop shadows to cards, rows, tiles or dialogs.
+- **Don't** use typographic glyphs (‹ › ⋯ ✓ ＋ ✦) or Material Symbols for UI icons.
+- **Don't** ship dark mode or the old MD3 blue palette; dark tokens live in Figma only for now.
+- **Don't** change `fontSize` token values in `tailwind.config.js`.

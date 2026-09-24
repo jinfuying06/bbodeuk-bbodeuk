@@ -172,11 +172,10 @@ export default function Welcome() {
                 >
                   <SpaceTile space="bathroom" />
                   <span className="flex min-w-0 flex-col gap-px">
-                    <span className="text-bb-title text-sky-ink">
-                      {tier.label} · {tier.pct}%
-                    </span>
+                    <span className="text-bb-title text-sky-ink">{tier.label}</span>
                     <span className="text-bb-caption text-sky-muted">{tier.desc}</span>
                   </span>
+                  <span className="ml-auto shrink-0 text-bb-caption text-sky-muted">{tier.pct}%</span>
                 </li>
               ))}
             </ul>

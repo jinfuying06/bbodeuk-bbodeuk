@@ -23,7 +23,7 @@ export default function CareAction() {
   const record = () => {
     // One record per visit; a repeat tap just re-confirms.
     if (!recordId) setRecordId(addRecord(guide.id).id);
-    showToast("청소 기록이 저장됐어요");
+    showToast("청소 기록을 저장했어요");
   };
 
   const undo = () => {
@@ -40,7 +40,7 @@ export default function CareAction() {
         <PageIntro title={title} body={guide.intro} />
 
         {guide.id === "basin" ? (
-          <div className="flex h-[116px] items-center justify-center rounded-[22px]" style={{ backgroundColor: space.color }}>
+          <div className="flex h-[116px] items-center justify-center rounded-2xl" style={{ backgroundColor: space.color }}>
             <Icon name="object-sink" className="text-[70px]" />
           </div>
         ) : null}

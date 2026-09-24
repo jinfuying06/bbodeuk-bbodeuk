@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-25T00:00:00Z",
+  "title": "Design System: 뽀득뽀득",
+  "extensions": {
+    "colorMeta": {
+      "sky-brand": { "role": "primary", "displayName": "Mint Glass", "canonical": "#56d9d2", "tonalRamp": ["#0d3e3b", "#146b63", "#1f8f86", "#2fb3aa", "#56d9d2", "#8de3db", "#bff1ec", "#e5f8f5"] },
+      "sky-deep": { "role": "primary", "displayName": "Deep Teal", "canonical": "#146b63" },
+      "sky-tint": { "role": "primary", "displayName": "Mint Mist", "canonical": "#e5f8f5" },
+      "onbrand": { "role": "primary", "displayName": "On-Brand Ink", "canonical": "#123c36" },
+      "sky-sky": { "role": "primary", "displayName": "Sea Glass", "canonical": "#8de3db" },
+      "sky-bath": { "role": "secondary", "displayName": "Bath Sky", "canonical": "#dceefe" },
+      "space-bath-icon": { "role": "secondary", "displayName": "Bath Slate", "canonical": "#41758e" },
+      "sky-kitchen": { "role": "secondary", "displayName": "Kitchen Apricot", "canonical": "#fbe8d4" },
+      "space-kitchen-icon": { "role": "secondary", "displayName": "Kitchen Umber", "canonical": "#95613c" },
+      "sky-living": { "role": "secondary", "displayName": "Living Lilac", "canonical": "#e9e1fa" },
+      "space-living-icon": { "role": "secondary", "displayName": "Living Plum", "canonical": "#766095" },
+      "sky-bed": { "role": "secondary", "displayName": "Bedroom Sage", "canonical": "#e2efda" },
+      "space-bed-icon": { "role": "secondary", "displayName": "Bedroom Moss", "canonical": "#5e7d4f" },
+      "sky-ink": { "role": "neutral", "displayName": "Charcoal Ink", "canonical": "#23282b" },
+      "sky-muted": { "role": "neutral", "displayName": "Slate Muted", "canonical": "#60676b" },
+      "sky-line": { "role": "neutral", "displayName": "Hairline", "canonical": "#e3e6e8" },
+      "sky-bg": { "role": "neutral", "displayName": "Porcelain Page", "canonical": "#f6f7f8" },
+      "sky-white": { "role": "neutral", "displayName": "White", "canonical": "#ffffff" },
+      "art-line": { "role": "neutral", "displayName": "Art Line", "canonical": "#64807a" },
+      "scrim": { "role": "neutral", "displayName": "Scrim", "canonical": "rgba(20, 26, 24, 0.7)" }
+    },
+    "typographyMeta": {
+      "bb-display": { "displayName": "Display", "purpose": "Point balance numbers only." },
+      "bb-heading": { "displayName": "Heading", "purpose": "Page intro h1." },
+      "bb-title": { "displayName": "Title", "purpose": "Section h2, card/dialog titles, tab-root header title." },
+      "bb-label": { "displayName": "Label", "purpose": "Row titles, chips, buttons, links, sub-page header title." },
+      "bb-body": { "displayName": "Body", "purpose": "Intro and card body copy, field text." },
+      "bb-label-sm": { "displayName": "Label Small", "purpose": "Toasts, small links, empty-card copy." },
+      "bb-caption": { "displayName": "Caption", "purpose": "Row subtitles, meta, section links." },
+      "bb-small": { "displayName": "Small", "purpose": "Bottom-nav labels." }
+    },
+    "shadows": [
+      { "name": "toast-ink", "value": "0 8px 24px rgba(0,0,0,0.16)", "purpose": "Top ink toast." },
+      { "name": "toast-pill", "value": "0 4px 12px rgba(0,0,0,0.16)", "purpose": "Bottom pill toast." },
+      { "name": "glass-press", "value": "inset 0 2px 4px rgba(0,77,102,0.12)", "purpose": "Glass Button while pressed." }
+    ],
+    "motion": [
+      { "name": "press", "value": "transform scale(0.97) 120ms ease-out", "purpose": "Tappable cards and rows." },
+      { "name": "glass-sweep", "value": "480ms cubic-bezier(0.2, 0.7, 0.2, 1)", "purpose": "One specular band (90x130, 18deg, white 0/0.65/0) across the Glass Button per tap." },
+      { "name": "fill", "value": "background-color 300ms", "purpose": "Record fill on cards, tiles, check rows." },
+      { "name": "toast", "value": "opacity + 8px translate 200ms ease-out, 2s hold", "purpose": "Toast enter/exit." },
+      { "name": "switch", "value": "transform 200ms ease-out", "purpose": "Switch thumb." },
+      { "name": "fade-policy", "value": "100/72/48/28% at staleness 0/0.6/0.85/>=1.1, linear interpolation", "purpose": "Space color recency fade; icons/text never fade." }
+    ],
+    "breakpoints": [
+      { "name": "base", "value": "390px" },
+      { "name": "column-max", "value": "430px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Glass Button (Primary)",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Every main filled CTA; one specular sweep per tap.",
+      "html": "<button class=\"ds-glass\">청소 기록하기<span class=\"ds-sweep\"></span></button>",
+      "css": ".ds-glass{position:relative;display:flex;width:342px;height:56px;align-items:center;justify-content:center;overflow:hidden;border:1px solid #fff;border-radius:20px;background:#56d9d2;color:#123c36;font:500 14px/22px 'Pretendard Variable',system-ui,sans-serif;transition:box-shadow 120ms ease-out;cursor:pointer}.ds-glass:active{box-shadow:inset 0 2px 4px rgba(0,77,102,0.12)}.ds-glass:focus-visible{outline:2px solid #146b63;outline-offset:-4px}.ds-sweep{position:absolute;top:-29px;left:-161px;width:90px;height:130px;transform:rotate(18deg);background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.65) 50%,rgba(255,255,255,0));pointer-events:none}.ds-glass:active .ds-sweep{animation:ds-sweep 480ms cubic-bezier(.2,.7,.2,1) forwards}@keyframes ds-sweep{to{transform:translateX(560px) rotate(18deg)}}"
+    },
+    {
+      "name": "Glass Button (Secondary)",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary, in-list and flow-page buttons.",
+      "html": "<button class=\"ds-glass-2\">공간 둘러보기</button>",
+      "css": ".ds-glass-2{display:flex;width:342px;height:52px;align-items:center;justify-content:center;border:1px solid #fff;border-radius:20px;background:#e5f8f5;color:#146b63;font:500 14px/22px 'Pretendard Variable',system-ui,sans-serif;transition:box-shadow 120ms ease-out;cursor:pointer}.ds-glass-2:active{box-shadow:inset 0 2px 4px rgba(0,77,102,0.12)}.ds-glass-2:focus-visible{outline:2px solid #146b63;outline-offset:-4px}.ds-glass-2:disabled{background:#e3e6e8;color:#60676b}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "text-field",
+      "description": "Login, sign-up and item forms; focus swaps the border to mint.",
+      "html": "<input class=\"ds-field\" placeholder=\"항목 이름\" />",
+      "css": ".ds-field{height:52px;width:342px;border:1px solid #e3e6e8;border-radius:12px;background:#fff;padding:0 16px;font:400 14px/22px 'Pretendard Variable',system-ui,sans-serif;color:#23282b;outline:none;transition:border-color 150ms}.ds-field::placeholder{color:#60676b}.ds-field:focus{border-color:#56d9d2}"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Segmented and filter choices.",
+      "html": "<button class=\"ds-chip ds-on\">욕실</button><button class=\"ds-chip\">주방</button>",
+      "css": ".ds-chip{height:44px;padding:0 16px;margin-right:8px;border:0;border-radius:9999px;background:#fff;color:#60676b;font:500 14px/22px 'Pretendard Variable',system-ui,sans-serif;transition:background-color 150ms,color 150ms;cursor:pointer}.ds-chip.ds-on{background:#56d9d2;color:#123c36}.ds-chip:focus-visible{outline:2px solid #146b63;outline-offset:2px}"
+    },
+    {
+      "name": "Item Row",
+      "kind": "card",
+      "refersTo": "item-row",
+      "description": "Tappable white row with space tile, title/subtitle, 44px chevron slot.",
+      "html": "<a class=\"ds-row\" href=\"#\"><span class=\"ds-tile\"></span><span class=\"ds-txt\"><b>세면대</b><small>오늘 기록</small></span><span class=\"ds-chev\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 6l6 6-6 6\"/></svg></span></a>",
+      "css": ".ds-row{display:flex;width:342px;height:64px;align-items:center;gap:12px;padding-left:12px;border-radius:18px;background:#fff;text-decoration:none;transition:transform 120ms ease-out}.ds-row:active{transform:scale(.97)}.ds-tile{width:40px;height:40px;border-radius:14px;background:#dceefe;flex-shrink:0}.ds-txt{flex:1;display:flex;flex-direction:column;font-family:'Pretendard Variable',system-ui,sans-serif}.ds-txt b{font-size:14px;line-height:22px;font-weight:500;color:#23282b}.ds-txt small{font-size:12px;line-height:18px;font-weight:400;color:#60676b}.ds-chev{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:#146b63}"
+    },
+    {
+      "name": "Switch Row",
+      "kind": "custom",
+      "refersTo": "switch-row",
+      "description": "Whole 62px row is the switch.",
+      "html": "<button class=\"ds-sw\" role=\"switch\" aria-checked=\"true\"><span>알림 받기</span><span class=\"ds-track\"><span class=\"ds-thumb\"></span></span></button>",
+      "css": ".ds-sw{display:flex;width:342px;height:62px;align-items:center;justify-content:space-between;padding:0 16px;border:0;border-radius:16px;background:#fff;color:#23282b;font:500 14px/22px 'Pretendard Variable',system-ui,sans-serif;cursor:pointer}.ds-sw:focus-visible{outline:2px solid #146b63;outline-offset:2px}.ds-track{display:flex;align-items:center;width:52px;height:32px;padding:0 4px;border-radius:9999px;background:#56d9d2;transition:background-color 200ms}.ds-thumb{width:24px;height:24px;border-radius:9999px;background:#fff;transform:translateX(20px);transition:transform 200ms ease-out}.ds-sw[aria-checked=false] .ds-track{background:#e3e6e8}.ds-sw[aria-checked=false] .ds-thumb{transform:none}"
+    },
+    {
+      "name": "Bottom Navigation",
+      "kind": "nav",
+      "refersTo": "bottom-nav",
+      "description": "Five tabs, Deep Teal active, Slate Muted inactive.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-tab ds-act\" href=\"#\"><i></i>홈</a><a class=\"ds-tab\" href=\"#\"><i></i>공간</a><a class=\"ds-tab\" href=\"#\"><i></i>기록</a><a class=\"ds-tab\" href=\"#\"><i></i>히스토리</a><a class=\"ds-tab\" href=\"#\"><i></i>가이드</a></nav>",
+      "css": ".ds-nav{display:flex;justify-content:space-between;width:390px;padding:12px;background:#fff}.ds-tab{display:flex;width:64px;height:48px;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#60676b;text-decoration:none;font:500 10px/16px 'Pretendard Variable',system-ui,sans-serif;transition:color 150ms}.ds-tab i{width:22px;height:22px;border-radius:6px;background:currentColor;opacity:.85}.ds-tab.ds-act{color:#146b63}.ds-tab:focus-visible{outline:2px solid #146b63;outline-offset:2px}"
+    },
+    {
+      "name": "Ink Toast",
+      "kind": "custom",
+      "refersTo": "toast-ink",
+      "description": "Top toast for record saved / cancelled.",
+      "html": "<div class=\"ds-toast\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12.5l4.5 4.5L19 7.5\"/></svg>청소 기록을 저장했어요</div>",
+      "css": ".ds-toast{display:flex;width:342px;height:52px;align-items:center;justify-content:center;gap:8px;padding:0 16px;border-radius:18px;background:#23282b;color:#fff;font:500 13px/19px 'Pretendard Variable',system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,0.16)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Room That Stays Painted",
+    "overview": "뽀득뽀득 records cleaning as color, not as a checklist. Tapping an item fills its card with the space's pastel; over the item's recommended cycle that fill thins in four soft stages but never disappears. Everything else stays quiet: a cool off-white page, white rounded surfaces, one mint-teal accent, and deep teal for anything that navigates. The atmosphere is ambient and non-punitive: nothing scores, warns, or scolds.\n\nDensity is a single calm column on a phone: 24px gutters, 12px between blocks, rows of 62-72px, generous touch targets. Depth comes from white-on-off-white tonal layering, not shadows. Motion is small and tactile: cards press to 0.97, the primary button throws one glass-like specular sweep per tap, and fades interpolate rather than step.\n\nSources of truth, in order: Figma page `02 · 전체 앱 — Light` (primary visual reference) and `01 · 디자인 시스템`, then this file, then shipped code. Figma also defines a full dark palette; it is deliberately not implemented. This system is light mode only until that decision changes.",
+    "keyCharacteristics": [
+      "Color means \"cared for recently\"; its absence never means failure.",
+      "One accent (mint `sky-brand`) for primary action and selection; deep teal (`sky-deep`) for links, active nav, header titles, focus.",
+      "Four space pastels, each paired with a darker icon ink that never fades.",
+      "Flat tonal layering; shadow only on transient toasts.",
+      "Pretendard Variable throughout, Korean-first, zero letter-spacing."
+    ],
+    "rules": [
+      { "name": "The Fade, Never Vanish Rule", "body": "A recorded item's fill = space color at 100 / 72 / 48 / 28% as elapsed ÷ recommended cycle crosses 0 / 0.6 / 0.85 / ≥1.1, linearly interpolated between stops. It floors at 28%. A never-recorded item is white (0), not 28%. A space's fill is the average of its items' fades. Icons and text never fade. Implemented in `fadeForStaleness` / `itemFade` / `spaceFade` in `src/data/cleaning.ts`; do not reimplement.", "section": "colors" },
+      { "name": "The Neutral Field Rule", "body": "Page, header and surfaces stay neutral; pastels appear only on space tiles, recorded/selected cards and the home canvas.", "section": "colors" },
+      { "name": "The Tokens Only Rule", "body": "No raw hex in TSX or CSS; space colors come from `getSpace(key)` / `spaceColor(key, alpha)`. Exception: exported illustration fills and sweep gradients.", "section": "colors" },
+      { "name": "The Weight Not Tracking Rule", "body": "Letter-spacing is 0 everywhere; emphasis is weight 700 or Deep Teal color.", "section": "typography" },
+      { "name": "The Flat Surface Rule", "body": "Cards, rows, tiles and dialogs carry no drop shadow; separation is white-on-off-white plus radius.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use `GlassButton` for every filled CTA (56 primary / 52 secondary), and the 44px Deep Teal text link for everything lighter.",
+      "Do derive every space fill from `getSpace` / `spaceColor` and every fade from `spaceFade` / `itemFade`, keeping icons and text at 100%.",
+      "Do keep 24px gutters, 12px block gaps, 44px minimum targets, and `pb-nav` on every screen with the bottom nav.",
+      "Do reuse `ItemRow`, `SpaceTile`, `SwitchRow`, `CheckRow`, `PageIntro`, `Pill`, `Dialog`, `Toast`/`useRouteToast` before writing a new row, card or modal.",
+      "Do take icons from the SVG registry and fade-stage wording from `FADE_STAGES`."
+    ],
+    "donts": [
+      "Don't let a fill drop below 28% or render \"stale\" as a warning color; there is no red/amber state in this system.",
+      "Don't use the banned words or show a cleanliness score.",
+      "Don't add drop shadows to cards, rows, tiles or dialogs.",
+      "Don't use typographic glyphs (‹ › ⋯ ✓ ＋ ✦) or Material Symbols for UI icons.",
+      "Don't ship dark mode or the old MD3 blue palette; dark tokens live in Figma only for now.",
+      "Don't change `fontSize` token values in `tailwind.config.js`."
+    ]
+  }
+}

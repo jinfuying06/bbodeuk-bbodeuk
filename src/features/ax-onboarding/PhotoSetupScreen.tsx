@@ -141,7 +141,7 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
 
         {status === "error" ? (
           <section className="mb-space-lg rounded-xl bg-sky-white p-space-md shadow-sm">
-            <p className="text-body-md text-sky-ink">사진 인식에 실패했어요. 다시 시도하거나 수동으로 설정할 수 있어요.</p>
+            <p className="text-body-md text-sky-ink">사진을 알아보지 못했어요. 다시 찍거나 직접 설정할 수 있어요.</p>
             <div className="mt-space-sm flex gap-space-sm">
               <button className="text-label-md text-sky-deep" type="button" onClick={submit}>
                 다시 시도하기

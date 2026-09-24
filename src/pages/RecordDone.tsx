@@ -48,7 +48,7 @@ export default function RecordDone() {
     <PageShell>
       <AppHeader title="기록 완료" />
       <main className="flex flex-col gap-4 px-margin-screen pb-nav pt-header">
-        <div className="relative flex h-[220px] flex-col items-center justify-center rounded-[28px] bg-sky-tint">
+        <div className="relative flex h-[220px] flex-col items-center justify-center rounded-3xl bg-sky-tint">
           <div className="relative h-[148px] w-[180px]">
             {item.id === "basin" ? (
               <CleanSink />

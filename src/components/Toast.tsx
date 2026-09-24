@@ -46,7 +46,7 @@ export default function Toast({ message, visible, pill = false, icon = true }: T
 /**
  * Tiny helper for the common "show a toast, hide after N ms" pattern.
  *   const [toast, showToast] = useToast();
- *   showToast("청소 기록이 저장됐어요");
+ *   showToast("청소 기록을 저장했어요");
  *   <Toast message={toast} visible={Boolean(toast)} />
  */
 export function useToast(duration = 2000) {
