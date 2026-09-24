@@ -105,11 +105,35 @@ const toItem = (entry: CatalogItem): Item => ({
   icon: entry.icon ?? getSpace(entry.space).icon,
 });
 
+// Items the user added on ItemAdd (localStorage, like ItemInfo edits).
+const CUSTOM_ITEMS_KEY = "bbodeuk.customItems.v1";
+
+function readCustomItems(): CatalogItem[] {
+  try {
+    return JSON.parse(window.localStorage.getItem(CUSTOM_ITEMS_KEY) ?? "[]") as CatalogItem[];
+  } catch {
+    return [];
+  }
+}
+
+const allCatalog = () => [...CATALOG, ...readCustomItems()];
+
+/** ItemAdd: saves a new item; it then shows up everywhere getItems() is used. */
+export function addItem(name: string, space: SpaceKey, intervalDays: number): Item {
+  const entry: CatalogItem = { id: `custom-${Date.now().toString(36)}`, name, space, intervalDays };
+  try {
+    window.localStorage.setItem(CUSTOM_ITEMS_KEY, JSON.stringify([...readCustomItems(), entry]));
+  } catch {
+    // storage unavailable — nothing persists in this prototype
+  }
+  return toItem(entry);
+}
+
 /** All items (ItemInfo edits applied, deleted ones removed). Pass a space to filter. */
 export function getItems(space?: SpaceKey): Item[] {
   const hidden = readHiddenItems();
   const overrides = readOverrides();
-  return CATALOG.filter((entry) => !hidden.includes(entry.id))
+  return allCatalog().filter((entry) => !hidden.includes(entry.id))
     .map((entry) => {
       const override = overrides[entry.id];
       if (!override) return toItem(entry);
@@ -130,7 +154,7 @@ export function getItem(idOrName: string | null | undefined): Item | undefined {
   if (!idOrName) return undefined;
   const live = getItems().find((item) => item.id === idOrName || item.fullName === idOrName);
   if (live) return live;
-  const raw = CATALOG.find((entry) => entry.id === idOrName || entry.fullName === idOrName || entry.name === idOrName);
+  const raw = allCatalog().find((entry) => entry.id === idOrName || entry.fullName === idOrName || entry.name === idOrName);
   return raw ? toItem(raw) : undefined;
 }
 
