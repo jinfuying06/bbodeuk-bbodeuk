@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Icon from "./Icon";
+import GlassButton from "./GlassButton";
 import { isMember, readPoints, SIGNUP_BONUS } from "../data/points";
 
 const SPACE_PRICE = 300;
@@ -8,18 +8,29 @@ const SPACE_PRICE = 300;
 type SpaceExpansionDialogProps = {
   open: boolean;
   onClose: () => void;
+  /** Space being added (Figma 32:1012 interpolates it into the title). */
+  spaceLabel?: string;
+  /** Member with enough points confirmed. Omitted (Setup) → go to 공간 관리 to finish there. */
+  onConfirm?: () => void;
 };
 
-export default function SpaceExpansionDialog({ open, onClose }: SpaceExpansionDialogProps) {
+/** 을/를 by final consonant. */
+const objectParticle = (word: string) => {
+  const code = word.charCodeAt(word.length - 1) - 0xac00;
+  return code >= 0 && code <= 11171 && code % 28 !== 0 ? "을" : "를";
+};
+
+/** Sky / Dialog (Figma 32:1012 공간 추가 확인): centered white card over the scrim. */
+export default function SpaceExpansionDialog({ open, onClose, spaceLabel = "새 공간", onConfirm }: SpaceExpansionDialogProps) {
   const navigate = useNavigate();
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const cancelRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
+    cancelRef.current?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -34,55 +45,52 @@ export default function SpaceExpansionDialog({ open, onClose }: SpaceExpansionDi
 
   if (!open) return null;
 
-  const member = isMember();
   const balance = readPoints();
-  const hasEnough = balance >= SPACE_PRICE;
 
-  const content = !member
+  const content = !isMember()
     ? {
         title: `회원가입 하면 ${SIGNUP_BONUS}P를 드려요`,
-        body: "가입 시 받는 포인트로 공간 1개를 바로 추가할 수 있어요. 회원가입 후 진행해보세요.",
+        body: ["가입 시 받는 포인트로 공간 1개를", "바로 추가할 수 있어요."],
         primaryLabel: "회원가입 하러 가기",
         onPrimary: () => navigate("/signup"),
       }
-    : hasEnough
+    : balance >= SPACE_PRICE
       ? {
-          title: `${SPACE_PRICE}P로 공간을 추가할 수 있어요`,
-          body: `보유 포인트 ${balance.toLocaleString()}P로 공간 1개를 추가할 수 있어요. 공간 관리에서 이어서 진행해보세요.`,
-          primaryLabel: "공간 추가하기",
-          onPrimary: () => navigate("/space-manage"),
+          title: `${spaceLabel}${objectParticle(spaceLabel)} 추가할까요?`,
+          body: [`${SPACE_PRICE}P를 사용해 새 공간을 열어요.`, `현재 ${balance.toLocaleString()}P → 추가 후 ${(balance - SPACE_PRICE).toLocaleString()}P`],
+          primaryLabel: `${SPACE_PRICE}P로 공간 추가`,
+          onPrimary: onConfirm ?? (() => navigate("/space-manage")),
         }
       : {
           title: "포인트가 부족해요",
-          body: `공간 1개를 추가하려면 ${SPACE_PRICE}P가 필요해요. 지금 보유 포인트는 ${balance.toLocaleString()}P예요.`,
+          body: [`공간 1개를 추가하려면 ${SPACE_PRICE}P가 필요해요.`, `지금 보유 포인트는 ${balance.toLocaleString()}P예요.`],
           primaryLabel: "포인트 충전하러 가기",
-          onPrimary: () => navigate("/points?intent=charge"),
+          onPrimary: () => navigate("/points?intent=short"),
         };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-on-surface/40" role="presentation" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-scrim px-margin-screen" role="presentation" onClick={onClose}>
       <section
+        aria-describedby="space-expansion-body"
         aria-labelledby="space-expansion-title"
         aria-modal="true"
-        className="w-full max-w-[430px] rounded-t-2xl bg-sky-white px-margin-screen pb-[calc(24px+env(safe-area-inset-bottom,0px))] pt-space-lg shadow-xl"
+        className="flex min-h-[292px] w-full max-w-[342px] flex-col gap-4 rounded-2xl bg-sky-white px-5 pb-5 pt-[22px]"
         role="dialog"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-space-md">
-          <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-sky-tint text-sky-deep">
-            <Icon name="add_home" className="text-[22px]" />
-          </span>
-          <button ref={closeButtonRef} aria-label="닫기" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-container-low" type="button" onClick={onClose}>
-            <Icon name="close" className="text-[22px]" />
-          </button>
-        </div>
-        <h2 id="space-expansion-title" className="mt-space-md text-headline-md text-sky-ink">{content.title}</h2>
-        <p className="mt-space-sm text-body-md text-sky-muted">{content.body}</p>
-        <button className="mt-space-lg flex h-12 w-full items-center justify-center rounded-full bg-sky-brand text-title-sm text-onbrand transition-transform duration-[120ms] active:scale-[0.98]" type="button" onClick={content.onPrimary}>
+        <h2 id="space-expansion-title" className="text-bb-title text-sky-ink">
+          {content.title}
+        </h2>
+        <p id="space-expansion-body" className="text-bb-body text-sky-muted">
+          {content.body[0]}
+          <br />
+          {content.body[1]}
+        </p>
+        <GlassButton className="w-full" onClick={content.onPrimary}>
           {content.primaryLabel}
-        </button>
-        <button className="mt-space-sm flex h-12 w-full items-center justify-center rounded-full text-title-sm text-sky-muted" type="button" onClick={onClose}>
-          기본 공간으로 계속하기
+        </GlassButton>
+        <button ref={cancelRef} className="flex h-11 w-full items-center justify-center text-bb-label text-sky-deep" type="button" onClick={onClose}>
+          취소
         </button>
       </section>
     </div>
