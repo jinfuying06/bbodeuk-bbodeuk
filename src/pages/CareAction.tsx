@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
@@ -6,7 +5,7 @@ import Icon from "../components/Icon";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
-import { addRecord, getSpace, removeRecord } from "../data/cleaning";
+import { getSpace, isRecordedToday, toggleTodayRecord, useRecords } from "../data/cleaning";
 import { GUIDES } from "../data/guides";
 
 // Figma reuses bath object art as placeholder 준비물 tiles (바닥/배수구/거울).
@@ -17,21 +16,11 @@ export default function CareAction() {
   const guide = GUIDES.find((entry) => entry.id === searchParams.get("item")) ?? GUIDES[0];
   const space = getSpace(guide.space);
   const title = `${space.label} · ${guide.title}`;
-  const [recordId, setRecordId] = useState<string | null>(null);
+  const recorded = isRecordedToday(guide.id, useRecords());
   const [toast, showToast] = useToast();
 
-  const record = () => {
-    // One record per visit; a repeat tap just re-confirms.
-    if (!recordId) setRecordId(addRecord(guide.id).id);
-    showToast("청소 기록을 저장했어요");
-  };
-
-  const undo = () => {
-    if (!recordId) return;
-    removeRecord(recordId);
-    setRecordId(null);
-    showToast("청소 기록을 취소했어요");
-  };
+  // Same toggle as QuickRecord: recorded today (from any screen) → the tap cancels it.
+  const toggle = () => showToast(toggleTodayRecord(guide.id) === "added" ? "청소 기록을 저장했어요" : "청소 기록을 취소했어요");
 
   return (
     <PageShell>
@@ -76,15 +65,9 @@ export default function CareAction() {
           )}
         </ol>
 
-        <GlassButton onClick={record}>청소했어요 · 기록하기</GlassButton>
-        <button
-          className={`text-link-sm transition-colors ${recordId ? "" : "!text-sky-muted"}`}
-          aria-disabled={!recordId}
-          type="button"
-          onClick={undo}
-        >
-          기록 취소
-        </button>
+        <GlassButton variant={recorded ? "secondary" : "primary"} aria-pressed={recorded} onClick={toggle}>
+          {recorded ? "오늘 기록했어요 · 기록 취소" : "청소했어요 · 기록하기"}
+        </GlassButton>
         {guide.id === "basin" ? (
           <Link className="text-link" to="/care">
             다른 청소법 보기
