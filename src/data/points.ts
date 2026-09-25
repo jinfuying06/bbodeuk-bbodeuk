@@ -67,3 +67,14 @@ export function spendPoints(amount: number): boolean {
   }
   return true;
 }
+
+/** Prototype-only mock purchase: adds `amount` to the stored balance and returns the new balance. No real payment. */
+export function addPoints(amount: number): number {
+  const next = readPoints() + amount;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, String(next));
+  } catch {
+    // no-op: prototype has no server fallback
+  }
+  return next;
+}

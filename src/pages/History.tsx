@@ -131,7 +131,7 @@ export default function History() {
               dayRecords.map((record) => {
                 const item = getItem(record.itemId);
                 if (!item) return null;
-                return <ItemRow key={record.id} title={item.name} sub={`${getSpace(item.space).label} · ${formatTime(record.at)}`} to={itemHistoryPath(item.id)} />;
+                return <ItemRow key={record.id} chevron="muted" space={item.space} title={item.name} sub={`${getSpace(item.space).label} · ${formatTime(record.at)}`} to={itemHistoryPath(item.id)} />;
               })
             ) : (
               <p className="text-bb-body text-sky-muted">

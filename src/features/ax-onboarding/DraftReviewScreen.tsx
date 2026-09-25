@@ -1,18 +1,22 @@
 import { useState } from "react";
+import GlassButton from "../../components/GlassButton";
 import Icon from "../../components/Icon";
 import PageShell from "../../components/PageShell";
+import { getSpace, spaceColor } from "../../data/cleaning";
+import FlowHeader from "./FlowHeader";
 import { findItem, spaceLabels, type SpaceKey } from "./itemLibrary";
 import { DEFAULT_ITEM_SLOT_LIMIT, type AXSpaceDraft } from "./types";
 
 type DraftReviewScreenProps = {
   initialDrafts: AXSpaceDraft[];
   onConfirm: (finalDrafts: AXSpaceDraft[]) => void;
-  onBack?: () => void;
+  onBack: () => void;
 };
 
 /**
+ * AI/05 추천 초안 확인 (260:3512).
  * 인식 결과를 사람이 확인·수정하는 편집 화면. AI 결과는 여기서 절대 자동 확정되지 않는다(PRD 원칙 17) —
- * "확인하고 시작하기"를 눌러야 onConfirm이 호출된다.
+ * 시작 버튼을 눌러야 onConfirm이 호출된다.
  */
 export default function DraftReviewScreen({ initialDrafts, onConfirm, onBack }: DraftReviewScreenProps) {
   const [drafts, setDrafts] = useState<AXSpaceDraft[]>(initialDrafts);
@@ -55,58 +59,55 @@ export default function DraftReviewScreen({ initialDrafts, onConfirm, onBack }: 
 
   return (
     <PageShell bottomNav={false}>
-      <main className="flex min-h-[100dvh] flex-col px-margin-screen pb-space-2xl pt-space-md">
-        <div className="mb-space-lg flex items-center">
-          {onBack ? (
-            <button
-              className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full bg-sky-bg text-sky-ink"
-              type="button"
-              aria-label="이전 화면으로"
-              onClick={onBack}
-            >
-              <Icon name="arrow_back_ios_new" className="text-[22px]" />
-            </button>
-          ) : null}
-        </div>
-
-        <section className="mb-space-lg">
-          <h1 className="text-headline-lg">이렇게 구성했어요</h1>
-          <p className="mt-2 text-body-md text-sky-muted">확인해 주세요. 필요 없는 항목은 지우고, 빠진 항목은 다시 체크할 수 있어요.</p>
+      <FlowHeader title="추천 항목 확인" onBack={onBack} />
+      <main className="flex flex-col gap-3 px-margin-screen pb-7 pt-header">
+        <section className="flex flex-col gap-2">
+          <h1 className="text-[25px] font-bold leading-[39px] text-sky-ink">이렇게 구성했어요</h1>
+          <p className="text-bb-body text-sky-muted">필요 없는 항목은 빼고, 빠진 항목은 다시 체크해 주세요.</p>
         </section>
 
-        <div className="flex flex-col gap-space-sm">
-          {drafts.map((draft, index) => {
-            const isOpen = openIndex === index;
-            const includedCount = draft.items.filter((item) => item.included).length;
-            const warning = limitWarningIndex === index;
+        {drafts.map((draft, index) => {
+          const isOpen = openIndex === index;
+          const includedCount = draft.items.filter((item) => item.included).length;
+          const space = getSpace(draft.spaceKey);
+          const fill = spaceColor(draft.spaceKey, 0.28);
 
-            return (
-              <section key={index} className="overflow-hidden rounded-xl bg-sky-white shadow-sm">
-                <button
-                  className="flex w-full items-center justify-between p-space-md text-left transition-colors active:bg-sky-bg"
-                  type="button"
-                  onClick={() => setOpenIndex(isOpen ? null : index)}
-                >
-                  <div className="min-w-0">
-                    <span className="text-title-sm text-sky-ink">{spaceLabels[draft.spaceKey]}</span>
-                    <span className="ml-2 text-caption text-sky-muted">{includedCount}개 선택됨</span>
-                  </div>
-                  <Icon
-                    name="keyboard_arrow_down"
-                    className={`text-[22px] text-sky-muted transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
+          return (
+            <section
+              key={index}
+              className={`flex flex-col gap-2.5 rounded-row-sm transition-colors duration-300 ${isOpen ? "bg-sky-white p-4" : "px-4"}`}
+              style={isOpen ? undefined : { backgroundColor: fill }}
+            >
+              <button
+                aria-expanded={isOpen}
+                className={`flex w-full items-center justify-between text-left ${isOpen ? "h-11" : "h-[60px]"}`}
+                type="button"
+                onClick={() => setOpenIndex(isOpen ? null : index)}
+              >
+                <span className="flex min-w-0 items-center">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: fill, color: space.iconColor }}>
+                    <Icon name={space.icon} className="text-[22px]" />
+                  </span>
+                  <span className={`truncate text-sky-ink ${isOpen ? "text-bb-label font-bold" : "text-bb-label-sm"}`}>
+                    {spaceLabels[draft.spaceKey]}&nbsp;&nbsp;·&nbsp;&nbsp;{includedCount}개 선택됨
+                  </span>
+                </span>
+                <Icon name="chevron-down" className={`shrink-0 text-[18px] text-sky-muted transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+              </button>
 
-                <div className={`${isOpen ? "flex" : "hidden"} flex-col gap-space-xs px-space-md pb-space-md`}>
+              {isOpen ? (
+                <>
+                  <hr className="border-sky-line/65" />
+
                   {!draft.resolved && draft.ambiguousCandidates.length > 0 ? (
-                    <div className="mb-space-xs rounded-lg bg-sky-bg p-space-sm">
-                      <p className="text-body-md text-sky-ink">어떤 공간에 가까운가요?</p>
-                      <div className="mt-space-xs flex flex-wrap gap-space-xxs">
+                    <div className="rounded-xl bg-sky-bg p-3">
+                      <p className="text-bb-label-sm text-sky-ink">어떤 공간에 가까운가요?</p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
                         {draft.ambiguousCandidates.map((candidate) => (
                           <button
                             key={candidate}
                             type="button"
-                            className="rounded-full border border-sky-line px-3 py-1.5 text-label-md text-sky-ink transition-colors active:bg-sky-bg"
+                            className="press h-9 rounded-full border border-sky-line bg-sky-white px-3 text-bb-label-sm text-sky-ink"
                             onClick={() => resolveSpace(index, candidate)}
                           >
                             {spaceLabels[candidate]}
@@ -116,12 +117,14 @@ export default function DraftReviewScreen({ initialDrafts, onConfirm, onBack }: 
                     </div>
                   ) : null}
 
-                  {warning ? (
-                    <p className="mb-space-xs text-caption text-sky-muted">한 공간에 최대 {DEFAULT_ITEM_SLOT_LIMIT}개까지 담을 수 있어요.</p>
+                  {limitWarningIndex === index ? (
+                    <p role="status" className="text-bb-caption text-sky-deep">
+                      한 공간에 최대 {DEFAULT_ITEM_SLOT_LIMIT}개까지 담을 수 있어요.
+                    </p>
                   ) : null}
 
                   {draft.items.length === 0 ? (
-                    <p className="py-space-sm text-body-md text-sky-muted">인식된 아이템이 없어요. 항목 추가는 다음 화면에서 할 수 있어요.</p>
+                    <p className="py-2 text-bb-body text-sky-muted">인식된 아이템이 없어요. 항목 추가는 시작한 뒤에도 할 수 있어요.</p>
                   ) : (
                     draft.items.map((item) => {
                       const libraryItem = findItem(item.itemId);
@@ -129,22 +132,18 @@ export default function DraftReviewScreen({ initialDrafts, onConfirm, onBack }: 
                       return (
                         <button
                           key={item.itemId}
+                          aria-pressed={item.included}
                           type="button"
-                          className={`flex items-center justify-between rounded-lg border p-space-sm text-left transition-all active:scale-[0.99] ${
-                            item.included ? "border-sky-brand/40 bg-sky-tint/20" : "border-transparent bg-sky-bg"
-                          }`}
+                          className="press flex h-[54px] items-center justify-between gap-3 rounded-xl bg-sky-white px-3 text-left transition-colors duration-200"
+                          style={item.included ? { backgroundColor: fill } : undefined}
                           onClick={() => toggleItem(index, item.itemId)}
                         >
-                          <div className="flex min-w-0 flex-col">
-                            <span className="truncate text-body-md text-sky-ink">{libraryItem.name}</span>
-                            {item.source === "ai" ? <span className="mt-0.5 text-caption text-sky-muted">AI 추천</span> : null}
-                          </div>
+                          <span className="flex min-w-0 flex-col">
+                            <span className="truncate text-bb-label-sm text-sky-ink">{libraryItem.name}</span>
+                            <span className="text-[10px] leading-4 text-sky-muted">{item.source === "ai" ? "AI 추천" : "직접 추가"}</span>
+                          </span>
                           <span
-                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border shadow-sm ${
-                              item.included
-                                ? "border-sky-brand/40 bg-sky-white text-sky-deep"
-                                : "border-sky-line/50 bg-sky-bg text-sky-muted"
-                            }`}
+                            className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-xl text-sky-deep ${item.included ? "bg-sky-white" : "bg-sky-bg"}`}
                           >
                             <Icon name="check" className={`text-[20px] transition-transform duration-200 ${item.included ? "scale-100" : "scale-0"}`} />
                           </span>
@@ -152,19 +151,17 @@ export default function DraftReviewScreen({ initialDrafts, onConfirm, onBack }: 
                       );
                     })
                   )}
-                </div>
-              </section>
-            );
-          })}
-        </div>
+                </>
+              ) : null}
+            </section>
+          );
+        })}
 
-        <button
-          className="mt-space-lg flex h-14 items-center justify-center rounded-full bg-sky-brand text-title-sm text-onbrand shadow-md"
-          type="button"
-          onClick={() => onConfirm(drafts)}
-        >
+        <p className="text-center text-[11px] leading-[17px] text-sky-muted">공간당 최대 {DEFAULT_ITEM_SLOT_LIMIT}개까지 선택할 수 있어요.</p>
+
+        <GlassButton onClick={() => onConfirm(drafts)}>
           {totalIncluded > 0 ? `${totalIncluded}개 항목으로 시작하기` : "확인하고 시작하기"}
-        </button>
+        </GlassButton>
       </main>
     </PageShell>
   );

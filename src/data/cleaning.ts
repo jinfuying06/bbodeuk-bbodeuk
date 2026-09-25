@@ -163,32 +163,42 @@ export function getItem(idOrName: string | null | undefined): Item | undefined {
 
 export type CleaningRecord = { id: string; itemId: string; /** ISO timestamp */ at: string };
 
-const RECORDS_KEY = "bbodeuk.session.records.v1";
+// v2: reseeded for distinct home fade stages (2026-09-25) — older sessions pick up the new seed.
+const RECORDS_KEY = "bbodeuk.session.records.v2";
 
-/** [itemId, days ago, "HH:MM"] — nothing seeded for today, so "오늘 N곳" starts at 0 in a test. */
+/**
+ * [itemId, days ago, "HH:MM"] — nothing seeded for today, so "오늘 N곳" starts at 0 in a test.
+ * Latest record per item is tuned so the home cards open on four distinct fade stages
+ * (spaceFade ≈ 거실 ~95% · 주방 ~72% · 욕실 ~48% · 방 28%); older rows only feed History.
+ */
 const SEED: Array<[string, number, string]> = [
+  // 거실 — cared for yesterday → ~100%
+  ["living-floor", 1, "21:30"],
+  ["living-floor", 8, "18:10"],
+  ["shelf", 1, "21:40"],
+  ["air-filter", 2, "11:00"],
+  ["air-filter", 33, "10:30"],
+  // 주방 — ~60% of each cycle → ~72%
+  ["sink", 2, "19:15"],
+  ["sink", 6, "20:40"],
+  ["sink", 13, "19:20"],
+  ["countertop", 3, "21:10"],
+  ["hood", 12, "11:30"],
+  // 욕실 — close to the 7-day cycle → ~48%
   ["basin", 6, "20:10"],
   ["basin", 13, "19:50"],
   ["basin", 20, "07:10"],
-  ["toilet", 3, "21:25"],
+  ["toilet", 6, "21:25"],
   ["toilet", 17, "21:00"],
-  ["shower", 3, "21:40"],
-  ["mirror", 1, "08:40"],
-  ["bath-floor", 3, "21:50"],
-  ["sink", 1, "19:15"],
-  ["sink", 5, "20:40"],
-  ["sink", 13, "19:20"],
-  ["countertop", 3, "21:10"],
-  ["hood", 28, "11:30"],
-  ["living-floor", 3, "18:30"],
-  ["living-floor", 11, "18:10"],
-  ["shelf", 3, "18:45"],
-  ["air-filter", 3, "11:00"],
-  ["air-filter", 33, "10:30"],
-  ["bedding", 1, "10:20"],
-  ["bedding", 9, "10:05"],
-  ["pillow", 9, "10:10"],
-  ["bedroom-floor", 3, "22:00"],
+  ["shower", 5, "21:40"],
+  ["mirror", 9, "08:40"],
+  ["bath-floor", 7, "21:50"],
+  ["drain", 6, "21:55"],
+  // 방 — past the cycle → 28% floor
+  ["bedding", 9, "10:20"],
+  ["bedding", 16, "10:05"],
+  ["pillow", 12, "10:10"],
+  ["bedroom-floor", 10, "22:00"],
 ];
 
 function seedRecords(): CleaningRecord[] {
@@ -371,9 +381,24 @@ export const itemFade = (item: Item, records = getRecords()) => {
   return staleness === Infinity ? 0 : fadeForStaleness(staleness);
 };
 
-/** Space fade = average of its items' fades (Figma v2 card: "항목별 관리 주기 농도의 평균"). */
+/**
+ * Space fade = average of its items' fades (Figma v2 card: "항목별 관리 주기 농도의 평균").
+ * Figma 127:480: "기록 없는 항목은 최소 농도로 유지" → never-recorded items count as the 28% floor
+ * here (not 0, which would drag the average under the floor). A space with no records at all is 0.
+ */
 export function spaceFade(space: SpaceKey, records = getRecords()): number {
-  const items = getItems(space);
-  if (items.length === 0) return 0;
-  return items.reduce((sum, item) => sum + itemFade(item, records), 0) / items.length;
+  const fades = getItems(space).map((item) => itemFade(item, records));
+  if (!fades.some((fade) => fade > 0)) return 0;
+  const floor = FADE_STOPS[FADE_STOPS.length - 1][1];
+  return fades.reduce((sum, fade) => sum + Math.max(fade, floor), 0) / fades.length;
+}
+
+/** Base tint under a <WaterFill> (the empty "tank"): the space color lies lightly under the whole card/row. */
+export const WATER_BASE_TINT = 0.4;
+
+/** Space color at `alpha` pre-mixed onto white as an opaque rgb() — lets CSS transition the card fill. */
+export function spaceFill(key: SpaceKey, alpha: number): string {
+  const hex = getSpace(key).color;
+  const [r, g, b] = [1, 3, 5].map((i) => Math.round(255 - (255 - parseInt(hex.slice(i, i + 2), 16)) * alpha));
+  return `rgb(${r}, ${g}, ${b})`;
 }

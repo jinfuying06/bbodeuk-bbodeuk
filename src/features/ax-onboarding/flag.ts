@@ -15,4 +15,4 @@
  * 4) server/ax-recognize/ 전체 삭제(로컬 dev 브릿지 포함) + vite.config.ts의 axRecognizeDevPlugin() 1줄 삭제
  * 5) 별도 배포된 프로덕션 백엔드 프록시(vercel.ts 등) 삭제
  */
-export const AX_ONBOARDING_ENABLED = false;
+export const AX_ONBOARDING_ENABLED = true;

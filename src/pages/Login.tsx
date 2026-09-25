@@ -107,7 +107,7 @@ export default function Login() {
               <Link className="text-link w-full" to="/signup">
                 이메일로 회원가입
               </Link>
-              <Link className="text-link w-full" to="/setup" onClick={() => resetToGuest()}>
+              <Link className="text-link w-full" to="/welcome" onClick={() => resetToGuest()}>
                 먼저 둘러보기
               </Link>
             </>

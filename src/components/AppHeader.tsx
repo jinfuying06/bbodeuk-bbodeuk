@@ -11,8 +11,7 @@ type AppHeaderProps = {
    */
   back?: boolean | string;
   /**
-   * Sub-page right slot. Omitted → decorative `⋯` (Figma "More", no action).
-   * `null` → empty 44px spacer (Login/SignUp/포인트 확인 variants), keeps the title centered.
+   * Sub-page right slot. Omitted/`null` → empty 44px spacer, keeps the title centered.
    */
   right?: ReactNode | null;
 };
@@ -50,13 +49,7 @@ export default function AppHeader({ title, back, right }: AppHeaderProps) {
           <Icon name="chevron-left" className="text-[22px]" />
         </button>
         <span className="min-w-0 flex-1 truncate text-center text-bb-label text-sky-ink">{title}</span>
-        {right === undefined ? (
-          <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center text-sky-deep">
-            <Icon name="more" className="text-[20px]" />
-          </span>
-        ) : (
-          <div className="flex h-11 min-w-11 shrink-0 items-center justify-center">{right}</div>
-        )}
+        <div className="flex h-11 min-w-11 shrink-0 items-center justify-center">{right}</div>
       </div>
     </header>
   );

@@ -1,9 +1,11 @@
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
 import ItemRow from "../components/ItemRow";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
+import WaterFill from "../components/WaterFill";
 import Toast, { useRouteToast } from "../components/Toast";
 import {
   formatRecency,
@@ -13,8 +15,9 @@ import {
   isRecordedToday,
   itemStaleness,
   lastRecord,
-  spaceColor,
   spaceFade,
+  spaceFill,
+  WATER_BASE_TINT,
   todaysRecords,
   useRecords,
   type CleaningRecord,
@@ -29,6 +32,12 @@ const LIGHT_CARE: Array<{ itemId: string; tip: string }> = [
   { itemId: "living-floor", tip: "눈에 띄는 곳만 밀어도 좋아요" },
   { itemId: "bedding", tip: "베개 커버만 바꿔도 좋아요" },
 ];
+
+/**
+ * Fades the home cards last showed. Coming back after recording (QuickRecord, CareAction …),
+ * cards first paint at the old fade and then transition up, so the color visibly rises.
+ */
+const lastShownFade: Partial<Record<SpaceKey, number>> = {};
 
 /** Space card recency = its most recent item record. */
 const cardRecency = (key: SpaceKey, records: CleaningRecord[]) => formatRecency(records.find((record) => getItem(record.itemId)?.space === key)?.at);
@@ -69,6 +78,15 @@ export default function Home() {
       ? `오늘 ${todayCount}곳을 돌봤어요`
       : "오늘은 아직 돌본 곳이 없어요";
 
+  const targetFade = Object.fromEntries(spaces.map((space) => [space.key, spaceFade(space.key, records)])) as Record<SpaceKey, number>;
+  const fadeKey = JSON.stringify(targetFade);
+  const [shownFade, setShownFade] = useState<Record<SpaceKey, number>>(() => ({ ...targetFade, ...lastShownFade }));
+  useEffect(() => {
+    Object.assign(lastShownFade, targetFade);
+    const frame = requestAnimationFrame(() => setShownFade(targetFade));
+    return () => cancelAnimationFrame(frame);
+  }, [fadeKey]);
+
   const recent = recentRows(records, spaceKeys);
   const lightCare = LIGHT_CARE.flatMap(({ itemId, tip }) => {
     const item = getItem(itemId);
@@ -99,21 +117,22 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             {spaces.map((space, index) => {
-              const fill = spaceColor(space.key, spaceFade(space.key, records));
+              const fade = shownFade[space.key] ?? targetFade[space.key];
               // Odd count (e.g. 베란다 added) → last card spans the row so no empty cell is left.
               const wide = spaces.length % 2 === 1 && index === spaces.length - 1;
               return (
                 <Link
                   key={space.key}
-                  className={`press relative flex h-[110px] flex-col justify-end gap-[3px] overflow-hidden rounded-2xl bg-sky-white px-4 py-[14px] ${wide ? "col-span-2" : ""}`}
-                  style={{ backgroundImage: `linear-gradient(${fill}, ${fill})` }}
+                  className={`press relative flex h-[110px] flex-col justify-end gap-[3px] overflow-hidden rounded-2xl px-4 py-[14px] ${wide ? "col-span-2" : ""}`}
+                  style={{ backgroundColor: spaceFill(space.key, WATER_BASE_TINT) }}
                   to={`/quick-record?filter=space&space=${space.key}`}
                 >
+                  <WaterFill direction="up" level={fade} color={space.color} phase={index} />
                   <span className="absolute right-4 top-[14px]" style={{ color: space.iconColor }}>
                     <Icon name={space.icon} className="block text-[43.2px]" />
                   </span>
-                  <span className="text-bb-label font-bold text-sky-ink">{space.label}</span>
-                  <span className="text-bb-caption text-sky-muted">{cardRecency(space.key, records)}</span>
+                  <span className="relative text-bb-label font-bold text-sky-ink">{space.label}</span>
+                  <span className="relative text-bb-caption text-sky-muted">{cardRecency(space.key, records)}</span>
                 </Link>
               );
             })}

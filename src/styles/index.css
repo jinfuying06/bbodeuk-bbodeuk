@@ -198,6 +198,97 @@
   }
 }
 
+/* Recency "water level" (<WaterFill>): rises with a gentle overshoot, surface sloshes at rest.
+   The wave SVG straddles the level edge (±4px) and is clipped by the parent's overflow.
+   Outside @layer: `water-fill-${direction}` is built dynamically, so Tailwind would purge it. */
+.water-fill {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  transition-duration: 1300ms;
+  transition-timing-function: cubic-bezier(0.34, 1.25, 0.5, 1);
+}
+.water-fill-up {
+  right: 0;
+  transition-property: height;
+}
+.water-fill-right {
+  top: 0;
+  transition-property: width;
+}
+.water-wave {
+  position: absolute;
+  overflow: visible;
+  animation: 6s ease-in-out var(--water-delay, 0s) infinite alternate;
+  transform-origin: center;
+  transition: scale 400ms ease-out;
+}
+/* Hover/press on the card or row: the surface swells and ripples (separate `scale`/`translate`
+   properties, so the idle `transform` slosh keeps running underneath). */
+:hover > .water-fill .water-wave,
+:active > .water-fill .water-wave {
+  animation-duration: 6s, 700ms;
+  animation-direction: alternate;
+}
+:hover > .water-fill-up .water-wave,
+:active > .water-fill-up .water-wave {
+  animation-name: water-slosh-x, water-ripple;
+  scale: 1 2.2;
+  --water-ripple: 0 -1.5px;
+}
+:hover > .water-fill-right .water-wave,
+:active > .water-fill-right .water-wave {
+  animation-name: water-slosh-y, water-ripple;
+  scale: 2.2 1;
+  --water-ripple: -1.5px 0;
+}
+.water-fill-up .water-wave {
+  left: 0;
+  bottom: calc(100% - 4px);
+  width: 200%;
+  height: 8px;
+  animation-name: water-slosh-x;
+}
+.water-fill-right .water-wave {
+  top: 0;
+  left: calc(100% - 4px);
+  width: 8px;
+  height: 200%;
+  animation-name: water-slosh-y;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .water-fill {
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+  .water-wave,
+  :hover > .water-fill .water-wave,
+  :active > .water-fill .water-wave {
+    animation: none;
+    scale: none;
+  }
+}
+
+/* One wave period (¼ of the 2×-wide tile), back and forth. */
+@keyframes water-slosh-x {
+  to {
+    transform: translateX(-25%);
+  }
+}
+
+@keyframes water-ripple {
+  to {
+    translate: var(--water-ripple);
+  }
+}
+
+@keyframes water-slosh-y {
+  to {
+    transform: translateY(-25%);
+  }
+}
+
 @keyframes glass-sweep {
   to {
     transform: translateX(560px) rotate(18deg);

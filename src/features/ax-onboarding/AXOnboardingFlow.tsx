@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PhotoSetupScreen from "./PhotoSetupScreen";
 import DraftReviewScreen from "./DraftReviewScreen";
 import type { AXSpaceDraft } from "./types";
 import type { SpaceKey } from "./itemLibrary";
-import { writeSetup } from "../../data/setup";
+import { DEFAULT_SPACES, writeSetup } from "../../data/setup";
 
 /**
  * 이 기능의 유일한 진입/종료 지점. App.tsx는 이 컴포넌트 하나만 라우트에 연결한다.
@@ -23,27 +23,35 @@ export default function AXOnboardingFlow() {
   const navigate = useNavigate();
   const [drafts, setDrafts] = useState<AXSpaceDraft[] | null>(null);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [drafts === null]);
+
   const finishSetup = (spaceKeys: SpaceKey[]) => {
-    const spaces = Array.from(new Set(spaceKeys.map((key) => SETUP_STORAGE_LABEL[key])));
+    // 욕실/주방은 Setup과 같은 규칙으로 항상 포함(필수 공간) — 사진을 안 찍었어도 빠지지 않게.
+    const required = DEFAULT_SPACES.filter((space) => space.required).map((space) => space.key);
+    const spaces = Array.from(new Set([...spaceKeys.map((key) => SETUP_STORAGE_LABEL[key]), ...required]));
     writeSetup({ spaces, roomName: "방" });
     navigate("/home");
   };
 
-  if (!drafts) {
-    return (
-      <PhotoSetupScreen
-        onComplete={setDrafts}
-        onSkip={() => navigate("/setup", { replace: true })}
-        onBack={() => navigate("/setup")}
-      />
-    );
-  }
-
+  // 사진 화면은 초안 확인 중에도 마운트된 채 숨겨둔다 — 초안에서 뒤로 가도 찍은 사진이 그대로 남도록.
   return (
-    <DraftReviewScreen
-      initialDrafts={drafts}
-      onBack={() => setDrafts(null)}
-      onConfirm={(finalDrafts) => finishSetup(finalDrafts.map((draft) => draft.spaceKey))}
-    />
+    <>
+      <div hidden={drafts !== null}>
+        <PhotoSetupScreen
+          onComplete={setDrafts}
+          onSkip={() => navigate("/setup", { replace: true })}
+          onBack={() => navigate("/setup", { replace: true })}
+        />
+      </div>
+      {drafts ? (
+        <DraftReviewScreen
+          initialDrafts={drafts}
+          onBack={() => setDrafts(null)}
+          onConfirm={(finalDrafts) => finishSetup(finalDrafts.map((draft) => draft.spaceKey))}
+        />
+      ) : null}
+    </>
   );
 }

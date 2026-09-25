@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
@@ -55,7 +55,6 @@ const playSparkle = (el: HTMLElement | null) => {
 const sweepGradient = "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(199,255,250,.22) 32%, rgba(255,255,255,.88) 50%, rgba(199,255,250,.22) 68%, rgba(255,255,255,0) 100%)";
 
 export default function QuickRecord() {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const records = useRecords();
   const activeSpaces = useMemo(() => getActiveSpaces(), []);
@@ -68,9 +67,6 @@ export default function QuickRecord() {
   const [shine, setShine] = useState<{ id: string; n: number } | null>(null);
   // Also shows the toast handed over from 기록 완료 → "기록 취소".
   const [toast, showToast] = useRouteToast();
-  const doneTimer = useRef<number | undefined>(undefined);
-
-  useEffect(() => () => window.clearTimeout(doneTimer.current), []);
 
   const items = useMemo(() => {
     if (filter === "recent") {
@@ -99,15 +95,12 @@ export default function QuickRecord() {
     setSearchParams(nextFilter === "space" ? { filter: nextFilter, space: nextSpace } : { filter: nextFilter }, { replace: true });
 
   const record = (item: Item) => {
-    window.clearTimeout(doneTimer.current);
     if (toggleTodayRecord(item.id) === "removed") {
       setShine(null);
       showToast("청소 기록을 취소했어요");
       return;
     }
     setShine((prev) => ({ id: item.id, n: (prev?.n ?? 0) + 1 }));
-    // 탭 → 유리광 480ms + 반짝임 → ~1.2s 후 09/기록 완료.
-    doneTimer.current = window.setTimeout(() => navigate(`/record-done?item=${item.id}`), 1200);
   };
 
   const overlays = (item: Item, sparkleClass: string, sweepClass: string) =>

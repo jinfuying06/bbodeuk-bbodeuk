@@ -5,8 +5,9 @@ import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
+import WaterFill from "../components/WaterFill";
 import SpaceTile from "../components/SpaceTile";
-import { formatRecency, getActiveSpaces, getItems, isSpaceKey, itemFade, lastRecord, spaceColor, useRecords, type SpaceKey } from "../data/cleaning";
+import { formatRecency, getActiveSpaces, getItems, isSpaceKey, itemFade, lastRecord, spaceFill, WATER_BASE_TINT, useRecords, type SpaceKey } from "../data/cleaning";
 
 export default function Spaces() {
   const records = useRecords();
@@ -42,18 +43,19 @@ export default function Spaces() {
 
               {expanded ? (
                 <div id={`space-panel-${space.key}`} className="flex flex-col gap-2 rounded-row border bg-sky-white p-3" style={{ borderColor: space.color }}>
-                  {items.map((item) => (
+                  {items.map((item, index) => (
                     <Link
                       key={item.id}
-                      className="press flex h-11 items-center justify-between rounded-xl px-[10px]"
-                      style={{ backgroundColor: spaceColor(space.key, itemFade(item, records)) }}
+                      className="press relative flex h-11 items-center justify-between overflow-hidden rounded-xl px-[10px]"
+                      style={{ backgroundColor: spaceFill(space.key, WATER_BASE_TINT) }}
                       to={`/item-info?item=${item.id}`}
                     >
-                      <span className="flex min-w-0 items-center gap-2">
+                      <WaterFill direction="right" level={itemFade(item, records)} color={space.color} phase={index} />
+                      <span className="relative flex min-w-0 items-center gap-2">
                         <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: space.iconColor }} />
                         <span className="truncate text-bb-label text-sky-ink">{item.name}</span>
                       </span>
-                      <span className="shrink-0 pl-2 text-bb-caption text-sky-muted">{formatRecency(lastRecord(item.id, records)?.at, { short: true })}</span>
+                      <span className="relative shrink-0 pl-2 text-bb-caption text-sky-muted">{formatRecency(lastRecord(item.id, records)?.at, { short: true })}</span>
                     </Link>
                   ))}
                   <Link className="press flex h-11 items-center justify-center rounded-tile text-bb-label font-bold text-sky-deep" style={{ backgroundColor: space.color }} to={`/quick-record?filter=space&space=${space.key}`}>

@@ -1,4 +1,5 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AX_ONBOARDING_ENABLED, AXOnboardingFlow } from "./features/ax-onboarding";
 import Care from "./pages/Care";
 import CareAction from "./pages/CareAction";
@@ -30,6 +31,11 @@ function RootEntry() {
 }
 
 export default function App() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
     <Routes>
       <Route path="/" element={<RootEntry />} />

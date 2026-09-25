@@ -3,7 +3,8 @@ import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-import { fadeLabel, formatDay, formatTime, getItem, getSpace, isSpaceKey, isToday, spaceColor, spaceFade, useRecords, type SpaceKey } from "../data/cleaning";
+import WaterFill from "../components/WaterFill";
+import { fadeLabel, formatDay, formatTime, getItem, getSpace, isSpaceKey, isToday, spaceFade, spaceFill, WATER_BASE_TINT, useRecords, type SpaceKey } from "../data/cleaning";
 
 // No Figma frame for this screen — styled after 07/내 공간 + 17/공간 관리 (Sky/BB rows, space-color tiles).
 const DETAILS: Record<SpaceKey, { cycle: string; detail: string }> = {
@@ -43,12 +44,13 @@ export default function SpaceInfo() {
           <p className="text-bb-body text-sky-muted">{DETAILS[key].detail}</p>
         </section>
 
-        <section className="flex h-[72px] items-center justify-between gap-3 rounded-row bg-sky-white px-4" style={{ backgroundImage: `linear-gradient(${spaceColor(key, fade)}, ${spaceColor(key, fade)})` }}>
-          <span className="flex min-w-0 flex-col">
+        <section className="relative flex h-[72px] items-center justify-between gap-3 overflow-hidden rounded-row px-4" style={{ backgroundColor: spaceFill(key, WATER_BASE_TINT) }}>
+          <WaterFill direction="right" level={fade} color={space.color} />
+          <span className="relative flex min-w-0 flex-col">
             <span className="text-bb-label text-sky-ink">내 관리 상태</span>
             <span className="text-bb-caption text-sky-muted">주기 기준으로 공간의 관리 흐름을 보여줘요.</span>
           </span>
-          <span className="shrink-0 rounded-full bg-sky-white px-3 py-1 text-bb-caption font-bold text-sky-deep">{fadeLabel(fade)}</span>
+          <span className="relative shrink-0 rounded-full bg-sky-white px-3 py-1 text-bb-caption font-bold text-sky-deep">{fadeLabel(fade)}</span>
         </section>
 
         <section className="flex flex-col gap-2 rounded-row border bg-sky-white p-3" style={{ borderColor: space.color }}>

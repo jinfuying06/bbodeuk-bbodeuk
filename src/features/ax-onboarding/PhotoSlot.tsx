@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import Icon from "../../components/Icon";
+import { getSpace, spaceColor } from "../../data/cleaning";
+import type { SpaceKey } from "./itemLibrary";
 
 type PhotoSlotProps = {
+  spaceKey: SpaceKey;
   label: string;
   photos: File[];
   maxPhotos: number;
@@ -10,7 +13,8 @@ type PhotoSlotProps = {
   onRemove: (index: number) => void;
 };
 
-export default function PhotoSlot({ label, photos, maxPhotos, requiredPhotos, onAdd, onRemove }: PhotoSlotProps) {
+/** Figma "Photo slot / 공간" (AI/01 260:3231 빈 상태 · AI/02 260:3325 채운 상태). */
+export default function PhotoSlot({ spaceKey, label, photos, maxPhotos, requiredPhotos, onAdd, onRemove }: PhotoSlotProps) {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   useEffect(() => {
@@ -24,53 +28,59 @@ export default function PhotoSlot({ label, photos, maxPhotos, requiredPhotos, on
   const filled = photos.length >= requiredPhotos;
   const canAddMore = photos.length < maxPhotos;
 
-  const handleFiles = (fileList: FileList | null) => {
-    if (!fileList || fileList.length === 0) return;
-    const remaining = maxPhotos - photos.length;
-    if (remaining <= 0) return;
-    onAdd(Array.from(fileList).slice(0, remaining));
-  };
+  const picker = (
+    <input
+      type="file"
+      accept="image/*"
+      capture="environment"
+      className="sr-only"
+      onChange={(event) => {
+        const files = Array.from(event.target.files ?? []).slice(0, maxPhotos - photos.length);
+        if (files.length > 0) onAdd(files);
+        event.target.value = "";
+      }}
+    />
+  );
 
   return (
     <div
-      className={`flex flex-col gap-space-xs rounded-xl border p-space-sm shadow-sm ${
-        filled ? "border-sky-brand/40 bg-sky-tint/20" : "border-sky-line/50 bg-sky-white"
-      }`}
+      className="flex h-[134px] flex-col gap-2 rounded-row-sm bg-sky-white p-3 transition-colors duration-300"
+      style={filled ? { backgroundColor: spaceColor(spaceKey, 0.28) } : undefined}
     >
-      <div className="flex items-center justify-between">
-        <span className="text-title-sm text-sky-ink">{label}</span>
-        <span className={`text-caption ${filled ? "text-sky-deep" : "text-sky-muted"}`}>{filled ? "완료" : "필수 1장"}</span>
+      <div className="flex h-[22px] items-center justify-between">
+        <span className="text-bb-label-sm font-bold text-sky-ink">{label}</span>
+        <span className="text-bb-small" style={{ color: filled ? getSpace(spaceKey).iconColor : undefined }}>
+          {filled ? "완료" : <span className="text-sky-muted">필수 {requiredPhotos}장</span>}
+        </span>
       </div>
 
-      <div className="grid grid-cols-3 gap-space-xxs">
+      <div className="flex h-[76px] gap-1.5">
         {previewUrls.map((url, index) => (
-          <div key={url} className="relative aspect-square overflow-hidden rounded-lg bg-sky-bg">
+          <div key={url} className="relative min-w-0 flex-1 overflow-hidden rounded-xl" style={{ backgroundColor: getSpace(spaceKey).color }}>
             <img src={url} alt={`${label} 사진 ${index + 1}`} className="h-full w-full object-cover" />
             <button
               type="button"
-              aria-label="사진 삭제"
-              className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-sky-ink/80 text-sky-white"
+              aria-label={`${label} 사진 ${index + 1} 삭제`}
+              className="absolute right-0 top-0 flex h-8 w-8 items-center justify-center"
               onClick={() => onRemove(index)}
             >
-              <Icon name="close" className="text-[14px]" />
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-sky-ink/70 text-sky-white">
+                <Icon name="plus" className="rotate-45 text-[14px]" />
+              </span>
             </button>
           </div>
         ))}
 
         {canAddMore ? (
-          <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-sky-line text-sky-muted transition-colors active:bg-sky-bg">
-            <Icon name="add_a_photo" className="text-[22px]" />
-            <span className="text-caption">{photos.length === 0 ? "촬영" : "추가"}</span>
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={(event) => {
-                handleFiles(event.target.files);
-                event.target.value = "";
-              }}
-            />
+          <label
+            aria-label={`${label} 사진 ${photos.length === 0 ? "촬영" : "추가"}`}
+            className={`press flex cursor-pointer flex-col items-center justify-center gap-0.5 border border-dashed border-sky-line text-sky-muted has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-sky-deep ${
+              photos.length === 0 ? "flex-1 rounded-xl" : "w-[25px] shrink-0 rounded-[10px]"
+            }`}
+          >
+            <Icon name="plus" className={photos.length === 0 ? "text-[23px]" : "text-[16px]"} />
+            {photos.length === 0 ? <span className="text-bb-small">촬영</span> : null}
+            {picker}
           </label>
         ) : null}
       </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Dialog from "../components/Dialog";
@@ -6,7 +6,8 @@ import GlassButton from "../components/GlassButton";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
-import { readPoints, SPACE_PRICE } from "../data/points";
+import Toast, { useToast } from "../components/Toast";
+import { addPoints, readPoints, SPACE_PRICE } from "../data/points";
 import { hasCompletedSetup } from "../data/setup";
 
 const packages = [300, 500, 1000];
@@ -37,10 +38,25 @@ export default function Points() {
   const [searchParams] = useSearchParams();
   const [selectedPackage, setSelectedPackage] = useState(300);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [balance, setBalance] = useState(readPoints);
+  const [toast, showToast] = useToast();
+  const payTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(payTimer.current), []);
 
   if (searchParams.get("intent") === "short") return <PointsShort />;
 
-  const balance = readPoints();
+  // Mock checkout: short "결제 중" beat, then the balance really increases (localStorage via addPoints).
+  const purchase = () => {
+    if (paying) return;
+    setPaying(true);
+    payTimer.current = window.setTimeout(() => {
+      setBalance(addPoints(selectedPackage));
+      setPaying(false);
+      setDialogOpen(false);
+      showToast(`${selectedPackage.toLocaleString()}P를 충전했어요`);
+    }, 900);
+  };
   const openable = Math.floor(balance / SPACE_PRICE);
 
   return (
@@ -72,21 +88,24 @@ export default function Points() {
 
         <GlassButton onClick={() => setDialogOpen(true)}>선택한 포인트 구매하기</GlassButton>
       </main>
-      {/* 32:1098 구매 안내 */}
+      {/* 32:1098 구매 안내 → mock purchase confirm */}
       <Dialog
         body={
           <>
-            현재는 결제 화면 미리보기예요.
+            보유 {balance.toLocaleString()}P → <span className="text-sky-deep">{(balance + selectedPackage).toLocaleString()}P</span>
             <br />
-            실제 결제나 포인트 차감은 발생하지 않아요.
+            충전한 포인트는 추가 공간을 열 때 쓸 수 있어요.
           </>
         }
         open={dialogOpen}
-        primaryLabel="확인했어요"
-        title="포인트 구매는 준비 중이에요"
-        onClose={() => setDialogOpen(false)}
-        onPrimary={() => setDialogOpen(false)}
+        primaryLabel={paying ? "결제하는 중…" : `${selectedPackage.toLocaleString()}P 구매하기`}
+        title={`${selectedPackage.toLocaleString()}P를 충전할까요?`}
+        onClose={() => {
+          if (!paying) setDialogOpen(false);
+        }}
+        onPrimary={purchase}
       />
+      <Toast message={toast} visible={Boolean(toast)} />
     </PageShell>
   );
 }
