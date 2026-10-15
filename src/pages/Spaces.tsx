@@ -17,9 +17,9 @@ export default function Spaces() {
 
   return (
     <PageShell>
-      <AppHeader title="내 공간" back />
+      <AppHeader title="공간" />
       <main className="flex flex-1 flex-col px-margin-screen pb-nav pt-header">
-        <PageIntro title={<>공간마다 쌓이는<br />작은 돌봄</>} body="오늘은 어디부터 살펴볼까요?" className="pb-4" />
+        <PageIntro title="공간마다 쌓이는 작은 돌봄" body="오늘은 어디부터 살펴볼까요?" className="pb-3" />
 
         {spaces.map((space) => {
           const items = getItems(space.key);

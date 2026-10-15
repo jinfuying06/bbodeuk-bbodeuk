@@ -48,7 +48,7 @@ export default function WeekendBigClean() {
     <PageShell>
       <AppHeader title="주말 대청소" back />
       <main className="flex flex-col px-margin-screen pb-nav-cta pt-header">
-        <PageIntro title="여유 있는 날, 대청소" body="오래 안 본 곳과 숨은 관리를 가볍게 훑어요." className="pb-4" />
+        <PageIntro title="오래 안 본 곳부터 가볍게" body="숨은 관리 자리도 함께 챙겨요." className="pb-3" />
 
         {groups.map(({ space, items }) => {
           const isOpen = open === space.key;

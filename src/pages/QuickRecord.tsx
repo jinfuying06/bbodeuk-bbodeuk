@@ -117,7 +117,7 @@ export default function QuickRecord() {
 
   return (
     <PageShell>
-      <AppHeader title="청소 기록" />
+      <AppHeader title="기록" />
       <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
         <PageIntro title={heading} body={body} />
 

@@ -26,9 +26,9 @@ export default function Care() {
 
   return (
     <PageShell>
-      <AppHeader title="청소 가이드" />
-      <main className="flex flex-col gap-[10px] px-margin-screen pb-nav pt-header">
-        <PageIntro title="작은 청소, 쉽게 시작해요" body="익숙하지 않아도 괜찮아요. 하나씩 함께해요." />
+      <AppHeader title="가이드" />
+      <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
+        <PageIntro title="작은 청소, 쉽게 시작해요" body="하나씩 따라 하면 돼요." />
 
         <Link aria-label="추천 가이드: 세면대부터 산뜻하게" className="press flex min-h-[206px] flex-col gap-2 rounded-3xl bg-sky-tint pb-4 pl-5 pr-5 pt-4" to="/care-action?item=basin">
           <span className="whitespace-pre text-bb-caption text-sky-deep">{"오늘의 가벼운 청소  ·  약 3분"}</span>

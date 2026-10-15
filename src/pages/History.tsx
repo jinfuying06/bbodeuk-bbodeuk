@@ -84,10 +84,11 @@ export default function History() {
     <PageShell>
       <AppHeader title="히스토리" />
       <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
+        {/* One fixed intro for both views, so the view switch never moves (2026-10-15). */}
+        <PageIntro title="차곡차곡 쌓인 흔적" body="조금씩 돌본 내 공간을 돌아봐요." />
+        {chips}
         {view === "date" ? (
           <>
-            <PageIntro title="차곡차곡 쌓인 흔적" body="조금씩 돌본 내 공간을 돌아봐요." />
-            {chips}
 
             <section aria-label={`${month.getMonth() + 1}월 달력`} className="flex flex-col gap-2 rounded-3xl bg-sky-surface px-[17px] pb-[18px] pt-[14px]">
               <div className="flex h-8 items-center justify-between">
@@ -156,9 +157,6 @@ export default function History() {
           </>
         ) : (
           <>
-            <h1 className="text-bb-heading text-sky-ink">공간마다 쌓이는 기록</h1>
-            {chips}
-            <p className="text-bb-body text-sky-muted">최근 돌본 항목을 공간별로 살펴봐요.</p>
             {getActiveSpaces().map((space) => {
               // Most recently cared-for first (never-recorded last), top 3.
               const items = getItems(space.key)
