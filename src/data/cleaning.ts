@@ -305,17 +305,17 @@ export const isRecordedToday = (itemId: string, records = getRecords()) => recor
 export const todaysRecords = (records = getRecords()) => records.filter((record) => isToday(record.at));
 
 /**
- * Recency copy: 방금 돌봤어요 (<10 min) · 오늘 기록 · 어제 기록 · N일 전 기록 · 아직 기록 없음.
+ * Recency copy: 방금 돌봤어요 (<10 min) · 오늘 · 어제 · N일 전 · 아직 기록 없음.
  * `short` (내 공간 item rows, Figma 07): 오늘 · 어제 · N일 전 · 기록 없음.
  */
 export function formatRecency(at: string | undefined, { short = false, now = new Date() }: { short?: boolean; now?: Date } = {}): string {
   if (!at) return short ? "기록 없음" : "아직 기록 없음";
   if (!short && now.getTime() - new Date(at).getTime() < 10 * 60_000) return "방금 돌봤어요";
   const days = daysAgo(at, now);
-  const suffix = short ? "" : " 기록";
-  if (days <= 0) return `오늘${suffix}`;
-  if (days === 1) return `어제${suffix}`;
-  return `${days}일 전${suffix}`;
+  // No trailing "기록" (2026-10-15): the context already says these are records.
+  if (days <= 0) return "오늘";
+  if (days === 1) return "어제";
+  return `${days}일 전`;
 }
 
 const timeFormatter = new Intl.DateTimeFormat("ko-KR", { hour: "numeric", minute: "2-digit" });
