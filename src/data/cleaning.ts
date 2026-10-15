@@ -4,8 +4,8 @@
  * (QuickRecord → History, ItemHistory, Home recency, Spaces …).
  *
  * - Spaces/items: static catalog (Figma page 02 names) + ItemInfo edits/deletes from itemStorage.
- * - Records: seeded relative to "now" on first load, then kept in sessionStorage
- *   (same session-scoped pattern the prototype used before). All dates are derived — no literals.
+ * - Records: seeded relative to "now" on first load, then kept in localStorage like the rest of
+ *   the app data (Settings → 데이터 초기화 clears it). All dates are derived — no literals.
  */
 import { useSyncExternalStore } from "react";
 import { readHiddenItems, readOverrides } from "./itemStorage";
@@ -26,12 +26,12 @@ export type Space = {
 };
 
 export const SPACES: Space[] = [
-  { key: "bathroom", label: "욕실", icon: "space-bath", color: "#dceefe", iconColor: "#41758e", setupKeys: ["욕실"] },
-  { key: "kitchen", label: "주방", icon: "space-kitchen", color: "#fbe8d4", iconColor: "#95613c", setupKeys: ["주방"] },
-  { key: "living", label: "거실", icon: "space-living", color: "#e9e1fa", iconColor: "#766095", setupKeys: ["거실"] },
-  { key: "bedroom", label: "방", icon: "space-bed", color: "#e2efda", iconColor: "#5e7d4f", setupKeys: ["침실 / 방", "방"] },
-  // Paid expansion space. Figma 43/공간 추가 완료 draws it with sky-bed + sky-deep icon.
-  { key: "terrace", label: "베란다", icon: "space-terrace", color: "#e2efda", iconColor: "#146b63", setupKeys: ["베란다 / 다용도실", "테라스"] },
+  { key: "bathroom", label: "욕실", icon: "space-bath", color: "#c4f2ff", iconColor: "#306d7e", setupKeys: ["욕실"] },
+  { key: "kitchen", label: "주방", icon: "space-kitchen", color: "#fff8c4", iconColor: "#7e7430", setupKeys: ["주방"] },
+  { key: "living", label: "거실", icon: "space-living", color: "#ffd0c4", iconColor: "#7e4030", setupKeys: ["거실"] },
+  { key: "bedroom", label: "방", icon: "space-bed", color: "#c7ffc4", iconColor: "#347e30", setupKeys: ["침실 / 방", "방"] },
+  // Paid expansion space = 공간1 slot (sky-space1 + space-space1-icon); keeps its own terrace glyph.
+  { key: "terrace", label: "베란다", icon: "space-terrace", color: "#e9c4ff", iconColor: "#61307e", setupKeys: ["베란다 / 다용도실", "테라스"] },
 ];
 
 const FREE_SPACES: SpaceKey[] = ["bathroom", "kitchen", "living", "bedroom"];
@@ -56,6 +56,11 @@ export function spaceColor(key: SpaceKey, alpha = 1): string {
   const hex = getSpace(key).color;
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
   return `rgba(${r}, ${g}, ${b}, ${Math.round(alpha * 1000) / 1000})`;
+}
+
+/** Small muted text on a (near-)100% space fill: sky-muted drops below 4.5:1 on 거실/베란다(공간1) → Charcoal Ink there. */
+export function metaTextOnFill(key: SpaceKey): string {
+  return key === "living" || key === "terrace" ? "text-sky-ink" : "text-sky-muted";
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -163,8 +168,8 @@ export function getItem(idOrName: string | null | undefined): Item | undefined {
 
 export type CleaningRecord = { id: string; itemId: string; /** ISO timestamp */ at: string };
 
-// v2: reseeded for distinct home fade stages (2026-09-25) — older sessions pick up the new seed.
-const RECORDS_KEY = "bbodeuk.session.records.v2";
+// Same shape as the old sessionStorage v2 key; moved to localStorage so records survive closing the tab.
+const RECORDS_KEY = "bbodeuk.records.v2";
 
 /**
  * [itemId, days ago, "HH:MM"] — nothing seeded for today, so "오늘 N곳" starts at 0 in a test.
@@ -217,7 +222,7 @@ const listeners = new Set<() => void>();
 
 function load(): CleaningRecord[] {
   try {
-    const stored = window.sessionStorage.getItem(RECORDS_KEY);
+    const stored = window.localStorage.getItem(RECORDS_KEY);
     if (stored) return (JSON.parse(stored) as CleaningRecord[]).sort(byNewest);
   } catch {
     // corrupted / unavailable → reseed
@@ -228,7 +233,7 @@ function load(): CleaningRecord[] {
 function save(next: CleaningRecord[]) {
   cache = [...next].sort(byNewest);
   try {
-    window.sessionStorage.setItem(RECORDS_KEY, JSON.stringify(cache));
+    window.localStorage.setItem(RECORDS_KEY, JSON.stringify(cache));
   } catch {
     // storage unavailable — in-memory cache still updates this session
   }
@@ -394,7 +399,7 @@ export function spaceFade(space: SpaceKey, records = getRecords()): number {
 }
 
 /** Base tint under a <WaterFill> (the empty "tank"): the space color lies lightly under the whole card/row. */
-export const WATER_BASE_TINT = 0.4;
+export const WATER_BASE_TINT = 0.18;
 
 /** Space color at `alpha` pre-mixed onto white as an opaque rgb() — lets CSS transition the card fill. */
 export function spaceFill(key: SpaceKey, alpha: number): string {
@@ -402,3 +407,9 @@ export function spaceFill(key: SpaceKey, alpha: number): string {
   const [r, g, b] = [1, 3, 5].map((i) => Math.round(255 - (255 - parseInt(hex.slice(i, i + 2), 16)) * alpha));
   return `rgb(${r}, ${g}, ${b})`;
 }
+
+/**
+ * Card/row background under a <WaterFill> (2026-10-15 color roles): never recorded (fade 0) → undefined,
+ * so the `bg-sky-surface` class shows with no tint; recorded at least once → the 18% base tint.
+ */
+export const waterBase = (key: SpaceKey, fade: number) => (fade > 0 ? spaceFill(key, WATER_BASE_TINT) : undefined);

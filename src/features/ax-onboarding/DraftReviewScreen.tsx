@@ -75,7 +75,7 @@ export default function DraftReviewScreen({ initialDrafts, onConfirm, onBack }: 
           return (
             <section
               key={index}
-              className={`flex flex-col gap-2.5 rounded-row-sm transition-colors duration-300 ${isOpen ? "bg-sky-white p-4" : "px-4"}`}
+              className={`flex flex-col gap-2.5 rounded-row-sm transition-colors duration-300 ${isOpen ? "bg-sky-surface p-4" : "px-4"}`}
               style={isOpen ? undefined : { backgroundColor: fill }}
             >
               <button
@@ -107,7 +107,7 @@ export default function DraftReviewScreen({ initialDrafts, onConfirm, onBack }: 
                           <button
                             key={candidate}
                             type="button"
-                            className="press h-9 rounded-full border border-sky-line bg-sky-white px-3 text-bb-label-sm text-sky-ink"
+                            className="press h-9 rounded-full border border-sky-line bg-sky-surface px-3 text-bb-label-sm text-sky-ink"
                             onClick={() => resolveSpace(index, candidate)}
                           >
                             {spaceLabels[candidate]}
@@ -134,7 +134,7 @@ export default function DraftReviewScreen({ initialDrafts, onConfirm, onBack }: 
                           key={item.itemId}
                           aria-pressed={item.included}
                           type="button"
-                          className="press flex h-[54px] items-center justify-between gap-3 rounded-xl bg-sky-white px-3 text-left transition-colors duration-200"
+                          className="press flex h-[54px] items-center justify-between gap-3 rounded-xl bg-sky-bg px-3 text-left transition-colors duration-200"
                           style={item.included ? { backgroundColor: fill } : undefined}
                           onClick={() => toggleItem(index, item.itemId)}
                         >
@@ -143,7 +143,7 @@ export default function DraftReviewScreen({ initialDrafts, onConfirm, onBack }: 
                             <span className="text-[10px] leading-4 text-sky-muted">{item.source === "ai" ? "AI 추천" : "직접 추가"}</span>
                           </span>
                           <span
-                            className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-xl text-sky-deep ${item.included ? "bg-sky-white" : "bg-sky-bg"}`}
+                            className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-xl text-sky-deep ${item.included ? "bg-sky-bg" : "bg-sky-surface"}`}
                           >
                             <Icon name="check" className={`text-[20px] transition-transform duration-200 ${item.included ? "scale-100" : "scale-0"}`} />
                           </span>

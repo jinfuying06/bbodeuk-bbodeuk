@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AX_ONBOARDING_ENABLED, AXOnboardingFlow } from "./features/ax-onboarding";
+import { hasCompletedSetup } from "./data/setup";
 import Care from "./pages/Care";
 import CareAction from "./pages/CareAction";
 import Help from "./pages/Help";
@@ -13,7 +14,6 @@ import ItemInfo from "./pages/ItemInfo";
 import Login from "./pages/Login";
 import QuickRecord from "./pages/QuickRecord";
 import RecordDone from "./pages/RecordDone";
-import Points from "./pages/Points";
 import Settings from "./pages/Settings";
 import Setup from "./pages/Setup";
 import SignUp from "./pages/SignUp";
@@ -26,8 +26,9 @@ import WeekendBigClean from "./pages/WeekendBigClean";
 import SamplePaint from "./pages/SamplePaint";
 import Welcome from "./pages/Welcome";
 
+// Returning users (setup done) skip the login screen.
 function RootEntry() {
-  return <Login />;
+  return hasCompletedSetup() ? <Navigate to="/home" replace /> : <Login />;
 }
 
 export default function App() {
@@ -44,10 +45,8 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/signup-done" element={<SignUpDone />} />
-      <Route path="/sample-paint" element={<SamplePaint />} />
       <Route path="/setup" element={<Setup />} />
       {AX_ONBOARDING_ENABLED ? <Route path="/setup/photo" element={<AXOnboardingFlow />} /> : null}
-      <Route path="/home/:state" element={<HomeStateDemo />} />
       <Route path="/item-add" element={<ItemAdd />} />
       <Route path="/item-history" element={<ItemHistory />} />
       <Route path="/item-info" element={<ItemInfo />} />
@@ -57,7 +56,6 @@ export default function App() {
       <Route path="/spaces" element={<Spaces />} />
       <Route path="/quick-record" element={<QuickRecord />} />
       <Route path="/record-done" element={<RecordDone />} />
-      <Route path="/points" element={<Points />} />
       <Route path="/deep-clean" element={<WeekendBigClean />} />
       <Route path="/weekend-bigclean" element={<WeekendBigClean />} />
       <Route path="/care-action" element={<CareAction />} />
@@ -65,6 +63,9 @@ export default function App() {
       <Route path="/settings" element={<Settings />} />
       <Route path="/history" element={<History />} />
       <Route path="/help" element={<Help />} />
+      {/* Figma state / paint demos — dev server only. */}
+      {import.meta.env.DEV ? <Route path="/home/:state" element={<HomeStateDemo />} /> : null}
+      {import.meta.env.DEV ? <Route path="/sample-paint" element={<SamplePaint />} /> : null}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

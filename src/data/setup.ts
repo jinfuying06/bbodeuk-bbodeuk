@@ -1,5 +1,3 @@
-import { SPACE_PRICE } from "./points";
-
 export const SETUP_KEY = "bbodeuk.setup.v1";
 
 export type SetupData = {
@@ -40,12 +38,11 @@ export const DEFAULT_SPACES: Array<{ key: string; label: string; required: boole
   { key: "침실 / 방", label: "방", required: false },
 ];
 
-/** Paid spaces a member can add beyond the four defaults. */
-export const EXPANSION_CATALOG: Array<{ key: string; label: string; price: number; previewItems: string[] }> = [
+/** Paid spaces (SPACE_PRICE_KRW each, one-time) that can be added beyond the four defaults. */
+export const EXPANSION_CATALOG: Array<{ key: string; label: string; previewItems: string[] }> = [
   {
     key: "베란다 / 다용도실",
     label: "베란다",
-    price: SPACE_PRICE,
     previewItems: ["베란다 바닥", "난간", "빨래 공간"],
   },
 ];

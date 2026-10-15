@@ -5,7 +5,6 @@ import CheckRow from "../components/CheckRow";
 import GlassButton from "../components/GlassButton";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
-import { grantSignupBonus } from "../data/points";
 
 const TERMS = [
   { key: "terms", label: "[필수] 만 14세 이상 · 이용약관 동의" },
@@ -49,7 +48,6 @@ export default function SignUp() {
       setMismatch(true);
       return;
     }
-    grantSignupBonus();
     navigate("/signup-done", { state: { nickname: nickname.trim() } });
   };
 
@@ -111,7 +109,7 @@ export default function SignUp() {
           </GlassButton>
         </form>
       </main>
-      <Toast icon={false} message={toast} visible={Boolean(toast)} pill />
+      <Toast message={toast} visible={Boolean(toast)} pill />
     </PageShell>
   );
 }

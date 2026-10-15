@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import ComingSoon from "../components/ComingSoon";
 import Icon from "../components/Icon";
 import CheckRow from "../components/CheckRow";
 import GlassButton from "../components/GlassButton";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
-import { AX_ONBOARDING_ENABLED } from "../features/ax-onboarding";
+import { AX_ONBOARDING_ENABLED, AX_READY } from "../features/ax-onboarding";
 import { DEFAULT_SPACES, writeSetup } from "../data/setup";
 
 // Stored keys stay as before ("침실 / 방" is the internal key; SPACES[].setupKeys maps it). Figma order.
@@ -15,7 +16,7 @@ import { DEFAULT_SPACES, writeSetup } from "../data/setup";
 const BASIC_SPACES = ["욕실", "주방", "거실", "침실 / 방"].map((key) => DEFAULT_SPACES.find((space) => space.key === key)!);
 
 const aiCardClass =
-  "press flex h-16 w-full items-center justify-between rounded-row-sm border border-sky-brand bg-sky-white px-[14px] text-left";
+  "press flex h-16 w-full items-center justify-between rounded-row-sm border border-sky-brand bg-sky-surface px-[14px] text-left";
 
 function AiCardBody() {
   return (
@@ -56,9 +57,11 @@ export default function Setup() {
         <PageIntro title={<>내 집에는<br />어떤 공간이 있나요?</>} body="자주 돌보는 공간부터 시작해요." className="min-h-[116px]" />
 
         {AX_ONBOARDING_ENABLED ? (
-          <Link className={aiCardClass} to="/setup/photo">
-            <AiCardBody />
-          </Link>
+          <ComingSoon className="rounded-row-sm" ready={AX_READY}>
+            <Link className={aiCardClass} to="/setup/photo">
+              <AiCardBody />
+            </Link>
+          </ComingSoon>
         ) : (
           <button className={aiCardClass} type="button" onClick={() => showToast("사진 맞춤 설정은 준비 중이에요")}>
             <AiCardBody />
@@ -90,7 +93,7 @@ export default function Setup() {
           {selected.length > 0 ? "이 공간으로 시작하기" : "공간을 하나 이상 선택해 주세요"}
         </GlassButton>
       </main>
-      <Toast icon={false} message={toast} visible={Boolean(toast)} pill />
+      <Toast message={toast} visible={Boolean(toast)} pill />
     </PageShell>
   );
 }

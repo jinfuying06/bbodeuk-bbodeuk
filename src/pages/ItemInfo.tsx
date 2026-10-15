@@ -87,7 +87,7 @@ function ItemInfoForm({ item }: { item: Item }) {
 
         <label className="flex min-h-[84px] flex-col gap-1.5 text-bb-label text-sky-ink">
           청소 주기
-          <span className={`bb-field flex items-center focus-within:border-sky-brand`}>
+          <span className={`bb-field flex items-center focus-within:border-sky-deep`}>
             <input
               aria-label="청소 주기 (일)"
               className="bg-transparent text-bb-body text-sky-ink outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"

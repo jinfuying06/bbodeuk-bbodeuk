@@ -3,7 +3,7 @@ import Icon from "./Icon";
 
 // `match` = path prefixes that light this tab up (sub-pages map to their parent tab, per Figma page 02).
 const tabs = [
-  { label: "홈", icon: "nav-home", to: "/home", match: ["/home", "/settings", "/points", "/help"] },
+  { label: "홈", icon: "nav-home", to: "/home", match: ["/home", "/settings", "/help"] },
   { label: "공간", icon: "nav-spaces", to: "/spaces", match: ["/spaces", "/space-manage", "/space-info", "/space-added", "/item-add", "/item-info"] },
   { label: "기록", icon: "nav-record", to: "/quick-record", match: ["/quick-record", "/record-done", "/deep-clean", "/weekend-bigclean"] },
   { label: "히스토리", icon: "nav-history", to: "/history", match: ["/history", "/item-history", "/home/error", "/home/loading", "/home/empty"] },
@@ -18,7 +18,7 @@ export default function BottomNavigation() {
   const activeTab = tabs.find((tab) => tab.match.includes(pathname)) ?? tabs.find((tab) => isActive(pathname, tab.match));
 
   return (
-    <nav className="fixed bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 bg-sky-white pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
+    <nav className="fixed bottom-0 left-1/2 z-50 w-full max-w-[430px] -translate-x-1/2 border-t border-sky-line bg-sky-bg pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
       <div className="mx-3 flex h-12 items-center justify-between">
         {tabs.map((tab) => {
           const active = tab === activeTab;

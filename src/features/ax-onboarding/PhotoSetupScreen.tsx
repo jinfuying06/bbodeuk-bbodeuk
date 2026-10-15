@@ -9,7 +9,6 @@ import { spaceLabels, type SpaceKey } from "./itemLibrary";
 import PhotoSlot from "./PhotoSlot";
 import {
   type AXImageInput,
-  type AXImageMediaType,
   type AXRecognitionResponse,
   type AXRecognizeRequest,
   type AXSpaceDraft,
@@ -17,12 +16,6 @@ import {
   REQUIRED_PHOTOS_PER_SPACE,
   toDraftItems,
 } from "./types";
-
-const SUPPORTED_MEDIA_TYPES: AXImageMediaType[] = ["image/png", "image/jpeg", "image/webp"];
-
-function resolveMediaType(file: File): AXImageMediaType {
-  return (SUPPORTED_MEDIA_TYPES as string[]).includes(file.type) ? (file.type as AXImageMediaType) : "image/jpeg";
-}
 
 // Figma 슬롯 순서(거실/주방 · 욕실/방).
 const SPACE_ORDER: SpaceKey[] = ["living", "kitchen", "bathroom", "bedroom"];
@@ -35,19 +28,28 @@ type PhotoSetupScreenProps = {
   onBack: () => void;
 };
 
+// 휴대폰 원본 사진(수 MB, iPhone HEIC 포함)을 긴 변 1024px JPEG로 줄여 보낸다 — 서버 요청 상한(이미지당 base64 1.5MB,
+// 서버리스 본문 ~4.5MB)과 모델 이미지 한도 안에 12장까지 들어가게. <img>가 디코딩할 수 있으면 HEIC도 JPEG로 바뀐다.
+const MAX_IMAGE_EDGE = 1024;
+
 function readFileAsImageInput(file: File): Promise<AXImageInput> {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result;
-      if (typeof result !== "string") {
-        reject(new Error("이미지를 읽지 못했어요."));
-        return;
-      }
-      resolve({ data: result.split(",")[1] ?? "", mediaType: resolveMediaType(file) });
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, MAX_IMAGE_EDGE / Math.max(image.naturalWidth, image.naturalHeight));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(image.naturalWidth * scale);
+      canvas.height = Math.round(image.naturalHeight * scale);
+      canvas.getContext("2d")?.drawImage(image, 0, 0, canvas.width, canvas.height);
+      resolve({ data: canvas.toDataURL("image/jpeg", 0.8).split(",")[1] ?? "", mediaType: "image/jpeg" });
     };
-    reader.onerror = () => reject(reader.error ?? new Error("이미지를 읽지 못했어요."));
-    reader.readAsDataURL(file);
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("이미지를 읽지 못했어요."));
+    };
+    image.src = url;
   });
 }
 
@@ -80,7 +82,7 @@ function Intro({ title, body }: { title: ReactNode; body: string }) {
 function InfoCard({ mark, title, body }: { mark: string; title?: string; body: string }) {
   return (
     <section className="flex gap-3 rounded-row-sm bg-sky-tint p-4">
-      <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-white text-[20px] font-bold text-sky-deep">
+      <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-bg text-[20px] font-bold text-sky-deep">
         {mark}
       </span>
       <div className="flex min-w-0 flex-col gap-[3px]">
@@ -152,7 +154,7 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
         {status === "loading" ? (
           <>
             <Intro title="사진을 확인하고 있어요" body="공간과 관리할 아이템을 찾고 있어요. 잠시만 기다려 주세요." />
-            <section aria-live="polite" className="flex h-[260px] flex-col items-center justify-center gap-[18px] rounded-2xl bg-sky-white px-6 py-7">
+            <section aria-live="polite" className="flex h-[260px] flex-col items-center justify-center gap-[18px] rounded-2xl bg-sky-surface px-6 py-7">
               <span aria-hidden="true" className="flex h-[70px] w-[70px] items-center justify-center rounded-full bg-sky-tint text-sky-deep">
                 <Icon name="sparkle" className="animate-pulse text-[26px] motion-reduce:animate-none" />
               </span>
@@ -164,7 +166,7 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
                 {LOADING_STEPS.map((label, index) => (
                   <span
                     key={label}
-                    className={`rounded-[5px] transition-all duration-500 ${index <= step ? "h-2.5 bg-sky-brand" : "h-2 bg-sky-line/55"}`}
+                    className={`rounded-[5px] transition-all duration-500 ${index <= step ? "h-2.5 bg-sky-deep" : "h-2 bg-sky-line/55"}`}
                   />
                 ))}
               </div>
@@ -174,7 +176,7 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
         ) : status === "error" ? (
           <>
             <Intro title="사진을 인식하지 못했어요" body="등록한 사진은 그대로 있어요. 다시 시도하거나 직접 설정할 수 있어요." />
-            <section className="flex flex-col gap-2.5 rounded-row-sm bg-sky-white p-4">
+            <section className="flex flex-col gap-2.5 rounded-row-sm bg-sky-surface p-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-bb-label font-bold text-sky-ink">
                   사진 {photoCount}장 · {filledSpaces.length}개 공간
@@ -196,7 +198,7 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
               </div>
             </section>
             <section role="alert" className="flex gap-3.5 rounded-row-sm bg-sky-tint p-[18px]">
-              <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sky-white text-[20px] font-bold text-sky-deep">
+              <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sky-bg text-[20px] font-bold text-sky-deep">
                 !
               </span>
               <div className="flex min-w-0 flex-col gap-[7px]">
@@ -207,7 +209,7 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
             </section>
             <GlassButton onClick={submit}>다시 시도하기</GlassButton>
             <button
-              className="press flex h-14 w-full items-center justify-center rounded-full border border-sky-line bg-sky-white text-bb-label text-sky-deep"
+              className="press flex h-14 w-full items-center justify-center rounded-full border border-sky-line bg-sky-bg text-bb-label text-sky-deep"
               type="button"
               onClick={onSkip}
             >
@@ -240,6 +242,7 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
               ))}
             </section>
 
+            <p className="text-bb-caption text-sky-muted">사진은 공간·아이템 인식을 위해 외부 AI(Anthropic)로 전송되며, 인식 후 저장하지 않아요.</p>
             <GlassButton disabled={!canSubmit} onClick={submit}>
               사진으로 시작하기
             </GlassButton>

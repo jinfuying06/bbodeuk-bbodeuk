@@ -4,30 +4,40 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Sky/BB palette — from Figma design system (2026-09-17 UI upgrade, see AGENTS.md §6).
-        // Names mirror the Figma variables (--bb-*) as-is. (The old MD3 blue palette was removed
-        // in the 2026-09-25 polish pass once nothing referenced it.)
-        "sky-brand": "#56d9d2",
-        "sky-deep": "#146b63",
-        "sky-tint": "#e5f8f5",
+        // Sky/BB palette — Figma Page 5 "Palette & Components" original values (user choice 2026-10-15;
+        // the OKLCH-normalized experiment was reverted). Color roles (2026-10-15): interactive fills (primary button,
+        // switch, check, non-space selection, field focus) = sky-deep #16587f with white labels (7.67:1); brand #38aeee is
+        // small accents only (logo, illustration, sparkle). onbrand stays for SamplePaint (dev). sky-muted fails on 거실/공간1/공간3 fills → metaTextOnFill() in data/cleaning.ts.
+        // DESIGN.md `colors:` frontmatter mirrors these.
+        // Surface roles: sky-bg = white page/header/nav/dialog/fields; sky-surface = cards/rows/chips/tiles;
+        // sky-white = literal white only (toast text, Glass Button border, switch thumb, sweep).
+        "sky-brand": "#38aeee",
+        "sky-deep": "#16587f",
+        "sky-tint": "#e1f3ff",
         "sky-ink": "#23282b",
         "sky-muted": "#60676b",
         "sky-line": "#e3e6e8",
         "sky-white": "#ffffff",
-        "sky-bg": "#f6f7f8",
-        "sky-bath": "#dceefe",
-        "sky-sky": "#8de3db",
-        "sky-kitchen": "#fbe8d4",
-        "sky-living": "#e9e1fa",
-        "sky-bed": "#e2efda",
-        onbrand: "#123c36",
-        "literal-white": "#ffffff",
-        porcelain: "#ffffff",
-        "art-line": "#64807a",
-        "space-bath-icon": "#41758e",
-        "space-kitchen-icon": "#95613c",
-        "space-living-icon": "#766095",
-        "space-bed-icon": "#5e7d4f",
+        "sky-bg": "#ffffff",
+        "sky-surface": "#f3f7fa",
+        "sky-sky": "#8fd8ff",
+        "sky-bath": "#c4f2ff",
+        "sky-kitchen": "#fff8c4",
+        "sky-living": "#ffd0c4",
+        "sky-bed": "#c7ffc4",
+        "sky-space1": "#e9c4ff",
+        "sky-space2": "#ffe8c4",
+        "sky-space3": "#ffc4f7",
+        onbrand: "#0a3149",
+        "art-line": "#5b7a8c",
+        "art-tint": "#e3f5ff",
+        "space-bath-icon": "#306d7e",
+        "space-kitchen-icon": "#7e7430",
+        "space-living-icon": "#7e4030",
+        "space-bed-icon": "#347e30",
+        "space-space1-icon": "#61307e",
+        "space-space2-icon": "#7e5f30",
+        "space-space3-icon": "#7e3073",
         // Dialog backdrop (Figma Sky / Dialog 31:1908). Full-screen, over header + nav.
         scrim: "rgba(20, 26, 24, 0.7)",
       },

@@ -5,7 +5,6 @@ import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
 import SpaceTile from "../components/SpaceTile";
 import { FADE_STAGES, getSpace, type SpaceKey } from "../data/cleaning";
-import { resetToGuest } from "../data/points";
 
 const BATH = getSpace("bathroom");
 
@@ -44,7 +43,7 @@ function DemoCard() {
   return (
     <button
       aria-pressed={recorded}
-      className="press relative flex h-[210px] w-[250px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-sky-line bg-sky-white pl-[14px] pt-2 transition-[background-color,transform] duration-300"
+      className="press relative flex h-[210px] w-[250px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-sky-line bg-sky-surface pl-[14px] pt-2 transition-[background-color,transform] duration-300"
       style={{ backgroundColor: recorded ? BATH.color : undefined }}
       type="button"
       onClick={tap}
@@ -65,11 +64,11 @@ function DemoCard() {
             style={{
               rotate: "10deg",
               background:
-                "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(199,255,250,.22) 32%, rgba(255,255,255,.88) 50%, rgba(199,255,250,.22) 68%, rgba(255,255,255,0) 100%)",
+                "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(225,243,255,.22) 32%, rgba(255,255,255,.88) 50%, rgba(225,243,255,.22) 68%, rgba(255,255,255,0) 100%)",
             }}
           />
           <Icon
-            className={`pointer-events-none absolute left-[111px] top-[14px] text-[28px] text-white transition-[opacity,transform] duration-300 motion-reduce:hidden ${
+            className={`pointer-events-none absolute left-[111px] top-[14px] text-[28px] text-sky-white transition-[opacity,transform] duration-300 motion-reduce:hidden ${
               moving ? "scale-100 opacity-100" : "scale-50 opacity-0"
             }`}
             name="sparkle"
@@ -121,7 +120,6 @@ export default function Welcome() {
   const navigate = useNavigate();
 
   const goSetup = () => {
-    resetToGuest();
     navigate("/setup");
   };
 
@@ -193,7 +191,7 @@ export default function Welcome() {
               label="나에게 맞는 시작  ·  3 / 3"
               title={["이제, 내 공간을", "가볍게 돌봐요."]}
             />
-            <section className="flex h-[184px] flex-col gap-3 rounded-2xl bg-sky-white p-5">
+            <section className="flex h-[184px] flex-col gap-3 rounded-2xl bg-sky-surface p-5">
               <h2 className="text-bb-title text-sky-ink">네 가지 기본 공간은 무료예요</h2>
               <ul className="flex justify-between">
                 {START_SPACES.map((key) => {
@@ -221,7 +219,7 @@ export default function Welcome() {
             <GlassButton size={52} variant="secondary" onClick={goSetup}>
               게스트 모드로 시작하기
             </GlassButton>
-            <Caption lines={["게스트도 공간을 고르고 청소를 기록할 수 있어요.", "기본 공간 사용에 포인트는 필요하지 않아요."]} />
+            <Caption lines={["게스트도 공간을 고르고 청소를 기록할 수 있어요.", "기본 공간은 무료로 쓸 수 있어요."]} />
             <GlassButton size={52} variant="secondary" onClick={() => setStep(0)}>
               체험 다시 보기
             </GlassButton>

@@ -4,7 +4,6 @@ import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
-import { markMember, resetToGuest } from "../data/points";
 
 
 /** Flow / 로그인 (27:247) + 로그인 확인 (32:1427). Visual only: no real auth in the MVP. */
@@ -28,11 +27,10 @@ export default function Login() {
       setError(true);
       return;
     }
-    markMember();
     navigate("/home");
   };
 
-  const comingSoon = () => showToast("아직 준비 중인 기능이에요");
+  const comingSoon = () => showToast("준비 중이에요");
 
   return (
     <PageShell bottomNav={false}>
@@ -107,14 +105,14 @@ export default function Login() {
               <Link className="text-link w-full" to="/signup">
                 이메일로 회원가입
               </Link>
-              <Link className="text-link w-full" to="/welcome" onClick={() => resetToGuest()}>
+              <Link className="text-link w-full" to="/welcome">
                 먼저 둘러보기
               </Link>
             </>
           )}
         </form>
       </main>
-      <Toast icon={false} message={toast} visible={Boolean(toast)} pill />
+      <Toast message={toast} visible={Boolean(toast)} pill />
     </PageShell>
   );
 }

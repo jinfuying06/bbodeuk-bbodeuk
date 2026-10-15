@@ -1,5 +1,5 @@
 import type { Plugin } from "vite";
-import { HttpError, handleAXRecognize } from "./handler";
+import { HttpError, handleAXRecognize } from "./handler.js";
 
 const MAX_BODY_BYTES = 8 * 1024 * 1024; // 8MB
 const LOCAL_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;

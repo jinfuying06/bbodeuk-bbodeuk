@@ -1,58 +1,35 @@
-import { useNavigate } from "react-router-dom";
 import Dialog from "./Dialog";
-import { isMember, readPoints, SIGNUP_BONUS, SPACE_PRICE } from "../data/points";
+import { SPACE_PRICE_KRW } from "../features/payments/prices";
 import { particle } from "../data/josa";
 
 type SpaceExpansionDialogProps = {
   open: boolean;
   onClose: () => void;
   /** Space being added (Figma 32:1012 interpolates it into the title). */
-  spaceLabel?: string;
-  /** Member with enough points confirmed. Omitted (Setup) → go to 공간 관리 to finish there. */
-  onConfirm?: () => void;
+  spaceLabel: string;
+  previewItems: string[];
+  paying: boolean;
+  onConfirm: () => void;
 };
 
-/** Figma 32:1012 공간 추가 확인 — member / guest / not-enough-points variants of Sky / Dialog. */
-export default function SpaceExpansionDialog({ open, onClose, spaceLabel = "새 공간", onConfirm }: SpaceExpansionDialogProps) {
-  const navigate = useNavigate();
-  if (!open) return null;
-
-  const balance = readPoints();
-  const content = !isMember()
-    ? {
-        title: `회원가입 하면 ${SIGNUP_BONUS}P를 드려요`,
-        body: ["가입 시 받는 포인트로 공간 1개를", "바로 추가할 수 있어요."],
-        primaryLabel: "회원가입 하러 가기",
-        onPrimary: () => navigate("/signup"),
-      }
-    : balance >= SPACE_PRICE
-      ? {
-          title: `${spaceLabel}${particle(spaceLabel, "을/를")} 추가할까요?`,
-          body: [`${SPACE_PRICE}P를 사용해 새 공간을 열어요.`, `현재 ${balance.toLocaleString()}P → 추가 후 ${(balance - SPACE_PRICE).toLocaleString()}P`],
-          primaryLabel: `${SPACE_PRICE}P로 공간 추가`,
-          onPrimary: onConfirm ?? (() => navigate("/space-manage")),
-        }
-      : {
-          title: "포인트가 부족해요",
-          body: [`공간 1개를 추가하려면 ${SPACE_PRICE}P가 필요해요.`, `지금 보유 포인트는 ${balance.toLocaleString()}P예요.`],
-          primaryLabel: "포인트 충전하러 가기",
-          onPrimary: () => navigate("/points?intent=short"),
-        };
-
+/** Figma 32:1012 공간 추가 확인 (Sky / Dialog) — 결제 전 확인: 받는 것, 원화 금액, 환불 안내. */
+export default function SpaceExpansionDialog({ open, onClose, spaceLabel, previewItems, paying, onConfirm }: SpaceExpansionDialogProps) {
+  const price = SPACE_PRICE_KRW.toLocaleString();
   return (
     <Dialog
-      open
+      open={open}
+      title={`${spaceLabel}${particle(spaceLabel, "을/를")} 추가할까요?`}
       body={
         <>
-          {content.body[0]}
+          {previewItems.join(" · ")} 같은 청소 항목이 함께 생겨요.
           <br />
-          {content.body[1]}
+          {price}원 한 번 결제로 계속 사용해요.
+          <span className="mt-2 block text-bb-caption">결제 후 7일 이내, 공간을 사용하지 않았다면 환불할 수 있어요.</span>
         </>
       }
-      primaryLabel={content.primaryLabel}
-      title={content.title}
+      primaryLabel={paying ? "결제하는 중…" : `${price}원 결제하기`}
       onClose={onClose}
-      onPrimary={content.onPrimary}
+      onPrimary={onConfirm}
     />
   );
 }

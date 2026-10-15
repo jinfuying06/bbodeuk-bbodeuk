@@ -61,7 +61,7 @@
 @layer components {
   /* Text field (Login, SignUp, ItemAdd, ItemInfo). */
   .bb-field {
-    @apply h-[52px] w-full rounded-xl border border-sky-line bg-sky-white px-4 text-bb-body text-sky-ink outline-none transition-colors placeholder:text-sky-muted focus:border-sky-brand;
+    @apply h-[52px] w-full rounded-xl border border-sky-line bg-sky-bg px-4 text-bb-body text-sky-ink outline-none transition-colors placeholder:text-sky-muted focus:border-sky-deep;
   }
   /* Text-link button: 44px tap box, label type, sky-deep. `-sm` = 13/19 variant. */
   .text-link {
@@ -87,7 +87,7 @@
     padding-top: calc(54px + env(safe-area-inset-top, 0px));
   }
 
-  /* No-nav flow pages (로그인/회원가입/포인트 확인/항목 삭제 완료): header + Figma 20px top gap. */
+  /* No-nav flow pages (로그인/회원가입/항목 삭제 완료): header + Figma 20px top gap. */
   .pt-header-flow {
     padding-top: calc(54px + 20px + env(safe-area-inset-top, 0px));
   }
@@ -136,7 +136,7 @@
     outline-offset: -4px;
   }
   .glass-btn:active:not(:disabled):not([aria-disabled="true"]) {
-    box-shadow: inset 0 2px 4px rgba(0, 77, 102, 0.12);
+    box-shadow: inset 0 2px 4px rgba(0, 40, 64, 0.28);
   }
   /* Sweep band, mounted fresh by <GlassButton> on each press so the animation restarts. */
   .glass-sweep {

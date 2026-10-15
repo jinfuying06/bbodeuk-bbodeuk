@@ -44,7 +44,7 @@ export default function PhotoSlot({ spaceKey, label, photos, maxPhotos, required
 
   return (
     <div
-      className="flex h-[134px] flex-col gap-2 rounded-row-sm bg-sky-white p-3 transition-colors duration-300"
+      className="flex h-[134px] flex-col gap-2 rounded-row-sm bg-sky-surface p-3 transition-colors duration-300"
       style={filled ? { backgroundColor: spaceColor(spaceKey, 0.28) } : undefined}
     >
       <div className="flex h-[22px] items-center justify-between">

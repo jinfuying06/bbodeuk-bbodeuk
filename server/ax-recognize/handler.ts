@@ -2,8 +2,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 
-import { itemLibrary, spaceLabels, type SpaceKey } from "../../src/features/ax-onboarding/itemLibrary";
-import { MAX_PHOTOS_PER_SPACE, type AXRecognitionResponse } from "../../src/features/ax-onboarding/types";
+import { itemLibrary, spaceLabels, type SpaceKey } from "../../src/features/ax-onboarding/itemLibrary.js";
+import { MAX_PHOTOS_PER_SPACE, type AXRecognitionResponse } from "../../src/features/ax-onboarding/types.js";
 
 /**
  * PRD_v3.0 SECTION 19 (AX 온보딩) 백엔드 프록시 핵심 로직.
@@ -122,7 +122,7 @@ export async function handleAXRecognize(body: unknown): Promise<AXRecognitionRes
   let response;
   try {
     response = await getClient().messages.parse({
-      model: "claude-opus-5",
+      model: "claude-opus-5-5",
       max_tokens: 4096,
       messages: [{ role: "user", content }],
       output_config: { format: zodOutputFormat(RecognitionSchema) },

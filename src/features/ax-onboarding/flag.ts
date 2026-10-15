@@ -16,3 +16,10 @@
  * 5) 별도 배포된 프로덕션 백엔드 프록시(vercel.ts 등) 삭제
  */
 export const AX_ONBOARDING_ENABLED = true;
+
+/**
+ * 실제 사진 인식 백엔드(VITE_AX_RECOGNIZE_URL)가 빌드 시점에 설정돼 있는지.
+ * 꺼져 있으면 진입 카드는 "준비 중"으로 가려지고 /setup/photo 직접 접근도 /setup으로 돌려보낸다.
+ * (api.ts의 목 인식은 개발/테스트용으로 남겨두지만, 사용자 화면에서는 이 값으로 막는다.)
+ */
+export const AX_READY = Boolean(import.meta.env.VITE_AX_RECOGNIZE_URL);

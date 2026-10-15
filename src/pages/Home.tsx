@@ -15,9 +15,9 @@ import {
   isRecordedToday,
   itemStaleness,
   lastRecord,
+  metaTextOnFill,
   spaceFade,
-  spaceFill,
-  WATER_BASE_TINT,
+  waterBase,
   todaysRecords,
   useRecords,
   type CleaningRecord,
@@ -123,8 +123,8 @@ export default function Home() {
               return (
                 <Link
                   key={space.key}
-                  className={`press relative flex h-[110px] flex-col justify-end gap-[3px] overflow-hidden rounded-2xl px-4 py-[14px] ${wide ? "col-span-2" : ""}`}
-                  style={{ backgroundColor: spaceFill(space.key, WATER_BASE_TINT) }}
+                  className={`press relative flex h-[110px] flex-col justify-end gap-[3px] overflow-hidden rounded-2xl bg-sky-surface px-4 py-[14px] ${wide ? "col-span-2" : ""}`}
+                  style={{ backgroundColor: waterBase(space.key, fade) }}
                   to={`/quick-record?filter=space&space=${space.key}`}
                 >
                   <WaterFill direction="up" level={fade} color={space.color} phase={index} />
@@ -132,7 +132,7 @@ export default function Home() {
                     <Icon name={space.icon} className="block text-[43.2px]" />
                   </span>
                   <span className="relative text-bb-label font-bold text-sky-ink">{space.label}</span>
-                  <span className="relative text-bb-caption text-sky-muted">{cardRecency(space.key, records)}</span>
+                  <span className={`relative text-bb-caption ${metaTextOnFill(space.key)}`}>{cardRecency(space.key, records)}</span>
                 </Link>
               );
             })}
@@ -159,7 +159,7 @@ export default function Home() {
             </Link>
           </div>
           {recent.length === 0 ? (
-            <Link className="press flex min-h-[120px] flex-col gap-2 rounded-2xl bg-sky-white p-[18px]" to="/quick-record">
+            <Link className="press flex min-h-[120px] flex-col gap-2 rounded-2xl bg-sky-surface p-[18px]" to="/quick-record">
               <span className="text-bb-title text-sky-ink">아직 남긴 청소 기록이 없어요</span>
               <span className="text-bb-label-sm font-normal text-sky-muted">공간 카드를 보며 첫 청소를 가볍게 시작해보세요.</span>
               <span className="flex items-center text-bb-label-sm font-bold text-sky-deep">

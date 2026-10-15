@@ -13,10 +13,10 @@ type ItemRowProps = {
   height?: 64 | 72;
 };
 
-/** Tappable white row: [space tile] title/sub, chevron in a 44px slot at the right edge. */
+/** Tappable Surface row: [space tile] title/sub, chevron in a 44px slot at the right edge. */
 export default function ItemRow({ title, sub, to, space, chevron = "deep", height = 64 }: ItemRowProps) {
   return (
-    <Link className={`press flex items-center gap-3 rounded-row bg-sky-white pl-3 ${height === 72 ? "h-[72px]" : "h-16"}`} to={to}>
+    <Link className={`press flex items-center gap-3 rounded-row bg-sky-surface pl-3 ${height === 72 ? "h-[72px]" : "h-16"}`} to={to}>
       {space ? <SpaceTile space={space} /> : null}
       <span className="min-w-0 flex-1">
         <span className="block truncate text-bb-label text-sky-ink">{title}</span>

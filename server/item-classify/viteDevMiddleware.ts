@@ -1,5 +1,5 @@
 import type { Plugin } from "vite";
-import { HttpError, handleItemClassify } from "./handler";
+import { HttpError, handleItemClassify } from "./handler.js";
 
 const MAX_BODY_BYTES = 64 * 1024; // 64KB
 const LOCAL_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;

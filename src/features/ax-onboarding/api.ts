@@ -42,11 +42,11 @@ export async function recognizeSpaces(request: AXRecognizeRequest): Promise<AXRe
     }
 
     const body = (await response.json().catch(() => null)) as { error?: string } | null;
-    lastError = new Error(body?.error ?? `인식 요청이 실패했습니다 (${response.status})`);
+    lastError = new Error(body?.error ?? `사진을 인식하지 못했어요 (${response.status})`);
     if (!RETRYABLE_STATUSES.includes(response.status)) break;
   }
 
-  throw lastError instanceof Error ? lastError : new Error("인식 요청이 반복적으로 실패했습니다");
+  throw lastError instanceof Error ? lastError : new Error("사진을 여러 번 인식하지 못했어요");
 }
 
 /**

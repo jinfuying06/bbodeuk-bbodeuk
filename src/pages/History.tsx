@@ -82,7 +82,7 @@ export default function History() {
             <PageIntro title="차곡차곡 쌓인 흔적" body="조금씩 돌본 내 공간을 돌아봐요." />
             {chips}
 
-            <section aria-label={`${month.getMonth() + 1}월 달력`} className="flex flex-col gap-2 rounded-3xl bg-sky-white px-[17px] pb-[18px] pt-[14px]">
+            <section aria-label={`${month.getMonth() + 1}월 달력`} className="flex flex-col gap-2 rounded-3xl bg-sky-surface px-[17px] pb-[18px] pt-[14px]">
               <div className="flex h-8 items-center justify-between">
                 {arrow(-1, canPrev)}
                 <h2 className="text-bb-title text-sky-ink">

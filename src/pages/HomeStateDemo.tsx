@@ -25,7 +25,6 @@ const PREVIEW_LINKS = [
   ["로그인 · 가입 흐름", "/welcome"],
   ["연결 없는 로그인", "/home/error"],
   ["기록 저장이 안 될 때", "/home/error"],
-  ["포인트 부족", "/points?intent=short"],
   ["기록·공간 이용 정책", "/help"],
 ] as const;
 
@@ -33,7 +32,7 @@ const TITLES: Record<string, string> = { error: "연결 확인", loading: "기�
 
 function Feedback({ glyph, title, body }: { glyph: string; title: string; body: string }) {
   return (
-    <div className="flex min-h-[140px] flex-col gap-2 rounded-2xl bg-sky-white pb-[18px] pl-5 pr-5 pt-[18px]">
+    <div className="flex min-h-[140px] flex-col gap-2 rounded-2xl bg-sky-surface pb-[18px] pl-5 pr-5 pt-[18px]">
       <span aria-hidden="true" className="text-bb-title text-sky-deep">
         {glyph}
       </span>
@@ -77,7 +76,7 @@ export default function HomeStateDemo() {
             <PageIntro title="기록을 가져오고 있어요" body="잠시만 기다려주세요." />
             <div aria-busy="true" aria-label="기록 불러오는 중" className="flex flex-col gap-3">
               {[0, 1, 2, 3].map((index) => (
-                <div key={index} className="flex h-[92px] animate-pulse items-center gap-[14px] rounded-2xl bg-sky-white pl-4">
+                <div key={index} className="flex h-[92px] animate-pulse items-center gap-[14px] rounded-2xl bg-sky-surface pl-4">
                   <span className="h-12 w-12 shrink-0 rounded-row-sm bg-sky-tint" />
                   <span className="flex flex-col gap-[10px]">
                     <span className="h-4 w-[174px] rounded-[8px] bg-sky-line" />

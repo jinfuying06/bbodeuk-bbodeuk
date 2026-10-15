@@ -3,7 +3,7 @@ import type { ReactElement, SVGProps } from "react";
 type IconComponent = (props: SVGProps<SVGSVGElement>) => ReactElement;
 
 const strokeProps = {
-  stroke: "#64807A",
+  stroke: "#5B7A8C",
   strokeWidth: 2.3,
   strokeLinecap: "round" as const,
   strokeLinejoin: "round" as const,
@@ -14,7 +14,7 @@ export const ObjectSinkIcon: IconComponent = (props) => (
     <path d="M1.15 21.3756H42.19V28.1805C42.19 39.522 1.15 39.522 1.15 28.1805V21.3756Z" fill="white" {...strokeProps} />
     <path
       d="M21.67 28.9366C33.0029 28.9366 42.19 25.5514 42.19 21.3756C42.19 17.1998 33.0029 13.8146 21.67 13.8146C10.3371 13.8146 1.15 17.1998 1.15 21.3756C1.15 25.5514 10.3371 28.9366 21.67 28.9366Z"
-      fill="#E5F8F5"
+      fill="#E3F5FF"
       {...strokeProps}
     />
     <path d="M21.67 15.3268V6.25366C21.67 -0.55122 34.59 -0.55122 34.59 6.25366V10.0341M19.39 33.4732V44.8146H29.27" fill="none" {...strokeProps} />
@@ -27,7 +27,7 @@ export const ObjectToiletIcon: IconComponent = (props) => (
     <path d="M1.15 20.8085H36.11C36.11 32.15 30.79 37.4427 18.63 37.4427V45.0037H7.23V31.3939" fill="white" {...strokeProps} />
     <path
       d="M18.63 26.1012C28.2839 26.1012 36.11 23.7316 36.11 20.8085C36.11 17.8855 28.2839 15.5159 18.63 15.5159C8.97606 15.5159 1.15 17.8855 1.15 20.8085C1.15 23.7316 8.97606 26.1012 18.63 26.1012Z"
-      fill="#E5F8F5"
+      fill="#E3F5FF"
       {...strokeProps}
     />
     <path d="M23.19 7.95488H26.99" fill="none" {...strokeProps} />
@@ -57,7 +57,7 @@ export const ObjectMirrorIcon: IconComponent = (props) => (
     <path d="M13.31 17.028L23.19 7.95488M14.83 27.6134L33.07 10.2232M1.15 48.7841H45.23" fill="none" {...strokeProps} />
     <path
       d="M30.03 30.6378L31.55 34.4183L35.35 35.9305L31.55 37.4427L30.03 41.2232L28.51 37.4427L24.71 35.9305L28.51 34.4183L30.03 30.6378Z"
-      fill="#8DE3DB"
+      fill="#8FD8FF"
       {...strokeProps}
     />
   </svg>
@@ -65,7 +65,7 @@ export const ObjectMirrorIcon: IconComponent = (props) => (
 
 export const ObjectFloorIcon: IconComponent = (props) => (
   <svg viewBox="0 0 48.66 40.8613" width="1em" height="0.84em" xmlns="http://www.w3.org/2000/svg" {...props}>
-    <path d="M1.91 27.6137L24.71 16.2723L47.51 27.6137L24.71 39.7113L1.91 27.6137Z" fill="#E5F8F5" {...strokeProps} />
+    <path d="M1.91 27.6137L24.71 16.2723L47.51 27.6137L24.71 39.7113L1.91 27.6137Z" fill="#E3F5FF" {...strokeProps} />
     <path
       d="M12.55 22.321L35.35 34.4186M14.07 33.6625L36.11 22.321M29.27 1.15031L22.43 22.321"
       fill="none"
@@ -85,12 +85,12 @@ export const ObjectDrainIcon: IconComponent = (props) => (
     />
     <path
       d="M23.19 38.1988C31.5847 38.1988 38.39 34.1366 38.39 29.1256C38.39 24.1146 31.5847 20.0524 23.19 20.0524C14.7953 20.0524 7.99 24.1146 7.99 29.1256C7.99 34.1366 14.7953 38.1988 23.19 38.1988Z"
-      fill="#E5F8F5"
+      fill="#E3F5FF"
       {...strokeProps}
     />
     <path
       d="M13.31 24.589L33.07 32.15M18.63 21.5646L31.55 26.8573M14.07 30.6378L26.23 35.9305M23.19 1.15C15.59 10.9793 15.59 15.5159 23.19 15.5159C30.79 15.5159 30.79 10.9793 23.19 1.15Z"
-      fill="#8DE3DB"
+      fill="#8FD8FF"
       {...strokeProps}
     />
   </svg>

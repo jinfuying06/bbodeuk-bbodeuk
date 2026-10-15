@@ -44,7 +44,7 @@ export default function Dialog({ open, title, body, primaryLabel, onPrimary, onC
         aria-describedby={`${id}-body`}
         aria-labelledby={`${id}-title`}
         aria-modal="true"
-        className="flex w-full max-w-[342px] flex-col gap-4 rounded-2xl bg-sky-white px-5 pb-5 pt-[22px]"
+        className="flex w-full max-w-[342px] flex-col gap-4 rounded-2xl bg-sky-bg px-5 pb-5 pt-[22px]"
         role="dialog"
         onClick={(event) => event.stopPropagation()}
       >

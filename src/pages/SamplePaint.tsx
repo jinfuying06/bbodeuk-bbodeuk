@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
-import { resetToGuest } from "../data/points";
 
 export default function SamplePaint() {
   const [painted, setPainted] = useState(false);
@@ -34,14 +33,14 @@ export default function SamplePaint() {
         ) : null}
         <button
           className={`relative mb-space-md overflow-hidden rounded-xl p-space-lg text-left shadow-sm transition-all active:scale-95 ${
-            painted ? "bg-sky-brand text-onbrand" : "bg-sky-white"
+            painted ? "bg-sky-brand text-onbrand" : "bg-sky-surface"
           }`}
           type="button"
           onClick={() => setPainted((current) => !current)}
         >
           <div className="mb-space-md flex items-center justify-between">
             <div className="flex items-center gap-space-xs">
-              <span className={`rounded-xl p-2 ${painted ? "bg-white/80 text-sky-deep" : "bg-sky-bg text-sky-muted"}`}>
+              <span className={`rounded-xl p-2 ${painted ? "bg-sky-white/80 text-sky-deep" : "bg-sky-bg text-sky-muted"}`}>
                 <Icon name="bathtub" className="text-[20px]" />
               </span>
               <div>
@@ -49,15 +48,15 @@ export default function SamplePaint() {
                 <span className="text-title-sm">욕실 · 세면대</span>
               </div>
             </div>
-            <span className={`flex h-10 w-10 items-center justify-center rounded-full shadow-sm ${painted ? "bg-white text-sky-deep" : "bg-sky-bg text-sky-muted"}`}>
+            <span className={`flex h-10 w-10 items-center justify-center rounded-full shadow-sm ${painted ? "bg-sky-white text-sky-deep" : "bg-sky-bg text-sky-muted"}`}>
               <Icon name={painted ? "check" : "water_drop"} className="text-[22px]" fill={painted} />
             </span>
           </div>
           <div className="flex flex-col items-center py-space-sm">
-            <div className={`mb-space-sm flex h-32 w-32 items-center justify-center rounded-full ${painted ? "bg-white/20" : "bg-sky-bg"}`}>
-              <Icon name="wash" className={`text-[76px] ${painted ? "text-white" : "text-art-line"}`} />
+            <div className={`mb-space-sm flex h-32 w-32 items-center justify-center rounded-full ${painted ? "bg-sky-white/20" : "bg-sky-bg"}`}>
+              <Icon name="wash" className={`text-[76px] ${painted ? "text-onbrand" : "text-art-line"}`} />
             </div>
-            <span className={`rounded-full px-3.5 py-1 text-label-md ${painted ? "bg-white text-sky-deep" : "bg-sky-bg text-sky-muted"}`}>
+            <span className={`rounded-full px-3.5 py-1 text-label-md ${painted ? "bg-sky-white text-sky-deep" : "bg-sky-bg text-sky-muted"}`}>
               {painted ? "뽀득하게 기록 완료!" : "터치해서 맑게 채우기"}
             </span>
           </div>
@@ -66,7 +65,7 @@ export default function SamplePaint() {
             <span className="font-bold">{painted ? "산뜻함 100%" : "가볍게 1초"}</span>
           </div>
         </button>
-        <section className="rounded-xl bg-sky-bg p-space-md">
+        <section className="rounded-xl bg-sky-surface p-space-md">
           <div className="flex items-start gap-space-sm">
             <span className="rounded-xl bg-sky-tint p-2 text-sky-deep">
               <Icon name="colors" className="text-[20px]" fill />
@@ -77,7 +76,7 @@ export default function SamplePaint() {
             </div>
           </div>
         </section>
-        <Link className="mt-auto flex h-14 items-center justify-center gap-2 rounded-full bg-sky-brand text-title-sm text-onbrand shadow-md" to="/setup" onClick={() => resetToGuest()}>
+        <Link className="mt-auto flex h-14 items-center justify-center gap-2 rounded-full bg-sky-brand text-title-sm text-onbrand shadow-md" to="/setup">
           내 집 설정하러 가기
           <Icon name="arrow_forward" className="text-[20px]" />
         </Link>

@@ -8,7 +8,7 @@ import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
 import SpaceTile from "../components/SpaceTile";
 import Toast, { useRouteToast } from "../components/Toast";
-import { formatRecency, getActiveSpaces, getItems, getSpace, isRecordedToday, lastRecord, spaceColor, toggleTodayRecord, useRecords, type Item, type SpaceKey } from "../data/cleaning";
+import { formatRecency, getActiveSpaces, getItems, getSpace, isRecordedToday, lastRecord, metaTextOnFill, toggleTodayRecord, useRecords, type Item, type SpaceKey } from "../data/cleaning";
 
 type Filter = "recent" | "fav" | "space";
 
@@ -52,7 +52,7 @@ const playSparkle = (el: HTMLElement | null) => {
   );
 };
 
-const sweepGradient = "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(199,255,250,.22) 32%, rgba(255,255,255,.88) 50%, rgba(199,255,250,.22) 68%, rgba(255,255,255,0) 100%)";
+const sweepGradient = "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(225,243,255,.22) 32%, rgba(255,255,255,.88) 50%, rgba(225,243,255,.22) 68%, rgba(255,255,255,0) 100%)";
 
 export default function QuickRecord() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -108,7 +108,7 @@ export default function QuickRecord() {
       <>
         <span key={`sw-${shine.n}`} ref={playSweep} aria-hidden="true" className={`pointer-events-none absolute opacity-0 mix-blend-screen ${sweepClass}`} style={{ background: sweepGradient }} />
         <span key={`sp-${shine.n}`} ref={playSparkle} aria-hidden="true" className={`pointer-events-none absolute opacity-0 text-sky-white ${sparkleClass}`}>
-          <Icon name="sparkle" className="drop-shadow-[0_0_2px_rgba(20,107,99,.35)]" />
+          <Icon name="sparkle" className="drop-shadow-[0_0_2px_rgba(22,88,127,.35)]" />
         </span>
       </>
     ) : null;
@@ -139,6 +139,7 @@ export default function QuickRecord() {
                   icon={space.icon}
                   iconColor={space.iconColor}
                   selected={currentSpace === space.key}
+                  selectedColor={space.color}
                   size={38}
                   onClick={() => setView("space", space.key)}
                 >
@@ -158,12 +159,12 @@ export default function QuickRecord() {
                   <button
                     key={item.id}
                     aria-pressed={recorded}
-                    className="press relative flex h-[122px] flex-col items-start overflow-hidden rounded-2xl border bg-sky-white pl-[14px] pt-2 text-left transition-colors duration-300"
-                    style={{ borderColor: space.iconColor, backgroundColor: recorded ? spaceColor(item.space) : undefined }}
+                    className="press relative flex h-[122px] flex-col items-start overflow-hidden rounded-2xl bg-sky-surface pl-[14px] pt-2 text-left transition-colors duration-300"
+                    style={recorded ? { backgroundColor: space.color } : undefined}
                     type="button"
                     onClick={() => record(item)}
                   >
-                    <span className="flex h-[62px] w-[76px] items-start">
+                    <span className="relative flex h-[62px] w-[76px] items-start">
                       {objectArt ? (
                         <Icon name={item.icon} className="ml-3 mt-1 text-[46px]" />
                       ) : (
@@ -172,8 +173,10 @@ export default function QuickRecord() {
                         </span>
                       )}
                     </span>
-                    <span className="text-bb-label text-sky-ink">{item.name}</span>
-                    <span className="text-bb-caption text-sky-muted">{formatRecency(lastRecord(item.id, records)?.at)}</span>
+                    <span className="relative text-bb-label text-sky-ink">
+                      {item.name}
+                    </span>
+                    <span className={`relative text-bb-caption ${recorded ? metaTextOnFill(item.space) : "text-sky-muted"}`}>{formatRecency(lastRecord(item.id, records)?.at)}</span>
                     {overlays(item, "left-[111px] top-[14px] text-[28px]", "-left-[174px] -top-[49px] h-[220px] w-[118px]")}
                   </button>
                 );
@@ -190,17 +193,19 @@ export default function QuickRecord() {
                   <button
                     key={item.id}
                     aria-pressed={recorded}
-                    className="press relative flex h-20 items-center gap-3 overflow-hidden rounded-2xl bg-sky-white px-[14px] text-left transition-colors duration-300"
-                    style={{ backgroundColor: recorded ? spaceColor(item.space) : undefined }}
+                    className="press relative flex h-20 items-center gap-3 overflow-hidden rounded-2xl bg-sky-surface px-[14px] text-left transition-colors duration-300"
+                    style={recorded ? { backgroundColor: space.color } : undefined}
                     type="button"
                     onClick={() => record(item)}
                   >
-                    <SpaceTile onFill={recorded} space={item.space} />
-                    <span className="flex min-w-0 flex-col gap-0.5">
+                    <span className="relative">
+                      <SpaceTile onFill={recorded} space={item.space} />
+                    </span>
+                    <span className="relative flex min-w-0 flex-col gap-0.5">
                       <span className="truncate text-bb-label text-sky-ink">
                         {space.label} · {item.name}
                       </span>
-                      <span className="text-bb-caption text-sky-muted">{formatRecency(lastRecord(item.id, records)?.at)}</span>
+                      <span className={`text-bb-caption ${recorded ? metaTextOnFill(item.space) : "text-sky-muted"}`}>{formatRecency(lastRecord(item.id, records)?.at)}</span>
                     </span>
                     {overlays(item, "right-4 top-3 text-[24px]", "-left-[120px] -top-10 h-[160px] w-[110px]")}
                   </button>

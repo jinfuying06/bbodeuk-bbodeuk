@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import PhotoSetupScreen from "./PhotoSetupScreen";
 import DraftReviewScreen from "./DraftReviewScreen";
 import type { AXSpaceDraft } from "./types";
+import { AX_READY } from "./flag";
 import type { SpaceKey } from "./itemLibrary";
 import { DEFAULT_SPACES, writeSetup } from "../../data/setup";
 
@@ -34,6 +35,9 @@ export default function AXOnboardingFlow() {
     writeSetup({ spaces, roomName: "방" });
     navigate("/home");
   };
+
+  // 인식 백엔드가 없으면 주소로 직접 들어와도 기본 설정 화면으로 돌려보낸다.
+  if (!AX_READY) return <Navigate to="/setup" replace />;
 
   // 사진 화면은 초안 확인 중에도 마운트된 채 숨겨둔다 — 초안에서 뒤로 가도 찍은 사진이 그대로 남도록.
   return (

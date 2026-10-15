@@ -25,8 +25,15 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Test
+        run: npm test
       - name: Build
         run: npm run build
+        env:
+          VITE_TOSS_CLIENT_KEY: ${{ vars.VITE_TOSS_CLIENT_KEY }}
+          VITE_PAYMENT_CONFIRM_URL: ${{ vars.VITE_PAYMENT_CONFIRM_URL }}
+          VITE_AX_RECOGNIZE_URL: ${{ vars.VITE_AX_RECOGNIZE_URL }}
+          VITE_API_BASE: ${{ vars.VITE_API_BASE }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

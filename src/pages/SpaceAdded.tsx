@@ -6,7 +6,7 @@ import ItemRow from "../components/ItemRow";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import { getItems, getSpace, isSpaceKey } from "../data/cleaning";
-import { readPoints, SPACE_PRICE } from "../data/points";
+import { SPACE_PRICE_KRW } from "../features/payments/prices";
 import { particle } from "../data/josa";
 
 /** Figma 34:2025 `43 / 공간 추가 완료` — reached from 공간 관리 after confirming 32:1012. */
@@ -14,7 +14,6 @@ export default function SpaceAdded() {
   const [params] = useSearchParams();
   const requested = params.get("space");
   const space = getSpace(isSpaceKey(requested) ? requested : "terrace");
-  const balance = readPoints();
   const subject = `${space.label}${particle(space.label, "이/가")}`;
 
   return (
@@ -32,9 +31,9 @@ export default function SpaceAdded() {
         <ItemRow height={72} space={space.key} sub={getItems(space.key).map((item) => item.name).join(" · ")} title={space.label} to={`/space-info?space=${space.key}`} />
 
         <section className="flex flex-col gap-2 rounded-3xl bg-sky-tint px-5 pb-4 pt-4">
-          <h2 className="text-bb-title text-sky-ink">보유 포인트 {balance.toLocaleString()}P</h2>
+          <h2 className="text-bb-title text-sky-ink">결제 완료</h2>
           <p className="text-bb-body text-sky-muted">
-            {(balance + SPACE_PRICE).toLocaleString()}P에서 공간 추가에 {SPACE_PRICE}P를 사용했어요.
+            {SPACE_PRICE_KRW.toLocaleString()}원 결제로 {space.label}{particle(space.label, "을/를")} 열었어요.
           </p>
         </section>
 

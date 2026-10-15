@@ -1,4 +1,4 @@
-import type { SpaceKey } from "./itemLibrary";
+import type { SpaceKey } from "./itemLibrary.js";
 
 /**
  * PRD_v3.0 SECTION 19 (AX 온보딩) 계약.

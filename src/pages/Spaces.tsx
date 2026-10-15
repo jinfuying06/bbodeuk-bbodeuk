@@ -7,7 +7,7 @@ import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import WaterFill from "../components/WaterFill";
 import SpaceTile from "../components/SpaceTile";
-import { formatRecency, getActiveSpaces, getItems, isSpaceKey, itemFade, lastRecord, spaceFill, WATER_BASE_TINT, useRecords, type SpaceKey } from "../data/cleaning";
+import { formatRecency, getActiveSpaces, getItems, isSpaceKey, itemFade, lastRecord, metaTextOnFill, useRecords, waterBase, type SpaceKey } from "../data/cleaning";
 
 export default function Spaces() {
   const records = useRecords();
@@ -29,7 +29,7 @@ export default function Spaces() {
               <button
                 aria-controls={`space-panel-${space.key}`}
                 aria-expanded={expanded}
-                className="press flex h-[72px] w-full items-center gap-3 rounded-row bg-sky-white px-3 text-left"
+                className="press flex h-[72px] w-full items-center gap-3 rounded-row bg-sky-surface px-3 text-left"
                 type="button"
                 onClick={() => setOpen(expanded ? null : space.key)}
               >
@@ -42,22 +42,26 @@ export default function Spaces() {
               </button>
 
               {expanded ? (
-                <div id={`space-panel-${space.key}`} className="flex flex-col gap-2 rounded-row border bg-sky-white p-3" style={{ borderColor: space.color }}>
-                  {items.map((item, index) => (
-                    <Link
-                      key={item.id}
-                      className="press relative flex h-11 items-center justify-between overflow-hidden rounded-xl px-[10px]"
-                      style={{ backgroundColor: spaceFill(space.key, WATER_BASE_TINT) }}
-                      to={`/item-info?item=${item.id}`}
-                    >
-                      <WaterFill direction="right" level={itemFade(item, records)} color={space.color} phase={index} />
-                      <span className="relative flex min-w-0 items-center gap-2">
-                        <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: space.iconColor }} />
-                        <span className="truncate text-bb-label text-sky-ink">{item.name}</span>
-                      </span>
-                      <span className="relative shrink-0 pl-2 text-bb-caption text-sky-muted">{formatRecency(lastRecord(item.id, records)?.at, { short: true })}</span>
-                    </Link>
-                  ))}
+                <div id={`space-panel-${space.key}`} className="flex flex-col gap-2 rounded-row border bg-sky-surface p-3" style={{ borderColor: space.color }}>
+                  {items.map((item, index) => {
+                    const fade = itemFade(item, records);
+                    return (
+                      <Link
+                        key={item.id}
+                        // Never-recorded rows: white (sky-bg), since a Surface row would vanish into this Surface panel.
+                        className="press relative flex h-11 items-center justify-between overflow-hidden rounded-xl bg-sky-bg px-[10px]"
+                        style={{ backgroundColor: waterBase(space.key, fade) }}
+                        to={`/item-info?item=${item.id}`}
+                      >
+                        <WaterFill direction="right" level={fade} color={space.color} phase={index} />
+                        <span className="relative flex min-w-0 items-center gap-2">
+                          <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: space.iconColor }} />
+                          <span className="truncate text-bb-label text-sky-ink">{item.name}</span>
+                        </span>
+                        <span className={`relative shrink-0 pl-2 text-bb-caption ${metaTextOnFill(space.key)}`}>{formatRecency(lastRecord(item.id, records)?.at, { short: true })}</span>
+                      </Link>
+                    );
+                  })}
                   <Link className="press flex h-11 items-center justify-center rounded-tile text-bb-label font-bold text-sky-deep" style={{ backgroundColor: space.color }} to={`/quick-record?filter=space&space=${space.key}`}>
                     {space.label} 기록하기
                   </Link>
