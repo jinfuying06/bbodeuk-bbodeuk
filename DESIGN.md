@@ -4,6 +4,7 @@ description: A mobile cleaning record where tapping an item paints its space in 
 colors:
   sky-brand: "#38aeee"
   sky-deep: "#16587f"
+  sky-slate: "#3e5463"
   sky-tint: "#e1f3ff"
   sky-sky: "#8fd8ff"
   onbrand: "#0a3149"
@@ -101,14 +102,14 @@ spacing:
   header: "54px"
 components:
   button-primary:
-    backgroundColor: "{colors.sky-ink}"
+    backgroundColor: "{colors.sky-slate}"
     textColor: "{colors.sky-white}"
     typography: "{typography.bb-label}"
     rounded: "{rounded.2xl}"
     height: "56px"
   button-secondary:
     backgroundColor: "{colors.sky-surface}"
-    textColor: "{colors.sky-ink}"
+    textColor: "{colors.sky-slate}"
     typography: "{typography.bb-label}"
     rounded: "{rounded.2xl}"
     height: "52px"
@@ -204,7 +205,7 @@ Figma Page 5 also defines a full dark palette; it is deliberately not implemente
 
 **Key Characteristics:**
 - Color means "cared for recently"; its absence never means failure.
-- Ink (`sky-ink`, white labels) for filled buttons; deep ocean blue (`sky-deep`, white labels) for every selection, switch, check, link, active nav, header title and focus; sky blue (`sky-brand`) is a small brand accent only.
+- Slate (`sky-slate`, white labels) for filled buttons; deep ocean blue (`sky-deep`, white labels) for every selection, switch, check, link, active nav, header title and focus; sky blue (`sky-brand`) is a small brand accent only.
 - Four core space pastels plus three expansion pastels, each paired with a darker icon ink that never fades.
 - Flat tonal layering; shadow only on transient toasts.
 - Pretendard Variable throughout, Korean-first, zero letter-spacing.
@@ -218,7 +219,7 @@ Every color does exactly one job:
 1. **Identity — space color.** 100% space fill + icon ink on space tiles, space selection chips (QuickRecord, 항목 추가), the CareAction header block and supply tiles, AX onboarding tints. Never faded.
 2. **State — water level only.** Recency is a water level of the space color (`<WaterFill>`) on Home cards, Spaces item rows and the SpaceInfo band. Never recorded = plain Surface, no tint. Recorded at least once = 18% base tint (`WATER_BASE_TINT`) under a water level of 100 / 72 / 48 / 28%.
 3. **Interactive — Deep Ocean** (`sky-deep`) with white labels: switches, checks, non-space selection (segmented chips, filters), field focus, links, active nav.
-3a. **Buttons — Ink** (`sky-ink`, 2026-10-15, user-approved): filled button CTAs (primary Glass Button, Spaces "OO 기록하기") are Ink with white labels; secondary buttons are Surface with an Ink label. A neutral that belongs to no space keeps all five space colors equal above it, where Deep Ocean leaned toward 욕실.
+3a. **Buttons — Slate** (`sky-slate`, `#3e5463`, 2026-10-15, user-approved): filled button CTAs (primary Glass Button, Spaces "OO 기록하기") are Slate with white labels (7.9:1); secondary buttons are Surface with a Slate label. A blue-tinted neutral that belongs to no space keeps all five space colors equal above it (Deep Ocean leaned toward 욕실; Ink #23282b read too heavy).
 4. **Brand sky** (`sky-brand`): small accents only — logo/favicon, illustrations, sparkles, the AI-setup card outline. Never a button, chip, switch or check fill.
 
 ### Primary
@@ -330,7 +331,7 @@ Icons are a single SVG registry (`src/components/icons`): UI glyphs on a 24px gr
 ### Buttons (Glass Button)
 Tactile and calm: a deep-ocean slab with a white label that catches light when tapped.
 - **Shape:** 20px radius, 1px white border, full width, `overflow: hidden`, 56px tall for main CTAs, 52px for secondary/in-list/flow buttons.
-- **Primary:** Ink (`#23282b`) fill, white label (14.9:1) (`bb-label`). **Secondary:** Surface fill, Ink label.
+- **Primary:** Slate (`#3e5463`) fill, white label (7.9:1) (`bb-label`). **Secondary:** Surface fill, Slate label.
 - **Press:** inset Glass press shadow (120ms ease-out) plus one specular sweep per tap: a 90×130 white band (0→0.65→0 alpha) rotated 18° travels left→right in 480ms `cubic-bezier(0.2,0.7,0.2,1)`, remounted on each press.
 - **Disabled:** Hairline fill, Slate Muted label, no sweep.
 - **Focus:** 2px Deep Ocean ring drawn inset (-4px) because the button clips.

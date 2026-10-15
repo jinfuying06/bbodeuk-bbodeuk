@@ -6,7 +6,7 @@ export default {
       colors: {
         // Sky/BB palette — Figma Page 5 "Palette & Components" original values (user choice 2026-10-15;
         // the OKLCH-normalized experiment was reverted). Color roles (2026-10-15): interactive fills (primary button,
-        // switch, check, non-space selection, field focus) = sky-deep #16587f; filled buttons = sky-ink #23282b (2026-10-15) with white labels (7.67:1); brand #38aeee is
+        // switch, check, non-space selection, field focus) = sky-deep #16587f; filled buttons = sky-slate #3e5463 (2026-10-15) with white labels (7.67:1); brand #38aeee is
         // small accents only (logo, illustration, sparkle). onbrand stays for SamplePaint (dev). sky-muted fails on 거실/공간1/공간3 fills → metaTextOnFill() in data/cleaning.ts.
         // DESIGN.md `colors:` frontmatter mirrors these.
         // Surface roles: sky-bg = white page/header/nav/dialog/fields; sky-surface = cards/rows/chips/tiles;
@@ -15,6 +15,7 @@ export default {
         "sky-deep": "#16587f",
         "sky-tint": "#e1f3ff",
         "sky-ink": "#23282b",
+        "sky-slate": "#3e5463",
         "sky-muted": "#60676b",
         "sky-line": "#e3e6e8",
         "sky-white": "#ffffff",
