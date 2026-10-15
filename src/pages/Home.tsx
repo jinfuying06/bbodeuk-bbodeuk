@@ -167,7 +167,7 @@ export default function Home() {
           ) : (
             <RowList>
               {recent.map((row) => (
-                <ItemRow key={row.id} list chevron="muted" meta={formatRecency(row.at)} space={row.space} title={row.name} to={`/item-history?item=${row.id}`} />
+                <ItemRow key={row.id} list meta={formatRecency(row.at)} space={row.space} title={row.name} />
               ))}
             </RowList>
           )}
