@@ -70,13 +70,19 @@ export default function Home() {
   const items = getItems().filter((item) => spaceKeys.has(item.space));
   const anyOverdue = items.some((item) => itemStaleness(item, records) >= 1);
 
-  // Headline variants: 31:1630 기록 직후 · 31:1495 가벼운 추천 · 29:136 / 31:791 default.
-  const headline = todayCount > 0 ? ["오늘도,", "내 공간이 산뜻해요"] : hasRecords && anyOverdue ? ["오늘 눈에 들어온", "한 곳부터"] : ["오늘도,", "내 공간을 맑게."];
-  const message = !hasRecords
-    ? "아직 기록은 없지만, 내 공간은 여기에서 시작해요."
-    : todayCount > 0
-      ? `오늘 ${todayCount}곳을 돌봤어요`
-      : "오늘은 아직 돌본 곳이 없어요";
+  // Status-driven intro (2026-10-15). No record CTA on Home: the second line points at the space cards
+  // (each opens 기록 for that space) and the 기록 tab covers the rest.
+  const allDoneToday = todayCount > 0 && todayCount >= spaces.length;
+  const tapHint = "공간을 눌러 청소한 곳을 기록해요";
+  const [headline, message]: [[string, string], string] = !hasRecords
+    ? [["첫 기록을", "남겨볼까요?"], tapHint]
+    : allDoneToday
+      ? [["오늘은", "집 전체가 반짝여요"], "모든 공간을 돌봤어요"]
+      : todayCount > 0
+        ? [["오늘도,", "내 공간이 산뜻해요"], `오늘 ${todayCount}곳을 돌봤어요`]
+        : anyOverdue
+          ? [["오늘 눈에 들어온", "한 곳부터"], tapHint]
+          : [["오늘도,", "내 공간을 맑게."], tapHint];
 
   const targetFade = Object.fromEntries(spaces.map((space) => [space.key, spaceFade(space.key, records)])) as Record<SpaceKey, number>;
   const fadeKey = JSON.stringify(targetFade);
@@ -139,14 +145,15 @@ export default function Home() {
           </div>
         </section>
 
-        <div className={`flex flex-col gap-2 pt-2 ${hasRecords ? "pb-6" : "pb-4"}`}>
-          <GlassButton to="/quick-record">청소 기록하기</GlassButton>
-          {hasRecords ? (
+        {hasRecords ? (
+          <div className="pb-6 pt-2">
             <GlassButton variant="secondary" size={52} className="w-full" to="/history">
               기록 모아보기
             </GlassButton>
-          ) : null}
-        </div>
+          </div>
+        ) : (
+          <div className="pb-4" />
+        )}
 
         <section className={`flex flex-col pt-2 ${hasRecords ? "gap-1.5" : "gap-3"}`}>
           <div className="flex h-7 items-center justify-between">
