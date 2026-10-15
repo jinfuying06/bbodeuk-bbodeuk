@@ -26,12 +26,12 @@ export type Space = {
 };
 
 export const SPACES: Space[] = [
-  { key: "bathroom", label: "욕실", icon: "space-bath", color: "#c4f2ff", iconColor: "#306d7e", setupKeys: ["욕실"] },
-  { key: "kitchen", label: "주방", icon: "space-kitchen", color: "#fff8c4", iconColor: "#7e7430", setupKeys: ["주방"] },
-  { key: "living", label: "거실", icon: "space-living", color: "#ffd0c4", iconColor: "#7e4030", setupKeys: ["거실"] },
-  { key: "bedroom", label: "방", icon: "space-bed", color: "#c7ffc4", iconColor: "#347e30", setupKeys: ["침실 / 방", "방"] },
+  { key: "bathroom", label: "욕실", icon: "space-bath", color: "#b6f5ff", iconColor: "#007194", setupKeys: ["욕실"] },
+  { key: "kitchen", label: "주방", icon: "space-kitchen", color: "#fff2af", iconColor: "#9c6400", setupKeys: ["주방"] },
+  { key: "living", label: "거실", icon: "space-living", color: "#ffdbc5", iconColor: "#994920", setupKeys: ["거실"] },
+  { key: "bedroom", label: "방", icon: "space-bed", color: "#c7fad3", iconColor: "#1a763f", setupKeys: ["침실 / 방", "방"] },
   // Paid expansion space = 공간1 slot (sky-space1 + space-space1-icon); keeps its own terrace glyph.
-  { key: "terrace", label: "베란다", icon: "space-terrace", color: "#e9c4ff", iconColor: "#61307e", setupKeys: ["베란다 / 다용도실", "테라스"] },
+  { key: "terrace", label: "베란다", icon: "space-terrace", color: "#f0deff", iconColor: "#70509b", setupKeys: ["베란다 / 다용도실", "테라스"] },
 ];
 
 const FREE_SPACES: SpaceKey[] = ["bathroom", "kitchen", "living", "bedroom"];

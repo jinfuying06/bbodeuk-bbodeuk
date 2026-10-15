@@ -17,16 +17,16 @@ colors:
   art-line: "#5b7a8c"
   art-tint: "#e3f5ff"
   scrim: "rgba(20, 26, 24, 0.7)"
-  sky-bath: "#c4f2ff"
-  space-bath-icon: "#306d7e"
-  sky-kitchen: "#fff8c4"
-  space-kitchen-icon: "#7e7430"
-  sky-living: "#ffd0c4"
-  space-living-icon: "#7e4030"
-  sky-bed: "#c7ffc4"
-  space-bed-icon: "#347e30"
-  sky-space1: "#e9c4ff"
-  space-space1-icon: "#61307e"
+  sky-bath: "#b6f5ff"
+  space-bath-icon: "#007194"
+  sky-kitchen: "#fff2af"
+  space-kitchen-icon: "#9c6400"
+  sky-living: "#ffdbc5"
+  space-living-icon: "#994920"
+  sky-bed: "#c7fad3"
+  space-bed-icon: "#1a763f"
+  sky-space1: "#f0deff"
+  space-space1-icon: "#70509b"
   sky-space2: "#ffe8c4"
   space-space2-icon: "#7e5f30"
   sky-space3: "#ffc4f7"
@@ -247,11 +247,11 @@ Expansion spaces have no dedicated glyph yet; until one exists, their tiles show
 
 | Space | Fill | Icon ink | Icon on fill |
 |---|---|---|---|
-| 욕실 | `#c4f2ff` | `#306d7e` | 4.84:1 |
-| 주방 | `#fff8c4` | `#7e7430` | 4.40:1 |
-| 거실 | `#ffd0c4` | `#7e4030` | 5.66:1 |
-| 방 | `#c7ffc4` | `#347e30` | 4.44:1 |
-| 공간1 | `#e9c4ff` | `#61307e` | 6.18:1 |
+| 욕실 | `#b6f5ff` | `#007194` | 4.84:1 |
+| 주방 | `#fff2af` | `#9c6400` | 4.40:1 |
+| 거실 | `#ffdbc5` | `#994920` | 5.66:1 |
+| 방 | `#c7fad3` | `#1a763f` | 4.44:1 |
+| 공간1 | `#f0deff` | `#70509b` | 6.18:1 |
 | 공간2 | `#ffe8c4` | `#7e5f30` | 4.93:1 |
 | 공간3 | `#ffc4f7` | `#7e3073` | 5.67:1 |
 
