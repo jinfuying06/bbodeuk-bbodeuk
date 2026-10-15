@@ -181,10 +181,7 @@ export default function Home() {
         </section>
 
         <section className="flex flex-col gap-3 pt-6">
-          <div>
-            <h2 className="text-bb-title text-sky-ink">오늘 가볍게 돌볼 곳</h2>
-            <p className="text-bb-caption text-sky-muted">눈에 들어오는 한 곳만 골라도 괜찮아요.</p>
-          </div>
+          <h2 className="flex h-7 items-center text-bb-title text-sky-ink">오늘 가볍게 돌볼 곳</h2>
           <RowList>
             {lightCare.map(({ item, tip }) => (
               <ItemRow
