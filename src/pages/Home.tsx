@@ -140,8 +140,7 @@ export default function Home() {
         </section>
 
         <div className="pb-4 pt-2">
-          <GlassButton to="/quick-record">청소 기록하기
-            <Icon name="plus" className="text-[16px]" /></GlassButton>
+          <GlassButton to="/quick-record">청소 기록하기</GlassButton>
         </div>
         {hasRecords ? (
           <div className="pb-6">

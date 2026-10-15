@@ -62,7 +62,7 @@ export default function Spaces() {
                       </Link>
                     );
                   })}
-                  <Link className="press flex h-11 items-center justify-center rounded-tile text-bb-label font-bold text-sky-deep" style={{ backgroundColor: space.color }} to={`/quick-record?filter=space&space=${space.key}`}>
+                  <Link className="press flex h-11 items-center justify-center rounded-tile bg-sky-deep text-bb-label font-bold text-sky-white" to={`/quick-record?filter=space&space=${space.key}`}>
                     {space.label} 기록하기
                   </Link>
                 </div>
