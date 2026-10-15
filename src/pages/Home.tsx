@@ -139,16 +139,14 @@ export default function Home() {
           </div>
         </section>
 
-        <div className="pb-4 pt-2">
+        <div className={`flex flex-col gap-2 pt-2 ${hasRecords ? "pb-6" : "pb-4"}`}>
           <GlassButton to="/quick-record">청소 기록하기</GlassButton>
-        </div>
-        {hasRecords ? (
-          <div className="pb-6">
+          {hasRecords ? (
             <GlassButton variant="secondary" size={52} className="w-full" to="/history">
               기록 모아보기
             </GlassButton>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
 
         <section className={`flex flex-col pt-2 ${hasRecords ? "gap-1.5" : "gap-3"}`}>
           <div className="flex h-7 items-center justify-between">
