@@ -150,7 +150,8 @@ export default function QuickRecord() {
 
             <p className="text-bb-caption text-sky-muted">톡 눌러 청소 기록을 채워보세요</p>
 
-            <div aria-label="청소 항목" className="grid grid-cols-2 gap-[10px]">
+            {/* Square 3-column tiles, centered (2026-10-16): balanced and a whole space fits on one screen. */}
+            <div aria-label="청소 항목" className="grid grid-cols-3 gap-2">
               {items.map((item) => {
                 const recorded = isRecordedToday(item.id, records);
                 const space = getSpace(item.space);
@@ -159,26 +160,23 @@ export default function QuickRecord() {
                   <button
                     key={item.id}
                     aria-pressed={recorded}
-                    // Even 16px padding, art and text share one left edge, art top / text bottom (2026-10-16).
-                    className="press relative flex h-[124px] flex-col items-start justify-between overflow-hidden rounded-2xl bg-sky-surface p-4 text-left transition-colors duration-300"
+                    className="press relative flex aspect-square flex-col items-center justify-center gap-1 overflow-hidden rounded-2xl bg-sky-surface px-1 text-center transition-colors duration-300"
                     style={recorded ? { backgroundColor: space.color } : undefined}
                     type="button"
                     onClick={() => record(item)}
                   >
-                    <span className="relative -ml-1 -mt-1 flex">
+                    <span className="relative flex h-10 items-center justify-center">
                       {objectArt ? (
-                        <Icon name={item.icon} className="text-[44px]" />
+                        <Icon name={item.icon} className="text-[40px]" />
                       ) : (
-                        <span className="flex p-1" style={{ color: space.iconColor }}>
-                          <Icon name={item.icon} className="text-[28px]" />
+                        <span className="flex" style={{ color: space.iconColor }}>
+                          <Icon name={item.icon} className="text-[26px]" />
                         </span>
                       )}
                     </span>
-                    <span className="relative flex flex-col gap-0.5">
-                      <span className="text-bb-label text-sky-ink">{item.name}</span>
-                      <span className={`text-bb-caption ${recorded ? metaTextOnFill(item.space) : "text-sky-muted"}`}>{formatRecency(lastRecord(item.id, records)?.at)}</span>
-                    </span>
-                    {overlays(item, "left-[111px] top-[14px] text-[28px]", "-left-[174px] -top-[49px] h-[220px] w-[118px]")}
+                    <span className="relative w-full truncate text-bb-label text-sky-ink">{item.name}</span>
+                    <span className={`relative -mt-0.5 text-bb-caption ${recorded ? metaTextOnFill(item.space) : "text-sky-muted"}`}>{formatRecency(lastRecord(item.id, records)?.at)}</span>
+                    {overlays(item, "right-2 top-2 text-[20px]", "-left-[120px] -top-[40px] h-[190px] w-[96px]")}
                   </button>
                 );
               })}
