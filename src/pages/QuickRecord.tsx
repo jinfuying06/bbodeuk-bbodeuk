@@ -159,24 +159,25 @@ export default function QuickRecord() {
                   <button
                     key={item.id}
                     aria-pressed={recorded}
-                    className="press relative flex h-[122px] flex-col items-start overflow-hidden rounded-2xl bg-sky-surface pl-[14px] pt-2 text-left transition-colors duration-300"
+                    // Even 16px padding, art and text share one left edge, art top / text bottom (2026-10-16).
+                    className="press relative flex h-[124px] flex-col items-start justify-between overflow-hidden rounded-2xl bg-sky-surface p-4 text-left transition-colors duration-300"
                     style={recorded ? { backgroundColor: space.color } : undefined}
                     type="button"
                     onClick={() => record(item)}
                   >
-                    <span className="relative flex h-[62px] w-[76px] items-start">
+                    <span className="relative -ml-1 -mt-1 flex">
                       {objectArt ? (
-                        <Icon name={item.icon} className="ml-3 mt-1 text-[46px]" />
+                        <Icon name={item.icon} className="text-[44px]" />
                       ) : (
-                        <span className="mt-1 flex" style={{ color: space.iconColor }}>
-                          <Icon name={item.icon} className="text-[24px]" />
+                        <span className="flex p-1" style={{ color: space.iconColor }}>
+                          <Icon name={item.icon} className="text-[28px]" />
                         </span>
                       )}
                     </span>
-                    <span className="relative text-bb-label text-sky-ink">
-                      {item.name}
+                    <span className="relative flex flex-col gap-0.5">
+                      <span className="text-bb-label text-sky-ink">{item.name}</span>
+                      <span className={`text-bb-caption ${recorded ? metaTextOnFill(item.space) : "text-sky-muted"}`}>{formatRecency(lastRecord(item.id, records)?.at)}</span>
                     </span>
-                    <span className={`relative text-bb-caption ${recorded ? metaTextOnFill(item.space) : "text-sky-muted"}`}>{formatRecency(lastRecord(item.id, records)?.at)}</span>
                     {overlays(item, "left-[111px] top-[14px] text-[28px]", "-left-[174px] -top-[49px] h-[220px] w-[118px]")}
                   </button>
                 );
