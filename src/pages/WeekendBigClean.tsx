@@ -81,10 +81,14 @@ export default function WeekendBigClean() {
                     const done = checked.has(item.id);
                     const recency = formatRecency(lastRecord(item.id, records)?.at);
                     return (
-                      <div key={item.id} className="flex flex-col gap-2">
-                        <CheckRow fill={space.color} label={item.name} on={done} onClick={() => toggle(item)} />
-                        <p className="text-bb-caption text-sky-muted">{item.hiddenCare ? `숨은 관리 · ${recency}` : recency}</p>
-                      </div>
+                      <CheckRow
+                        key={item.id}
+                        fill={space.color}
+                        label={item.name}
+                        on={done}
+                        onClick={() => toggle(item)}
+                        trailing={<span className="shrink-0 text-right text-bb-caption text-sky-muted">{item.hiddenCare ? `숨은 관리 · ${recency}` : recency}</span>}
+                      />
                     );
                   })}
                 </div>
