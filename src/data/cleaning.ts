@@ -75,7 +75,7 @@ export type Item = {
   space: SpaceKey;
   /** Recommended cycle in days (drives recency fade). */
   intervalDays: number;
-  /** Registry icon: object-* art for 욕실, otherwise the space icon (Figma 34/35/36). */
+  /** Registry icon: object-* art for 욕실·주방·거실·방 items, otherwise the space icon (Figma 34/35/36). */
   icon: string;
   /** "숨은 관리" — easy-to-miss spot (배수구, 후드 필터 …). */
   hiddenCare?: boolean;
@@ -90,15 +90,15 @@ const CATALOG: CatalogItem[] = [
   { id: "mirror", name: "거울", space: "bathroom", intervalDays: 10, icon: "object-mirror" },
   { id: "bath-floor", name: "바닥", fullName: "욕실 바닥", space: "bathroom", intervalDays: 7, icon: "object-floor" },
   { id: "drain", name: "배수구", space: "bathroom", intervalDays: 7, icon: "object-drain", hiddenCare: true },
-  { id: "sink", name: "싱크대", space: "kitchen", intervalDays: 3 },
-  { id: "countertop", name: "조리대", space: "kitchen", intervalDays: 5 },
-  { id: "hood", name: "후드 필터", space: "kitchen", intervalDays: 21, hiddenCare: true },
-  { id: "living-floor", name: "바닥", fullName: "거실 바닥", space: "living", intervalDays: 7 },
-  { id: "shelf", name: "선반", space: "living", intervalDays: 7 },
-  { id: "air-filter", name: "공기청정기", space: "living", intervalDays: 30, hiddenCare: true },
-  { id: "bedding", name: "침구", space: "bedroom", intervalDays: 7 },
-  { id: "pillow", name: "베개 커버", space: "bedroom", intervalDays: 7 },
-  { id: "bedroom-floor", name: "바닥", fullName: "방 바닥", space: "bedroom", intervalDays: 7 },
+  { id: "sink", name: "싱크대", space: "kitchen", intervalDays: 3, icon: "object-kitchen-sink" },
+  { id: "countertop", name: "조리대", space: "kitchen", intervalDays: 5, icon: "object-countertop" },
+  { id: "hood", name: "후드 필터", space: "kitchen", intervalDays: 21, hiddenCare: true, icon: "object-hood" },
+  { id: "living-floor", name: "바닥", fullName: "거실 바닥", space: "living", intervalDays: 7, icon: "object-floor" },
+  { id: "shelf", name: "선반", space: "living", intervalDays: 7, icon: "object-shelf" },
+  { id: "air-filter", name: "공기청정기", space: "living", intervalDays: 30, hiddenCare: true, icon: "object-air-purifier" },
+  { id: "bedding", name: "침구", space: "bedroom", intervalDays: 7, icon: "object-bedding" },
+  { id: "pillow", name: "베개 커버", space: "bedroom", intervalDays: 7, icon: "object-pillow" },
+  { id: "bedroom-floor", name: "바닥", fullName: "방 바닥", space: "bedroom", intervalDays: 7, icon: "object-floor" },
   { id: "terrace-floor", name: "바닥", fullName: "베란다 바닥", space: "terrace", intervalDays: 14 },
   { id: "rail", name: "난간", space: "terrace", intervalDays: 21 },
   { id: "laundry", name: "빨래 공간", space: "terrace", intervalDays: 14 },

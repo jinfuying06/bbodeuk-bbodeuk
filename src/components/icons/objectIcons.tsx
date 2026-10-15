@@ -95,3 +95,78 @@ export const ObjectDrainIcon: IconComponent = (props) => (
     />
   </svg>
 );
+
+// --- 주방 · 거실 · 방 object art (2026-10-16), drawn in the same language as the 욕실 set:
+// 2.3px #5B7A8C rounded strokes, white + #E3F5FF fills, #8FD8FF accent, 46×46 box.
+const accent = "#8FD8FF";
+const tint = "#E3F5FF";
+
+export const ObjectKitchenSinkIcon: IconComponent = (props) => (
+  <svg viewBox="0 0 46 46" width="1.2em" height="1.2em" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M8 28H38V34C38 38.4 34.4 42 30 42H16C11.6 42 8 38.4 8 34V28Z" fill={tint} {...strokeProps} />
+    <rect x="1.15" y="22" width="43.7" height="6" rx="1.5" fill="white" {...strokeProps} />
+    <path d="M31 22V9.5C31 4.2 22.5 4.2 22.5 9.5V11.5M28 22H34" fill="none" {...strokeProps} />
+    <path d="M22.5 14.5C21 16.8 21 18.4 22.5 18.4C24 18.4 24 16.8 22.5 14.5Z" fill={accent} {...strokeProps} />
+  </svg>
+);
+
+export const ObjectCountertopIcon: IconComponent = (props) => (
+  <svg viewBox="0 0 46 46" width="1.2em" height="1.2em" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <rect x="2.3" y="15" width="32" height="25" rx="6" fill={tint} {...strokeProps} />
+    <circle cx="28.3" cy="21" r="2" fill="white" {...strokeProps} />
+    <path d="M15 6.5C18 5.5 30 18 33.5 25L30 28.5L12.5 10.5C12.5 8.5 13.5 7 15 6.5Z" fill="white" {...strokeProps} />
+    <path d="M32 27L42.5 37.5" fill="none" {...strokeProps} strokeWidth={4} />
+    <path d="M1.15 44.5H44.85" fill="none" {...strokeProps} />
+  </svg>
+);
+
+export const ObjectHoodIcon: IconComponent = (props) => (
+  <svg viewBox="0 0 46 46" width="1.2em" height="1.2em" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <rect x="17" y="1.15" width="12" height="11" rx="1.5" fill="white" {...strokeProps} />
+    <path d="M6 25L15 12.15H31L40 25H6Z" fill="white" {...strokeProps} />
+    <rect x="2.3" y="25" width="41.4" height="6" rx="2" fill={tint} {...strokeProps} />
+    <path d="M10 28H36" fill="none" {...strokeProps} strokeDasharray="2.5 3.5" />
+    <path d="M16 37C14.5 38.7 17.5 40.3 16 42M23 36.5C21.5 38.2 24.5 39.8 23 41.5M30 37C28.5 38.7 31.5 40.3 30 42" fill="none" {...strokeProps} stroke={accent} />
+  </svg>
+);
+
+export const ObjectShelfIcon: IconComponent = (props) => (
+  <svg viewBox="0 0 46 46" width="1.2em" height="1.2em" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <rect x="7" y="11" width="6.5" height="19" rx="1.2" fill={tint} {...strokeProps} />
+    <rect x="13.5" y="15" width="6.5" height="15" rx="1.2" fill="white" {...strokeProps} />
+    <path d="M21 30L24.6 16.2L30.2 17.6L26.8 30" fill={tint} {...strokeProps} />
+    <path d="M37.5 22C37.5 16.5 34 14 30.8 14C30.8 18.5 34 21.5 37.5 22ZM37.5 22C37.5 15.5 41 12.5 44 12.5C44 17.5 41 21.5 37.5 22Z" fill={accent} {...strokeProps} />
+    <path d="M32.5 22H42.5L41 30H34Z" fill="white" {...strokeProps} />
+    <rect x="1.15" y="30" width="43.7" height="5" rx="1.5" fill="white" {...strokeProps} />
+    <path d="M8 35V41M38 35V41" fill="none" {...strokeProps} />
+  </svg>
+);
+
+export const ObjectAirPurifierIcon: IconComponent = (props) => (
+  <svg viewBox="0 0 46 46" width="1.2em" height="1.2em" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <rect x="12" y="5" width="24" height="39.85" rx="6.5" fill="white" {...strokeProps} />
+    <rect x="16.5" y="9.5" width="15" height="4" rx="2" fill={tint} {...strokeProps} />
+    <circle cx="24" cy="28.5" r="7.5" fill={tint} {...strokeProps} />
+    <circle cx="24" cy="28.5" r="2.5" fill="white" {...strokeProps} />
+    <path d="M2.3 18H8M1.15 24H7M2.3 30H8" fill="none" {...strokeProps} stroke={accent} />
+  </svg>
+);
+
+export const ObjectBeddingIcon: IconComponent = (props) => (
+  <svg viewBox="0 0 46 46" width="1.2em" height="1.2em" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <rect x="2.3" y="8" width="8" height="31" rx="3" fill="white" {...strokeProps} />
+    <rect x="10.3" y="25" width="33.4" height="9" rx="3" fill="white" {...strokeProps} />
+    <rect x="12" y="18.5" width="9" height="6.5" rx="3.2" fill="white" {...strokeProps} />
+    <path d="M19 23C19 20.8 20.8 19 23 19H40.7C42.4 19 43.7 20.3 43.7 22V31C43.7 32.7 42.4 34 40.7 34H23C20.8 34 19 32.2 19 30V23Z" fill={tint} {...strokeProps} />
+    <path d="M19 25.5H43.7" fill="none" {...strokeProps} />
+    <path d="M6.3 39V43.5M39.7 34V43.5" fill="none" {...strokeProps} />
+  </svg>
+);
+
+export const ObjectPillowIcon: IconComponent = (props) => (
+  <svg viewBox="0 0 46 46" width="1.2em" height="1.2em" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M5 14C14 10.5 30 10.5 39 14C42 22 42 30 39 38C30 41.5 14 41.5 5 38C2 30 2 22 5 14Z" fill={tint} {...strokeProps} />
+    <path d="M10 18.5C17 16.5 27 16.5 34 18.5C35.8 23.5 35.8 28.5 34 33.5C27 35.5 17 35.5 10 33.5C8.2 28.5 8.2 23.5 10 18.5Z" fill="white" {...strokeProps} strokeDasharray="2.6 3" />
+    <path d="M39 1.5L40.3 4.8L43.6 6.1L40.3 7.4L39 10.7L37.7 7.4L34.4 6.1L37.7 4.8L39 1.5Z" fill={accent} {...strokeProps} />
+  </svg>
+);
