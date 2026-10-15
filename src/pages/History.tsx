@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
-import ItemRow from "../components/ItemRow";
+import ItemRow, { RowList } from "../components/ItemRow";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
@@ -128,11 +128,13 @@ export default function History() {
               <p className="text-bb-caption text-sky-deep">{new Set(dayRecords.map((record) => getItem(record.itemId)?.space).filter(Boolean)).size}곳을 돌봤어요</p>
             ) : null}
             {dayRecords.length > 0 ? (
-              dayRecords.map((record) => {
-                const item = getItem(record.itemId);
-                if (!item) return null;
-                return <ItemRow key={record.id} space={item.space} title={item.name} sub={`${getSpace(item.space).label} · ${formatTime(record.at)}`} />;
-              })
+              <RowList>
+                {dayRecords.map((record) => {
+                  const item = getItem(record.itemId);
+                  if (!item) return null;
+                  return <ItemRow key={record.id} list meta={formatTime(record.at)} space={item.space} sub={getSpace(item.space).label} title={item.name} />;
+                })}
+              </RowList>
             ) : (
               <p className="text-bb-body text-sky-muted">
                 이 날은 남긴 기록이 없어요.
@@ -158,11 +160,13 @@ export default function History() {
                 .slice(0, 3);
               if (items.length === 0) return null;
               return (
-                <section key={space.key} className="flex flex-col gap-3">
+                <section key={space.key} className="flex flex-col gap-1">
                   <h2 className="text-bb-title text-sky-ink">{space.label}</h2>
-                  {items.map(({ item, at }) => (
-                    <ItemRow key={item.id} space={space.key} title={item.name} sub={formatRecency(at)} to={itemHistoryPath(item.id)} />
-                  ))}
+                  <RowList>
+                    {items.map(({ item, at }) => (
+                      <ItemRow key={item.id} list chevron="muted" meta={formatRecency(at)} space={space.key} title={item.name} to={itemHistoryPath(item.id)} />
+                    ))}
+                  </RowList>
                 </section>
               );
             })}

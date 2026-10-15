@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
-import ItemRow from "../components/ItemRow";
+import ItemRow, { RowList } from "../components/ItemRow";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
 import WaterFill from "../components/WaterFill";
@@ -165,9 +165,11 @@ export default function Home() {
               </span>
             </Link>
           ) : (
-            recent.map((row) => (
-              <ItemRow key={row.id} chevron="muted" space={row.space} sub={formatRecency(row.at)} title={row.name} to={`/item-history?item=${row.id}`} />
-            ))
+            <RowList>
+              {recent.map((row) => (
+                <ItemRow key={row.id} list chevron="muted" meta={formatRecency(row.at)} space={row.space} title={row.name} to={`/item-history?item=${row.id}`} />
+              ))}
+            </RowList>
           )}
         </section>
 
@@ -176,15 +178,20 @@ export default function Home() {
             <h2 className="text-bb-title text-sky-ink">오늘 가볍게 돌볼 곳</h2>
             <p className="text-bb-caption text-sky-muted">눈에 들어오는 한 곳만 골라도 괜찮아요.</p>
           </div>
-          {lightCare.map(({ item, tip }) => (
-            <ItemRow
-              key={item.id}
-              space={item.space}
-              sub={`${item.hiddenCare ? "숨은 관리" : formatRecency(lastRecord(item.id, records)?.at)} · ${tip}`}
-              title={item.name}
-              to={`/quick-record?filter=space&space=${item.space}`}
-            />
-          ))}
+          <RowList>
+            {lightCare.map(({ item, tip }) => (
+              <ItemRow
+                key={item.id}
+                list
+                chevron="muted"
+                meta={item.hiddenCare ? "숨은 관리" : formatRecency(lastRecord(item.id, records)?.at)}
+                space={item.space}
+                sub={tip}
+                title={item.name}
+                to={`/quick-record?filter=space&space=${item.space}`}
+              />
+            ))}
+          </RowList>
           <GlassButton size={52} className="w-full" to="/deep-clean">
             여유 있는 날, 대청소 둘러보기
           </GlassButton>
