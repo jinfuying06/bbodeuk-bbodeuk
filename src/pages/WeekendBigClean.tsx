@@ -49,7 +49,6 @@ export default function WeekendBigClean() {
       <AppHeader title="주말 대청소" back />
       <main className="flex flex-col gap-3 px-margin-screen pb-nav-cta pt-header">
         <PageIntro title="여유 있는 날, 대청소" body="오래 안 본 곳과 숨은 관리를 가볍게 훑어요." />
-        <p className="rounded-xl bg-sky-tint p-3 text-bb-label text-sky-deep">먼지 털기 → 표면 닦기 → 바닥 정리</p>
 
         {groups.map(({ space, items }) => {
           const isOpen = open === space.key;
