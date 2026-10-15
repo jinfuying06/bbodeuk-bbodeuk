@@ -101,14 +101,14 @@ spacing:
   header: "54px"
 components:
   button-primary:
-    backgroundColor: "{colors.sky-deep}"
+    backgroundColor: "{colors.sky-ink}"
     textColor: "{colors.sky-white}"
     typography: "{typography.bb-label}"
     rounded: "{rounded.2xl}"
     height: "56px"
   button-secondary:
-    backgroundColor: "{colors.sky-tint}"
-    textColor: "{colors.sky-deep}"
+    backgroundColor: "{colors.sky-surface}"
+    textColor: "{colors.sky-ink}"
     typography: "{typography.bb-label}"
     rounded: "{rounded.2xl}"
     height: "52px"
@@ -204,7 +204,7 @@ Figma Page 5 also defines a full dark palette; it is deliberately not implemente
 
 **Key Characteristics:**
 - Color means "cared for recently"; its absence never means failure.
-- Deep ocean blue (`sky-deep`, white labels) for every primary action, selection, switch, check, link, active nav, header title and focus; sky blue (`sky-brand`) is a small brand accent only.
+- Ink (`sky-ink`, white labels) for filled buttons; deep ocean blue (`sky-deep`, white labels) for every selection, switch, check, link, active nav, header title and focus; sky blue (`sky-brand`) is a small brand accent only.
 - Four core space pastels plus three expansion pastels, each paired with a darker icon ink that never fades.
 - Flat tonal layering; shadow only on transient toasts.
 - Pretendard Variable throughout, Korean-first, zero letter-spacing.
@@ -217,13 +217,14 @@ A white neutral field with a navy interactive color, a small sky-blue brand acce
 Every color does exactly one job:
 1. **Identity — space color.** 100% space fill + icon ink on space tiles, space selection chips (QuickRecord, 항목 추가), the CareAction header block and supply tiles, AX onboarding tints. Never faded.
 2. **State — water level only.** Recency is a water level of the space color (`<WaterFill>`) on Home cards, Spaces item rows and the SpaceInfo band. Never recorded = plain Surface, no tint. Recorded at least once = 18% base tint (`WATER_BASE_TINT`) under a water level of 100 / 72 / 48 / 28%.
-3. **Interactive — Deep Ocean** (`sky-deep`) with white labels: primary buttons, switches, checks, non-space selection (segmented chips, filters), field focus, links, active nav.
+3. **Interactive — Deep Ocean** (`sky-deep`) with white labels: switches, checks, non-space selection (segmented chips, filters), field focus, links, active nav.
+3a. **Buttons — Ink** (`sky-ink`, 2026-10-15, user-approved): filled button CTAs (primary Glass Button, Spaces "OO 기록하기") are Ink with white labels; secondary buttons are Surface with an Ink label. A neutral that belongs to no space keeps all five space colors equal above it, where Deep Ocean leaned toward 욕실.
 4. **Brand sky** (`sky-brand`): small accents only — logo/favicon, illustrations, sparkles, the AI-setup card outline. Never a button, chip, switch or check fill.
 
 ### Primary
-- **Deep Ocean** (`sky-deep`, `#16587f`): the interactive color. Primary Glass Button fill, selected non-space chips, switch-on track, check-on circle, text-field focus border, PhotoSetup progress (active) — all with white labels/glyphs (7.7:1). Also tab-root header title, back chevron, active nav tab, text links, trailing row chevrons, focus ring, pill toast fill, secondary button label (AA 7.7:1 on white, 7.1:1 on Surface, 6.8:1 on Sky Mist).
+- **Deep Ocean** (`sky-deep`, `#16587f`): the interactive color. Selected non-space chips, switch-on track, check-on circle, text-field focus border, PhotoSetup progress (active) — all with white labels/glyphs (7.7:1). Also tab-root header title, back chevron, active nav tab, text links, trailing row chevrons, focus ring, pill toast fill (AA 7.7:1 on white, 7.1:1 on Surface, 6.8:1 on Sky Mist).
 - **Sky Glass** (`sky-brand`, `#38aeee`): brand accent only (Color roles §4). 2.48:1 on white, so never used for text or as the only state cue.
-- **Sky Mist** (`sky-tint`): secondary button fill, info/tip cards, locked switch track, hint strips.
+- **Sky Mist** (`sky-tint`): info/tip cards, locked switch track, hint strips.
 - **On-Brand Ink** (`onbrand`, `#0a3149`): navy for text on Sky Glass (5.5:1). Now only used by the dev-only SamplePaint screen.
 - **Cloud Blue** (`sky-sky`): text selection highlight and small illustration accents.
 
@@ -329,7 +330,7 @@ Icons are a single SVG registry (`src/components/icons`): UI glyphs on a 24px gr
 ### Buttons (Glass Button)
 Tactile and calm: a deep-ocean slab with a white label that catches light when tapped.
 - **Shape:** 20px radius, 1px white border, full width, `overflow: hidden`, 56px tall for main CTAs, 52px for secondary/in-list/flow buttons.
-- **Primary:** Deep Ocean (`#16587f`) fill, white label (7.7:1) (`bb-label`). **Secondary:** Sky Mist fill, Deep Ocean label.
+- **Primary:** Ink (`#23282b`) fill, white label (14.9:1) (`bb-label`). **Secondary:** Surface fill, Ink label.
 - **Press:** inset Glass press shadow (120ms ease-out) plus one specular sweep per tap: a 90×130 white band (0→0.65→0 alpha) rotated 18° travels left→right in 480ms `cubic-bezier(0.2,0.7,0.2,1)`, remounted on each press.
 - **Disabled:** Hairline fill, Slate Muted label, no sweep.
 - **Focus:** 2px Deep Ocean ring drawn inset (-4px) because the button clips.
