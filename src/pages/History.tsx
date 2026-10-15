@@ -50,14 +50,21 @@ export default function History() {
     setMonth(new Date(now.getFullYear(), now.getMonth(), 1));
   };
 
+  // Segmented view switch (2026-10-15): one Surface track, the selected half lifts to white with a Slate label.
+  const segment = (key: View, label: string) => (
+    <button
+      aria-pressed={view === key}
+      className={`h-10 flex-1 rounded-full text-bb-label transition-colors duration-150 ${view === key ? "bg-sky-bg font-bold text-sky-deep shadow-[0_1px_3px_rgba(35,40,43,0.12)]" : "text-sky-muted"}`}
+      type="button"
+      onClick={() => setView(key)}
+    >
+      {label}
+    </button>
+  );
   const chips = (
-    <div className="flex gap-2" role="group" aria-label="히스토리 보기">
-      <Pill className="flex-1" selected={view === "date"} onClick={() => setView("date")}>
-        날짜별
-      </Pill>
-      <Pill className="flex-1" selected={view === "space"} onClick={() => setView("space")}>
-        공간별
-      </Pill>
+    <div aria-label="히스토리 보기" className="flex rounded-full bg-sky-surface p-1" role="group">
+      {segment("date", "날짜별")}
+      {segment("space", "공간별")}
     </div>
   );
 

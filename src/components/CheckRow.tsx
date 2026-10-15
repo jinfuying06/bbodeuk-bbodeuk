@@ -10,15 +10,17 @@ type CheckRowProps = {
   /** Row background while on (e.g. the space color on 주말 대청소). Default stays Surface. */
   fill?: string;
   trailing?: ReactNode;
+  /** List style (2026-10-15): no Surface fill while off, so turning on reads as the row getting painted. */
+  list?: boolean;
 };
 
 /** Sky / Check row (Figma 25:155): 48px Surface row, 24px check circle (off = sky-line, on = sky-deep). */
-export default function CheckRow({ label, on, onClick, locked = false, fill, trailing }: CheckRowProps) {
+export default function CheckRow({ label, on, onClick, locked = false, fill, trailing, list = false }: CheckRowProps) {
   return (
     <button
       aria-disabled={locked || undefined}
       aria-pressed={on}
-      className="press flex h-12 items-center gap-3 rounded-2xl bg-sky-surface pl-3 pr-4 text-left transition-colors duration-300"
+      className={`press flex h-12 items-center gap-3 rounded-2xl pl-3 pr-4 text-left transition-colors duration-300 ${list ? "" : "bg-sky-surface"}`}
       style={on && fill ? { backgroundColor: fill } : undefined}
       type="button"
       onClick={locked ? undefined : onClick}

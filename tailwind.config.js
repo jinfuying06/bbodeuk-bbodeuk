@@ -12,8 +12,9 @@ export default {
         // Surface roles: sky-bg = white page/header/nav/dialog/fields; sky-surface = cards/rows/chips/tiles;
         // sky-white = literal white only (toast text, Glass Button border, switch thumb, sweep).
         "sky-brand": "#38aeee",
-        "sky-deep": "#16587f",
-        "sky-tint": "#e1f3ff",
+        // 2026-10-15: interactive color unified to Slate (was Deep Ocean #16587f). Name kept so usages stay put.
+        "sky-deep": "#3e5463",
+        "sky-tint": "#e7edf1",
         "sky-ink": "#23282b",
         "sky-slate": "#3e5463",
         "sky-muted": "#60676b",

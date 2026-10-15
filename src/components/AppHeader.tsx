@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import BrandLogo from "./BrandLogo";
 import Icon from "./Icon";
 
 type AppHeaderProps = {
@@ -14,20 +15,25 @@ type AppHeaderProps = {
    * Sub-page right slot. Omitted/`null` → empty 44px spacer, keeps the title centered.
    */
   right?: ReactNode | null;
+  /** Tab-root only: show the round brand logo before the title (Home wordmark). */
+  brand?: boolean;
 };
 
 const shell = "fixed left-1/2 top-0 z-50 w-full max-w-[430px] -translate-x-1/2 bg-sky-bg pt-safe";
 
-export default function AppHeader({ title, back, right }: AppHeaderProps) {
+export default function AppHeader({ title, back, right, brand = false }: AppHeaderProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
   if (!back) {
-    // Tab-root variant: brand-colored title left, 내 정보 (account) right.
+    // Tab-root variant: Ink title left (logo first on Home), 내 정보 (account) right.
     return (
       <header className={shell}>
         <div className="flex h-header items-center justify-between px-6">
-          <span className="truncate text-bb-title text-sky-deep">{title}</span>
+          <span className="flex min-w-0 items-center gap-2">
+            {brand ? <BrandLogo className="h-7 w-7" /> : null}
+            <span className="truncate text-bb-title text-sky-ink">{title}</span>
+          </span>
           <Link aria-label="내 정보" className="flex h-11 w-11 shrink-0 items-center justify-center text-sky-muted transition-colors active:text-sky-deep" to="/settings">
             <Icon name="account" className="text-[22px]" />
           </Link>

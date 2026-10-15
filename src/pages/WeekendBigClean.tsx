@@ -47,18 +47,19 @@ export default function WeekendBigClean() {
   return (
     <PageShell>
       <AppHeader title="주말 대청소" back />
-      <main className="flex flex-col gap-3 px-margin-screen pb-nav-cta pt-header">
-        <PageIntro title="여유 있는 날, 대청소" body="오래 안 본 곳과 숨은 관리를 가볍게 훑어요." />
+      <main className="flex flex-col px-margin-screen pb-nav-cta pt-header">
+        <PageIntro title="여유 있는 날, 대청소" body="오래 안 본 곳과 숨은 관리를 가볍게 훑어요." className="pb-4" />
 
         {groups.map(({ space, items }) => {
           const isOpen = open === space.key;
           const panelId = `deep-clean-${space.key}`;
           return (
-            <section key={space.key} className="flex flex-col gap-3">
+            // Same list-style accordion as 내 공간 (2026-10-15).
+            <section key={space.key} className="flex flex-col border-b border-sky-line">
               <button
                 aria-controls={panelId}
                 aria-expanded={isOpen}
-                className="press flex h-16 items-center gap-3 rounded-row bg-sky-surface px-3 text-left"
+                className="press flex h-[72px] items-center gap-3 text-left"
                 type="button"
                 onClick={() => setOpen(isOpen ? null : space.key)}
               >
@@ -69,13 +70,13 @@ export default function WeekendBigClean() {
                   </span>
                   <span className="truncate text-bb-caption text-sky-muted">{isOpen && items[0] ? `${items[0].name}부터 가볍게 살펴봐요` : "눌러서 항목 펼치기"}</span>
                 </span>
-                <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center text-sky-deep">
+                <span aria-hidden="true" className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center text-sky-deep">
                   <Icon name="chevron-down" className={`text-[18px] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
                 </span>
               </button>
 
               {isOpen ? (
-                <div id={panelId} className="flex flex-col gap-2">
+                <div id={panelId} className="flex flex-col gap-1 pb-4 pl-10">
                   {items.map((item) => {
                     const done = checked.has(item.id);
                     const recency = formatRecency(lastRecord(item.id, records)?.at);
@@ -83,6 +84,7 @@ export default function WeekendBigClean() {
                       <CheckRow
                         key={item.id}
                         fill={space.color}
+                        list
                         label={item.name}
                         on={done}
                         onClick={() => toggle(item)}

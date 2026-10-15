@@ -97,7 +97,7 @@ export default function Home() {
 
   return (
     <PageShell>
-      <AppHeader title="뽀득뽀득" />
+      <AppHeader brand title="뽀득뽀득" />
       <main className="flex flex-1 flex-col px-margin-screen pb-nav pt-header">
         <section className="flex h-[110px] shrink-0 flex-col gap-1 pt-1">
           <h1 className="text-bb-heading text-sky-ink">

@@ -3,9 +3,9 @@ name: 뽀득뽀득
 description: A mobile cleaning record where tapping an item paints its space in pastel, and the color fades gently instead of scoring you.
 colors:
   sky-brand: "#38aeee"
-  sky-deep: "#16587f"
+  sky-deep: "#3e5463"
   sky-slate: "#3e5463"
-  sky-tint: "#e1f3ff"
+  sky-tint: "#e7edf1"
   sky-sky: "#8fd8ff"
   onbrand: "#0a3149"
   sky-ink: "#23282b"
@@ -198,7 +198,7 @@ components:
 Density is a single calm column on a phone: 24px gutters, 12px between blocks, rows of 62-72px, generous touch targets. Depth comes from Surface-on-white tonal layering, not shadows. Motion is small and tactile: cards press to 0.97, the primary button throws one glass-like specular sweep per tap, and water levels interpolate rather than step.
 
 Sources of truth, in order:
-1. **Colors:** this file and `tailwind.config.js` are the color source of truth. Values are the original Figma `Page 5` (`Palette & Components / Light`) hex values, as chosen by the user 2026-10-15; the OKLCH-normalized palette experiment was reverted. Brand is `#38aeee`; since 2026-10-15 the interactive (primary) color is Deep Ocean `#16587f` with white labels and Surface is `#f3f7fa` (see Color roles). Pages `01 · 디자인 시스템`, `02 · 전체 앱 — Light`, `03`, `04` and the `BB / Sky Blue` variables still carry the older mint palette; where they disagree, this file wins.
+1. **Colors:** this file and `tailwind.config.js` are the color source of truth. Values are the original Figma `Page 5` (`Palette & Components / Light`) hex values, as chosen by the user 2026-10-15; the OKLCH-normalized palette experiment was reverted. Brand is `#38aeee`; since 2026-10-15 the interactive (primary) color is Slate `#3e5463` with white labels and Surface is `#f3f7fa` (see Color roles). Pages `01 · 디자인 시스템`, `02 · 전체 앱 — Light`, `03`, `04` and the `BB / Sky Blue` variables still carry the older mint palette; where they disagree, this file wins.
 2. **Everything else:** Figma page `02 · 전체 앱 — Light` (primary visual reference) and `01 · 디자인 시스템`, then this file, then shipped code.
 
 Figma Page 5 also defines a full dark palette; it is deliberately not implemented. This system is light mode only until that decision changes.
@@ -218,14 +218,14 @@ A white neutral field with a navy interactive color, a small sky-blue brand acce
 Every color does exactly one job:
 1. **Identity — space color.** 100% space fill + icon ink on space tiles, space selection chips (QuickRecord, 항목 추가), the CareAction header block and supply tiles, AX onboarding tints. Never faded.
 2. **State — water level only.** Recency is a water level of the space color (`<WaterFill>`) on Home cards, Spaces item rows and the SpaceInfo band. Never recorded = plain Surface, no tint. Recorded at least once = 18% base tint (`WATER_BASE_TINT`) under a water level of 100 / 72 / 48 / 28%.
-3. **Interactive — Deep Ocean** (`sky-deep`) with white labels: switches, checks, non-space selection (segmented chips, filters), field focus, links, active nav.
-3a. **Buttons — Slate** (`sky-slate`, `#3e5463`, 2026-10-15, user-approved): filled button CTAs (primary Glass Button, Spaces "OO 기록하기") are Slate with white labels (7.9:1); secondary buttons are Surface with a Slate label. A blue-tinted neutral that belongs to no space keeps all five space colors equal above it (Deep Ocean leaned toward 욕실; Ink #23282b read too heavy).
+3. **Interactive — Slate** (`sky-deep` = `sky-slate` = `#3e5463` since 2026-10-15; the old Deep Ocean navy `#16587f` is retired so the app has one accent) with white labels: buttons, switches, checks, non-space selection (segmented chips, filters), field focus, links, active nav.
+3a. **Buttons — Slate** (`sky-slate`, `#3e5463`, 2026-10-15, user-approved): filled button CTAs (primary Glass Button, Spaces "OO 기록하기") are Slate with white labels (7.9:1); secondary buttons are Surface with a Slate label. A blue-tinted neutral that belongs to no space keeps all five space colors equal above it (the old navy leaned toward 욕실; Ink #23282b read too heavy).
 4. **Brand sky** (`sky-brand`): small accents only — logo/favicon, illustrations, sparkles, the AI-setup card outline. Never a button, chip, switch or check fill.
 
 ### Primary
-- **Deep Ocean** (`sky-deep`, `#16587f`): the interactive color. Selected non-space chips, switch-on track, check-on circle, text-field focus border, PhotoSetup progress (active) — all with white labels/glyphs (7.7:1). Also tab-root header title, back chevron, active nav tab, text links, trailing row chevrons, focus ring, pill toast fill (AA 7.7:1 on white, 7.1:1 on Surface, 6.8:1 on Sky Mist).
+- **Slate** (`sky-deep`, `#3e5463`): the interactive color. Selected non-space chips, switch-on track, check-on circle, text-field focus border, PhotoSetup progress (active) — all with white labels/glyphs (7.9:1). Also tab-root header title, back chevron, active nav tab, text links, trailing row chevrons, focus ring, pill toast fill (AA 7.9:1 on white, 7.1:1 on Surface, 6.8:1 on Slate Mist).
 - **Sky Glass** (`sky-brand`, `#38aeee`): brand accent only (Color roles §4). 2.48:1 on white, so never used for text or as the only state cue.
-- **Sky Mist** (`sky-tint`): info/tip cards, locked switch track, hint strips.
+- **Slate Mist** (`sky-tint`): info/tip cards, locked switch track, hint strips.
 - **On-Brand Ink** (`onbrand`, `#0a3149`): navy for text on Sky Glass (5.5:1). Now only used by the dev-only SamplePaint screen.
 - **Cloud Blue** (`sky-sky`): text selection highlight and small illustration accents.
 
@@ -286,7 +286,7 @@ Figma Page 5 defines the dark counterpart: brand `#4ec4ff` with `#0b3550` label,
 ### Hierarchy
 - **Display** (`bb-display`): reserved; not currently used.
 - **Heading** (`bb-heading`): page intro h1 (`PageIntro`), Charcoal Ink.
-- **Title** (`bb-title`): section h2, info-card and dialog titles; tab-root header title in Deep Ocean.
+- **Title** (`bb-title`): section h2, info-card and dialog titles; tab-root header title in Ink (Home adds the round brand logo before it).
 - **Label** (`bb-label`): row/card titles, field labels, chips, button labels, text links, sub-page header title.
 - **Body** (`bb-body`): intro sub-copy, card and dialog body, field text; usually Slate Muted.
 - **Label Small** (`bb-label-sm`): toasts, small text links, empty-card copy.
@@ -296,7 +296,7 @@ Figma Page 5 defines the dark counterpart: brand `#4ec4ff` with `#0b3550` label,
 The older non-`bb` tokens in `tailwind.config.js` (`headline-*`, `title-*`, `body-*`, `label-*`, `caption`) remain for legacy screens; new work uses `bb-*`. The `fontSize` token values themselves are frozen (AGENTS.md §6); per-screen heading size choices (e.g. Welcome 28/26) are allowed.
 
 ### Named Rules
-**The Weight Not Tracking Rule.** Letter-spacing is 0 everywhere; emphasis is weight 700 or Deep Ocean color.
+**The Weight Not Tracking Rule.** Letter-spacing is 0 everywhere; emphasis is weight 700 or Slate color.
 
 ## Layout
 
@@ -334,39 +334,39 @@ Tactile and calm: a deep-ocean slab with a white label that catches light when t
 - **Primary:** Slate (`#3e5463`) fill, white label (7.9:1) (`bb-label`). **Secondary:** Surface fill, Slate label.
 - **Press:** inset Glass press shadow (120ms ease-out) plus one specular sweep per tap: a 90×130 white band (0→0.65→0 alpha) rotated 18° travels left→right in 480ms `cubic-bezier(0.2,0.7,0.2,1)`, remounted on each press.
 - **Disabled:** Hairline fill, Slate Muted label, no sweep.
-- **Focus:** 2px Deep Ocean ring drawn inset (-4px) because the button clips.
-- **Text link:** Deep Ocean `bb-label` (or `bb-label-sm`) in a 44px-tall box; used for 취소, secondary navigation and "기록 취소".
+- **Focus:** 2px Slate ring drawn inset (-4px) because the button clips.
+- **Text link:** Slate `bb-label` (or `bb-label-sm`) in a 44px-tall box; used for 취소, secondary navigation and "기록 취소".
 
 ### Chips (Pill)
-- **Style:** fully round, `bb-label`. Unselected Surface / Slate Muted; selected Deep Ocean / white; 150ms color transition.
+- **Style:** fully round, `bb-label`. Unselected Surface / Slate Muted; selected Slate / white; 150ms color transition. A two-way view switch (히스토리 날짜별/공간별) is a segmented control instead: one Surface track with 4px inset, the selected half lifts to white with a bold Slate label and a 1px soft shadow.
 - **Space chips** (`selectedColor` prop): selected = that space's color fill, Charcoal Ink bold label, icon in icon ink, no border. Unselected = Surface / Slate Muted with the icon still in its ink.
 - **Sizes:** 44px segmented chip, 38px space/filter pill (optional 16px space icon in its icon ink).
 
 ### Cards / Containers
-- **Item row:** Surface, 18px radius, 64 or 72px tall, 12px left pad, 12px gap: 40px space tile, title `bb-label` Ink over subtitle `bb-caption` Muted, chevron in a 44px trailing slot (Deep Ocean, or Muted for recent-record rows). Presses to 0.97.
+- **Item row (list style, default for lists since 2026-10-15):** no fill, rows stacked in `RowList` with Hairline dividers; meta (recency, time, duration) right-aligned `bb-caption` Muted; a chevron only when the row navigates. Home, 히스토리 and 케어 lists use it. **Item row (card style, remaining standalone uses):** Surface, 18px radius, 64 or 72px tall, 12px left pad, 12px gap: 40px space tile, title `bb-label` Ink over subtitle `bb-caption` Muted, chevron in a 44px trailing slot (Slate, or Muted for recent-record rows). Presses to 0.97.
 - **Space tile:** 40px, 14px radius, space fill with icon ink (24px icon; expansion spaces show color only); on an already-filled row it becomes 70% white.
 - **Home space card:** 20px card, 110px tall, water rising from the bottom to the space's level (Surface when never recorded, 18% base tint otherwise); label/icon stay full strength.
 - **Record card (QuickRecord):** Surface 20px card; tapping fills it with the space color at 100% (300ms), tapping again the same day clears it. No border. It shows today's record only, not recency.
-- **Info card:** 24px radius, 16px/20px padding, 8px gap; Sky Mist for tips/notices, Surface for FAQ.
+- **Info card:** 24px radius, 16px/20px padding, 8px gap; Slate Mist for tips/notices, Surface for FAQ.
 
 ### Inputs / Fields
 - **Style:** 52px, 12px radius, White Page fill, 1px Hairline, `bb-body` Ink, Muted placeholder, 16px side padding.
-- **Focus:** border shifts to Deep Ocean; no outline ring (fields are the one exception to the global focus ring).
+- **Focus:** border shifts to Slate; no outline ring (fields are the one exception to the global focus ring).
 
 ### Switch & Check rows
-- **Switch row:** whole 62px Surface row (16px radius) is the `role="switch"`. Track 52×32: Deep Ocean on, Hairline off, Sky Mist when locked; 24px white thumb slides 20px in 200ms ease-out.
-- **Check row:** 48px Surface row (20px radius), 24px circle: Hairline off, Deep Ocean with white check on, Sky Mist with Deep Ocean check when locked. May fill with the space color when on (대청소).
+- **Switch row:** whole 62px Surface row (16px radius) is the `role="switch"`. Track 52×32: Slate on, Hairline off, Slate Mist when locked; 24px white thumb slides 20px in 200ms ease-out.
+- **Check row:** 48px Surface row (20px radius), 24px circle: Hairline off, Slate with white check on, Slate Mist with Slate check when locked. May fill with the space color when on (대청소). List style (`list`): no fill while off, so checking paints the row in the space color.
 
 ### Navigation
-- **Header:** White Page, 54px. Tab-root variant: Deep Ocean `bb-title` left, account icon (Muted, 44px) right to 내 정보. Sub-page variant: Deep Ocean back chevron (44px, falls back to /home on direct entry), centered Ink `bb-label` title, decorative "more" or an empty 44px spacer on the right.
-- **Bottom nav:** White Page with a 1px Hairline top border, five tabs 홈 / 공간 / 기록 / 히스토리 / 가이드, each 64×48 with a 22px icon over a `bb-small` label, 3px gap. Active Deep Ocean, inactive Slate Muted; sub-pages light their parent tab.
+- **Header:** White Page, 54px. Tab-root variant: Ink `bb-title` left (Home: 28px round brand logo first, 8px gap), account icon (Muted, 44px) right to 내 정보. Sub-page variant: Slate back chevron (44px, falls back to /home on direct entry), centered Ink `bb-label` title, decorative "more" or an empty 44px spacer on the right.
+- **Bottom nav:** White Page with a 1px Hairline top border, five tabs 홈 / 공간 / 기록 / 히스토리 / 가이드, each 64×48 with a 22px icon over a `bb-small` label, 3px gap. Active Slate, inactive Slate Muted; sub-pages light their parent tab.
 
 ### Dialog
 Scrim over everything; White Page 342px card, 20px radius, 16px gap: `bb-title` Ink title, `bb-body` Muted body, primary Glass Button 56, 취소 text link. Focus moves to 취소; Escape and scrim tap close; body scroll locks.
 
 ### Toasts
 - **Ink toast (top):** record events. Charcoal Ink, 52px, 18px radius, check icon + `bb-label-sm` white, 62px below the top edge.
-- **Pill toast (bottom):** settings/item saved and "준비 중" notices (no icon). Deep Ocean, 310×48, 24px radius, 26px above the bottom (white text 7.7:1).
+- **Pill toast (bottom):** settings/item saved and "준비 중" notices (no icon). Slate, 310×48, 24px radius, 26px above the bottom (white text 7.9:1).
 - **Motion:** fade + 8px slide in 200ms ease-out; auto-hide after 2s. Route hand-offs carry the message in router state and clear it so refresh does not replay.
 
 ### Motion summary
@@ -387,9 +387,9 @@ Korean, soft 해요체, short. Color and copy describe care, never judgment.
 ## Do's and Don'ts
 
 ### Do:
-- **Do** use `GlassButton` for every filled CTA (56 primary / 52 secondary), and the 44px Deep Ocean text link for everything lighter.
+- **Do** use `GlassButton` for every filled CTA (56 primary / 52 secondary), and the 44px Slate text link for everything lighter.
 - **Do** derive every space fill from `getSpace` / `spaceColor` and every water level from `spaceFade` / `itemFade` (background via `waterBase`), keeping icons and text at 100%.
-- **Do** use Deep Ocean with white labels for every button, switch, check and non-space selection; use the space color for space chips.
+- **Do** use Slate with white labels for every button, switch, check and non-space selection; use the space color for space chips.
 - **Do** use `sky-surface` for cards/rows/chips and `sky-bg` for page, header, nav, dialog and fields; `sky-white` is literal white, not a surface.
 - **Do** keep 24px gutters, 12px block gaps, 44px minimum targets, and `pb-nav` on every screen with the bottom nav.
 - **Do** reuse `ItemRow`, `SpaceTile`, `SwitchRow`, `CheckRow`, `PageIntro`, `Pill`, `Dialog`, `Toast`/`useRouteToast` before writing a new row, card or modal.
