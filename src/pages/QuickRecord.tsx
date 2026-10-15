@@ -21,7 +21,7 @@ const filters: Array<{ key: Filter; label: string }> = [
 const intro: Record<Filter, [string, string]> = {
   recent: ["최근 돌본 곳을 다시", "한 번 누르면 기록, 다시 누르면 취소돼요."],
   fav: ["자주 돌보는 곳부터", "한 번 누르면 기록, 다시 누르면 취소돼요."],
-  space: ["어디를 청소했나요?", "청소한 곳을 톡 눌러 기록해요."],
+  space: ["어디를 청소했나요?", "한 번 누르면 기록, 다시 누르면 취소돼요."],
 };
 
 const isFilter = (value: string | null): value is Filter => value === "recent" || value === "fav" || value === "space";
@@ -148,7 +148,7 @@ export default function QuickRecord() {
               ))}
             </div>
 
-            <p className="text-bb-caption text-sky-muted">색이 채워진 항목을 한 번 더 누르면 기록을 취소해요.</p>
+            <p className="text-bb-caption text-sky-muted">톡 눌러 청소 기록을 채워보세요</p>
 
             <div aria-label="청소 항목" className="grid grid-cols-2 gap-[10px]">
               {items.map((item) => {
