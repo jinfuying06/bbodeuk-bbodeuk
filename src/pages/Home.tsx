@@ -192,7 +192,7 @@ export default function Home() {
               />
             ))}
           </RowList>
-          <GlassButton size={52} className="w-full" to="/deep-clean">
+          <GlassButton size={52} variant="secondary" className="w-full" to="/deep-clean">
             여유 있는 날, 대청소 둘러보기
           </GlassButton>
         </section>

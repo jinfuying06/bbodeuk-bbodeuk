@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 type GlassButtonProps = {
   children: ReactNode;
-  /** primary = sky-slate / white (default), secondary = sky-surface / sky-slate. Disabled styling comes from `disabled`. */
+  /** primary = sky-deep / white (default; one per screen), secondary = tonal sky-tint / sky-tint-ink. Disabled styling comes from `disabled`. */
   variant?: "primary" | "secondary";
   /** Figma heights: 56 for main CTAs (default), 52 for secondary/in-list buttons. */
   size?: 56 | 52;
@@ -16,7 +16,7 @@ type GlassButtonProps = {
 export default function GlassButton({ children, variant = "primary", size = 56, to, className = "", type = "button", onPointerDown, ...rest }: GlassButtonProps) {
   // Each press mounts a new sweep span (keyed), which restarts the CSS animation.
   const [sweeps, setSweeps] = useState(0);
-  const classes = `glass-btn ${size === 56 ? "h-14" : "h-[52px]"} ${variant === "primary" ? "bg-sky-slate text-sky-white" : "bg-sky-surface text-sky-slate"} ${className}`;
+  const classes = `glass-btn ${size === 56 ? "h-14" : "h-[52px]"} ${variant === "primary" ? "bg-sky-deep text-sky-white" : "bg-sky-tint text-sky-tint-ink"} ${className}`;
   const sweep = sweeps > 0 ? <span key={sweeps} aria-hidden="true" className="glass-sweep" /> : null;
 
   if (to) {

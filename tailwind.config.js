@@ -6,22 +6,22 @@ export default {
       colors: {
         // Sky/BB palette — Figma Page 5 "Palette & Components" original values (user choice 2026-10-15;
         // the OKLCH-normalized experiment was reverted). Color roles (2026-10-15): interactive fills (primary button,
-        // switch, check, non-space selection, field focus) = sky-deep #16587f; filled buttons = sky-slate #3e5463 (2026-10-15) with white labels (7.67:1); brand #38aeee is
+        // switch, check, non-space selection, field focus) = sky-deep #16587f; one filled button per screen, others tonal sky-tint/sky-tint-ink (2026-10-15) with white labels (7.67:1); brand #38aeee is
         // small accents only (logo, illustration, sparkle). onbrand stays for SamplePaint (dev). sky-muted fails on 거실/공간1/공간3 fills → metaTextOnFill() in data/cleaning.ts.
         // DESIGN.md `colors:` frontmatter mirrors these.
         // Surface roles: sky-bg = white page/header/nav/dialog/fields; sky-surface = cards/rows/chips/tiles;
         // sky-white = literal white only (toast text, Glass Button border, switch thumb, sweep).
         "sky-brand": "#38aeee",
-        // 2026-10-15: interactive color unified to Slate (was Deep Ocean #16587f). Name kept so usages stay put.
-        "sky-deep": "#3e5463",
-        "sky-tint": "#e7edf1",
+        // 2026-10-15: one clear water-blue accent for every interactive element (was Deep Ocean #16587f, then Slate #3e5463).
+        "sky-deep": "#0b74b0",
+        "sky-tint": "#e6f5fc",
+        "sky-tint-ink": "#0a6596",
         "sky-ink": "#23282b",
-        "sky-slate": "#3e5463",
         "sky-muted": "#60676b",
         "sky-line": "#e3e6e8",
         "sky-white": "#ffffff",
         "sky-bg": "#ffffff",
-        "sky-surface": "#f3f7fa",
+        "sky-surface": "#f1f8fc",
         "sky-sky": "#8fd8ff",
         "sky-bath": "#c4f2ff",
         "sky-kitchen": "#fff8c4",
