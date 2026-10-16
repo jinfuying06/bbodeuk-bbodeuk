@@ -108,7 +108,7 @@ export default function Setup() {
           );
         })}
 
-        <p className="text-bb-caption text-sky-muted">공간은 나중에 공간 화면에서 언제든 바꿀 수 있어요.</p>
+        <p className="text-bb-caption text-sky-muted">공간 구성은 설정에서 바꿀 수 있어요.</p>
 
         <GlassButton disabled={selected.length === 0} onClick={complete}>
           {selected.length > 0 ? "이 공간으로 시작하기" : "공간을 하나 이상 선택해 주세요"}
