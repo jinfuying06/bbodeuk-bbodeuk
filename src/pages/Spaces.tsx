@@ -7,12 +7,18 @@ import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import WaterFill from "../components/WaterFill";
 import SpaceTile from "../components/SpaceTile";
-import { formatRecency, getActiveSpaces, getItems, isSpaceKey, itemFade, lastRecord, metaTextOnFill, useRecords, waterBase, type SpaceKey } from "../data/cleaning";
+import { formatRecency, getActiveSpaces, getItems, isSpaceKey, itemFade, lastRecord, metaTextOnFill, spaceFill, useRecords, waterBase, type SpaceKey } from "../data/cleaning";
+
+type RowFill = "water" | "tint";
+/** Recency look of item rows (2026-10-17 comparison): water level vs whole-row color that fades. `?fill=` overrides. */
+const DEFAULT_FILL: RowFill = "water";
 
 export default function Spaces() {
   const records = useRecords();
   const spaces = getActiveSpaces();
-  const requested = useSearchParams()[0].get("space");
+  const [params, setParams] = useSearchParams();
+  const requested = params.get("space");
+  const fillMode: RowFill = params.get("fill") === "tint" ? "tint" : params.get("fill") === "water" ? "water" : DEFAULT_FILL;
   const [open, setOpen] = useState<SpaceKey | null>(isSpaceKey(requested) && spaces.some((space) => space.key === requested) ? requested : spaces[0]?.key ?? null);
 
   return (
@@ -50,11 +56,11 @@ export default function Spaces() {
                       <Link
                         key={item.id}
                         // Never-recorded rows: faint Surface so the row still reads as a row on the white page.
-                        className="press relative flex h-11 items-center justify-between overflow-hidden rounded-xl bg-sky-surface px-[10px]"
-                        style={{ backgroundColor: waterBase(space.key, fade) }}
+                        className="press relative flex h-11 items-center justify-between overflow-hidden rounded-xl bg-sky-surface px-[10px] transition-colors duration-500"
+                        style={{ backgroundColor: fillMode === "tint" ? (fade > 0 ? spaceFill(space.key, fade) : undefined) : waterBase(space.key, fade) }}
                         to={`/item-info?item=${item.id}`}
                       >
-                        <WaterFill direction="right" level={fade} color={space.color} phase={index} />
+                        {fillMode === "water" ? <WaterFill direction="right" level={fade} color={space.color} phase={index} /> : null}
                         <span className="relative min-w-0 truncate text-bb-label text-sky-ink">{item.name}</span>
                         <span className={`relative shrink-0 pl-2 text-bb-caption ${metaTextOnFill(space.key)}`}>{formatRecency(lastRecord(item.id, records)?.at, { short: true })}</span>
                       </Link>
@@ -74,6 +80,25 @@ export default function Spaces() {
           새 청소 항목
         </Link>
       </main>
+      {/* Review-only switch, compiled in only when VITE_REVIEW=1. */}
+      {import.meta.env.VITE_REVIEW === "1" ? (
+        <div className="fixed bottom-24 right-4 z-50 flex rounded-full bg-sky-ink/85 p-1 text-[12px] text-sky-white shadow-lg">
+          {(["water", "tint"] as const).map((key) => (
+            <button
+              key={key}
+              className={`rounded-full px-3 py-1 ${fillMode === key ? "bg-sky-white text-sky-ink" : ""}`}
+              type="button"
+              onClick={() => {
+                const next = new URLSearchParams(params);
+                next.set("fill", key);
+                setParams(next, { replace: true });
+              }}
+            >
+              {key === "water" ? "A 물" : "B 색 바램"}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </PageShell>
   );
 }
