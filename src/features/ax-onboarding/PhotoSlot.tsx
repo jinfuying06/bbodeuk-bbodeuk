@@ -45,8 +45,8 @@ export default function PhotoSlot({ spaceKey, label, photos, maxPhotos, required
   return (
     <div
       className="flex h-[134px] flex-col gap-2 rounded-row-sm p-3 transition-colors duration-300"
-      // Empty slots wear a faint wash of their space color (2026-10-16), filled ones a stronger one.
-      style={{ backgroundColor: spaceColor(spaceKey, filled ? 0.28 : 0.12) }}
+      // Empty slots show their space color at half strength; once a photo is in, the wash drops back so the photo leads (2026-10-16).
+      style={{ backgroundColor: spaceColor(spaceKey, filled ? 0.12 : 0.5) }}
     >
       <div className="flex h-[22px] items-center justify-between">
         <span className="text-bb-label-sm font-bold text-sky-ink">{label}</span>
