@@ -73,7 +73,7 @@ function buildInitialDrafts(response: AXRecognitionResponse, requestedSpaces: Sp
 function Intro({ title, body }: { title: ReactNode; body: string }) {
   return (
     <section className="flex flex-col gap-2">
-      <h1 className="text-[25px] font-bold leading-[39px] text-sky-ink">{title}</h1>
+      <h1 className="text-bb-heading text-sky-ink">{title}</h1>
       <p className="text-bb-body text-sky-muted">{body}</p>
     </section>
   );
@@ -224,7 +224,7 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
           <>
             {filledSpaces.length === 0 ? (
               <>
-                <Intro title={<>공간 사진으로<br />맞춤 설정하기</>} body="사진에 보이는 물건을 기준으로 관리 아이템을 추천해드려요." />
+                <Intro title="사진으로 맞춤 설정해요" body="사진에 보이는 물건을 기준으로 관리 아이템을 추천해드려요." />
                 <InfoCard mark="!" title="공간마다 1장은 꼭 필요해요" body="원하면 2장을 더 찍어 인식 정확도를 높일 수 있어요." />
               </>
             ) : (

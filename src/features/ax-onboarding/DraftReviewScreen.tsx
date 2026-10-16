@@ -65,7 +65,7 @@ export default function DraftReviewScreen({ initialDrafts, onConfirm, onBack }: 
       <FlowHeader title="추천 항목 확인" onBack={onBack} />
       <main className="flex flex-col gap-3 px-margin-screen pb-7 pt-header">
         <section className="flex flex-col gap-2">
-          <h1 className="text-[25px] font-bold leading-[39px] text-sky-ink">이렇게 구성했어요</h1>
+          <h1 className="text-bb-heading text-sky-ink">이렇게 구성했어요</h1>
           <p className="text-bb-body text-sky-muted">필요 없는 항목은 빼고, 빠진 항목은 다시 체크해 주세요.</p>
         </section>
 

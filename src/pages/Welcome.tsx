@@ -80,7 +80,8 @@ function DemoCard() {
   );
 }
 
-function StepHead({ label, title, body, size = 28 }: { label: string; title: [string, string]; body: [string, string?]; size?: 26 | 28 }) {
+/** One-line title (2026-10-16 rule: every big title fits one line, 26px; overflow moves into the body). */
+function StepHead({ label, title, body }: { label: string; title: string; body: [string, string?] }) {
   const ref = useRef<HTMLHeadingElement>(null);
   useEffect(() => ref.current?.focus(), []);
   return (
@@ -88,12 +89,10 @@ function StepHead({ label, title, body, size = 28 }: { label: string; title: [st
       <p className="whitespace-pre text-[12px] leading-[22px] text-sky-muted">{label}</p>
       <h1
         ref={ref}
-        className={`${size === 28 ? "text-[28px]" : "text-[26px]"} font-bold leading-[38px] text-sky-ink outline-none`}
+        className="text-bb-heading text-sky-ink outline-none"
         tabIndex={-1}
       >
-        {title[0]}
-        <br />
-        {title[1]}
+        {title}
       </h1>
       <p className="text-bb-body text-sky-muted">
         {body[0]}
@@ -139,7 +138,7 @@ export default function Welcome() {
             <StepHead
               body={["세면대를 닦았다고 생각하고", "아래 카드를 눌러보세요."]}
               label="처음 만나는 뽀득뽀득  ·  1 / 3"
-              title={["한 번 톡,", "오늘의 청소가 반짝."]}
+              title="한 번 톡, 청소가 반짝."
             />
             <div className="flex h-[210px] justify-center">
               <DemoCard />
@@ -157,10 +156,9 @@ export default function Welcome() {
         {step === 1 ? (
           <>
             <StepHead
-              body={["공간 색은 항목마다 마지막 청소 후 지난 시간을", "관리 주기와 비교해 보여줘요."]}
+              body={["시간이 지나면 관리 주기에 맞춰", "천천히 옅어져요."]}
               label="공간의 색 변화  ·  2 / 3"
-              size={26}
-              title={["항목을 기록하면 공간 색이 다시 채워지고,", "시간이 지나면 관리 주기에 맞춰 천천히 옅어져요."]}
+              title="기록하면 색이 채워져요"
             />
             <ul aria-label="공간 색상 단계" className="mt-[22px] flex flex-col gap-2">
               {FADE_STAGES.map((tier) => (
@@ -189,7 +187,7 @@ export default function Welcome() {
             <StepHead
               body={["로그인하거나, 가입 없이 먼저 시작해보세요."]}
               label="나에게 맞는 시작  ·  3 / 3"
-              title={["이제, 내 공간을", "가볍게 돌봐요."]}
+              title="이제 가볍게 시작해요"
             />
             <section className="flex flex-col gap-4 py-3">
               <h2 className="text-bb-title text-sky-ink">네 가지 기본 공간은 무료예요</h2>

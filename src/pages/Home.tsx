@@ -75,15 +75,16 @@ export default function Home() {
   // (each opens 기록 for that space) and the 기록 tab covers the rest.
   const allDoneToday = todayCount > 0 && todayCount >= spaces.length;
   const tapHint = "공간을 눌러 청소한 곳을 기록해요";
-  const [headline, message]: [[string, string], string] = !hasRecords
-    ? [["첫 기록을", "남겨볼까요?"], tapHint]
+  // One-line headlines (2026-10-16 title rule).
+  const [headline, message]: [string, string] = !hasRecords
+    ? ["첫 기록을 남겨볼까요?", tapHint]
     : allDoneToday
-      ? [["오늘은", "집 전체가 반짝여요"], "모든 공간을 돌봤어요"]
+      ? ["집 전체가 반짝여요", "모든 공간을 돌봤어요"]
       : todayCount > 0
-        ? [["오늘도,", "내 공간이 산뜻해요"], `오늘 ${todayCount}곳을 돌봤어요`]
+        ? ["오늘도 산뜻해요", `오늘 ${todayCount}곳을 돌봤어요`]
         : anyOverdue
-          ? [["오늘 눈에 들어온", "한 곳부터"], tapHint]
-          : [["오늘도,", "내 공간을 맑게."], tapHint];
+          ? ["한 곳부터 가볍게", tapHint]
+          : ["오늘도 내 공간을 맑게", tapHint];
 
   const targetFade = Object.fromEntries(spaces.map((space) => [space.key, spaceFade(space.key, records)])) as Record<SpaceKey, number>;
   const fadeKey = JSON.stringify(targetFade);
@@ -106,12 +107,8 @@ export default function Home() {
     <PageShell>
       <AppHeader brand title="뽀득뽀득" />
       <main className="flex flex-1 flex-col px-margin-screen pb-nav pt-header">
-        <section className="flex h-[110px] shrink-0 flex-col gap-1 pt-1">
-          <h1 className="text-bb-heading text-sky-ink">
-            {headline[0]}
-            <br />
-            {headline[1]}
-          </h1>
+        <section className="flex shrink-0 flex-col gap-1 pb-5 pt-1">
+          <h1 className="text-bb-heading text-sky-ink">{headline}</h1>
           <p className="text-bb-body text-sky-muted">{message}</p>
         </section>
 

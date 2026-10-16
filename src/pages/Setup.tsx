@@ -89,15 +89,8 @@ export default function Setup() {
       <AppHeader back="/welcome" title="내 공간 설정" />
       <main className="flex flex-col gap-3 px-margin-screen pb-7 pt-header">
         <PageIntro
-          title={
-            <>
-              내 집에는
-              <br />
-              어떤 공간이 있나요?
-            </>
-          }
+          title="어떤 공간이 있나요?"
           body="자주 돌보는 공간부터 시작해요."
-          className="min-h-[116px]"
         />
 
         {AX_ONBOARDING_ENABLED && AX_READY ? (
