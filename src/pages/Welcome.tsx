@@ -160,7 +160,7 @@ export default function Welcome() {
               body={["공간 색은 항목마다 마지막 청소 후 지난 시간을", "관리 주기와 비교해 보여줘요."]}
               label="공간의 색 변화  ·  2 / 3"
               size={26}
-              title={["돌보면 맑게 채워지고,", "주기에 맞춰 천천히 옅어져요."]}
+              title={["항목을 기록하면 공간 색이 다시 채워지고,", "시간이 지나면 관리 주기에 맞춰 천천히 옅어져요."]}
             />
             <ul aria-label="공간 색상 단계" className="mt-[22px] flex flex-col gap-2">
               {FADE_STAGES.map((tier) => (
@@ -178,7 +178,6 @@ export default function Welcome() {
                 </li>
               ))}
             </ul>
-            <Caption lines={["항목을 기록하면 공간 색이 다시 채워지고,", "시간이 지나면 관리 주기에 맞춰 천천히 옅어져요."]} />
             <GlassButton size={52} onClick={() => setStep(2)}>
               이제 시작하기
             </GlassButton>
