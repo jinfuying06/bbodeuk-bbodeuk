@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import GlassButton from "../../components/GlassButton";
 import Icon from "../../components/Icon";
 import PageShell from "../../components/PageShell";
-import { getSpace, spaceColor } from "../../data/cleaning";
+import { SPACES, getSpace, spaceColor } from "../../data/cleaning";
 import { recognizeSpaces } from "./api";
 import FlowHeader from "./FlowHeader";
 import { spaceLabels, type SpaceKey } from "./itemLibrary";
@@ -81,8 +81,8 @@ function Intro({ title, body }: { title: ReactNode; body: string }) {
 
 function InfoCard({ mark, title, body }: { mark: string; title?: string; body: string }) {
   return (
-    <section className="flex gap-3 rounded-row-sm bg-sky-tint p-4">
-      <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-bg text-[20px] font-bold text-sky-deep">
+    <section className="flex items-center gap-3 py-1">
+      <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-tint text-[20px] font-bold text-sky-deep">
         {mark}
       </span>
       <div className="flex min-w-0 flex-col gap-[3px]">
@@ -154,8 +154,12 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
         {status === "loading" ? (
           <>
             <Intro title="사진을 확인하고 있어요" body="공간과 관리할 아이템을 찾고 있어요. 잠시만 기다려 주세요." />
-            <section aria-live="polite" className="flex h-[260px] flex-col items-center justify-center gap-[18px] rounded-2xl bg-sky-surface px-6 py-7">
-              <span aria-hidden="true" className="flex h-[70px] w-[70px] items-center justify-center rounded-full bg-sky-tint text-sky-deep">
+            <section aria-live="polite" className="flex h-[260px] flex-col items-center justify-center gap-[18px] rounded-2xl border border-sky-line px-6 py-7">
+              <span
+                aria-hidden="true"
+                className="flex h-[70px] w-[70px] items-center justify-center rounded-full text-sky-deep"
+                style={{ background: `linear-gradient(135deg, ${SPACES.slice(0, 4).map((space) => space.color).join(", ")})` }}
+              >
                 <Icon name="sparkle" className="animate-pulse text-[26px] motion-reduce:animate-none" />
               </span>
               <p className="text-center text-[15px] font-bold leading-[23px] text-sky-ink">{LOADING_STEPS[step]}</p>
@@ -176,7 +180,7 @@ export default function PhotoSetupScreen({ onComplete, onSkip, onBack }: PhotoSe
         ) : status === "error" ? (
           <>
             <Intro title="사진을 인식하지 못했어요" body="등록한 사진은 그대로 있어요. 다시 시도하거나 직접 설정할 수 있어요." />
-            <section className="flex flex-col gap-2.5 rounded-row-sm bg-sky-surface p-4">
+            <section className="flex flex-col gap-2.5 rounded-row-sm border border-sky-line p-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-bb-label font-bold text-sky-ink">
                   사진 {photoCount}장 · {filledSpaces.length}개 공간
