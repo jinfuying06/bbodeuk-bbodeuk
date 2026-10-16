@@ -82,7 +82,6 @@ export default function ItemAdd() {
               key={entry.key}
               className="min-w-0 flex-1 !px-[7px]"
               selected={space === entry.key}
-              selectedColor={entry.color}
               size={38}
               onClick={() => {
                 setSpace(entry.key);

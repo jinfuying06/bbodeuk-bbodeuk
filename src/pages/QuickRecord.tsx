@@ -132,7 +132,6 @@ export default function QuickRecord() {
                   key={space.key}
                   className="min-w-0 flex-1 !px-[7px]"
                   selected={currentSpace === space.key}
-                  selectedColor={space.color}
                   size={38}
                   onClick={() => setView("space", space.key)}
                 >
