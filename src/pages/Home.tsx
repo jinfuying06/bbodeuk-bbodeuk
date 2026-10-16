@@ -12,6 +12,7 @@ import {
   getActiveSpaces,
   getItem,
   getItems,
+  getSpace,
   isRecordedToday,
   itemStaleness,
   lastRecord,
@@ -45,12 +46,12 @@ const cardRecency = (key: SpaceKey, records: CleaningRecord[]) => formatRecency(
 /** One row per item, newest first. */
 const recentRows = (records: CleaningRecord[], spaces: Set<string>) => {
   const seen = new Set<string>();
-  const rows: Array<{ id: string; space: SpaceKey; name: string; at: string }> = [];
+  const rows: Array<{ id: string; space: SpaceKey; name: string; icon: string; hidden: boolean; at: string }> = [];
   for (const record of records) {
     const item = getItem(record.itemId);
     if (!item || seen.has(item.id) || !spaces.has(item.space)) continue;
     seen.add(item.id);
-    rows.push({ id: item.id, space: item.space, name: item.name, at: record.at });
+    rows.push({ id: item.id, space: item.space, name: item.name, icon: item.icon, hidden: Boolean(item.hiddenCare), at: record.at });
     if (rows.length === 2) break;
   }
   return rows;
@@ -174,7 +175,7 @@ export default function Home() {
           ) : (
             <RowList>
               {recent.map((row) => (
-                <ItemRow key={row.id} list meta={formatRecency(row.at)} space={row.space} title={row.name} />
+                <ItemRow key={row.id} list hidden={row.hidden} icon={row.icon} meta={formatRecency(row.at)} space={row.space} sub={getSpace(row.space).label} title={row.name} />
               ))}
             </RowList>
           )}
@@ -188,9 +189,11 @@ export default function Home() {
                 key={item.id}
                 list
                 chevron="muted"
-                meta={item.hiddenCare ? "숨은 관리" : formatRecency(lastRecord(item.id, records)?.at)}
+                hidden={Boolean(item.hiddenCare)}
+                icon={item.icon}
+                meta={formatRecency(lastRecord(item.id, records)?.at)}
                 space={item.space}
-                sub={tip}
+                sub={`${getSpace(item.space).label} · ${tip}`}
                 title={item.name}
                 to={`/quick-record?filter=space&space=${item.space}`}
               />

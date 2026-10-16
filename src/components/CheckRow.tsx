@@ -12,10 +12,12 @@ type CheckRowProps = {
   trailing?: ReactNode;
   /** List style (2026-10-15): no Surface fill while off, so turning on reads as the row getting painted. */
   list?: boolean;
+  /** On-state check circle color (e.g. the space ink) instead of Slate. */
+  checkColor?: string;
 };
 
 /** Sky / Check row (Figma 25:155): 48px Surface row, 24px check circle (off = sky-line, on = sky-deep). */
-export default function CheckRow({ label, on, onClick, locked = false, fill, trailing, list = false }: CheckRowProps) {
+export default function CheckRow({ label, on, onClick, locked = false, fill, trailing, list = false, checkColor }: CheckRowProps) {
   return (
     <button
       aria-disabled={locked || undefined}
@@ -28,6 +30,7 @@ export default function CheckRow({ label, on, onClick, locked = false, fill, tra
       <span
         aria-hidden="true"
         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors ${locked ? "bg-sky-tint text-sky-deep" : on ? "bg-sky-deep text-sky-white" : "bg-sky-line"}`}
+        style={on && !locked && checkColor ? { backgroundColor: checkColor } : undefined}
       >
         {on ? <Icon name="check" className="text-[16px]" /> : null}
       </span>

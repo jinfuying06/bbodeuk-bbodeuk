@@ -119,11 +119,12 @@ export default function DraftReviewScreen({ initialDrafts, onConfirm, onBack }: 
                       const libraryItem = findItem(item.itemId);
                       if (!libraryItem) return null;
                       return (
+                        // Quiet selection (2026-10-16): no row fill — only the check circle carries the space color.
                         <CheckRow
                           key={item.itemId}
-                          fill={space.color}
+                          checkColor={space.iconColor}
                           list
-                          label={libraryItem.name}
+                          label={<span className={item.included ? "text-sky-ink" : "text-sky-muted"}>{libraryItem.name}</span>}
                           on={item.included}
                           onClick={() => toggleItem(index, item.itemId)}
                           trailing={<span className="shrink-0 text-bb-caption text-sky-muted">{item.source === "ai" ? "AI 추천" : "직접 추가"}</span>}

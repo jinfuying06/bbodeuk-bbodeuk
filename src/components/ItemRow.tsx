@@ -12,6 +12,8 @@ type ItemRowProps = {
   space?: SpaceKey;
   /** Item art (object-*) in the space tile instead of the space icon. */
   icon?: string;
+  /** 숨은 관리 marker next to the title (keeps the right side for time only). */
+  hidden?: boolean;
   /** Right-aligned caption (recency, time). */
   meta?: string;
   /** deep = item/nav rows (default); muted = Figma "Recent record" rows. */
@@ -25,14 +27,17 @@ type ItemRowProps = {
 };
 
 /** Space row: [space tile] title/sub [meta]. With `to` it is tappable and shows a chevron. */
-export default function ItemRow({ title, sub, to, space, icon, meta, chevron = "deep", height = 64, list = false }: ItemRowProps) {
+export default function ItemRow({ title, sub, to, space, icon, hidden = false, meta, chevron = "deep", height = 64, list = false }: ItemRowProps) {
   const shape = list ? "" : "rounded-row bg-sky-surface pl-3";
   const base = `flex items-center gap-3 ${shape} ${height === 72 ? "h-[72px]" : "h-16"}`;
   const body = (
     <>
       {space ? <SpaceTile icon={icon} space={space} /> : null}
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-bb-label text-sky-ink">{title}</span>
+        <span className="flex min-w-0 items-center gap-1.5">
+          <span className="truncate text-bb-label text-sky-ink">{title}</span>
+          {hidden ? <span className="shrink-0 rounded-full bg-sky-tint px-1.5 py-px text-[11px] font-medium leading-4 text-sky-deep">숨은 관리</span> : null}
+        </span>
         {sub ? <span className="block truncate text-bb-caption text-sky-muted">{sub}</span> : null}
       </span>
       {meta ? <span className="shrink-0 text-right text-bb-caption text-sky-muted">{meta}</span> : null}

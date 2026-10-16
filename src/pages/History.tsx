@@ -135,7 +135,7 @@ export default function History() {
                 {dayRecords.map((record) => {
                   const item = getItem(record.itemId);
                   if (!item) return null;
-                  return <ItemRow key={record.id} list meta={formatTime(record.at)} space={item.space} sub={getSpace(item.space).label} title={item.name} />;
+                  return <ItemRow key={record.id} list hidden={Boolean(item.hiddenCare)} icon={item.icon} meta={formatTime(record.at)} space={item.space} sub={getSpace(item.space).label} title={item.name} />;
                 })}
               </RowList>
             ) : (
@@ -164,7 +164,7 @@ export default function History() {
                   <h2 className="text-bb-title text-sky-ink">{space.label}</h2>
                   <RowList>
                     {items.map(({ item, at }) => (
-                      <ItemRow key={item.id} list chevron="muted" meta={formatRecency(at)} space={space.key} title={item.name} to={itemHistoryPath(item.id)} />
+                      <ItemRow key={item.id} list chevron="muted" hidden={Boolean(item.hiddenCare)} icon={item.icon} meta={formatRecency(at)} space={space.key} sub={space.label} title={item.name} to={itemHistoryPath(item.id)} />
                     ))}
                   </RowList>
                 </section>
