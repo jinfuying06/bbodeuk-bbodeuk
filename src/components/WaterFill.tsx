@@ -9,6 +9,8 @@ type Props = {
   color: string;
   /** Per-card/row offset so the idle waves don't move in lockstep. */
   phase?: number;
+  /** Feathered surface instead of a crisp wave line (home card comparison, 2026-10-17). */
+  soft?: boolean;
 };
 
 // 4 wave periods, amplitude ±1.25 around the 4-unit midline. Tile is 2× the edge, slid back and forth.
@@ -18,12 +20,20 @@ const WAVE = {
 };
 
 /** Recency as a "water level" of the space color, with a gently sloshing surface. Parent needs `relative overflow-hidden`. */
-export default function WaterFill({ direction, level, color, phase = 0 }: Props) {
+export default function WaterFill({ direction, level, color, phase = 0, soft = false }: Props) {
   const wave = WAVE[direction];
   const size = direction === "up" ? { height: `${level * 100}%` } : { width: `${level * 100}%` };
   return (
-    <span aria-hidden="true" className={`water-fill water-fill-${direction}`} style={{ ...size, backgroundColor: color }}>
-      {level > 0 ? (
+    <span
+      aria-hidden="true"
+      className={`water-fill water-fill-${direction}`}
+      style={
+        soft
+          ? { ...size, backgroundImage: `linear-gradient(${direction === "up" ? "to top" : "to right"}, ${color} 0%, ${color} max(0%, calc(100% - 40px)), color-mix(in srgb, ${color} 0%, transparent) 100%)` }
+          : { ...size, backgroundColor: color }
+      }
+    >
+      {level > 0 && !soft ? (
         <svg className="water-wave" viewBox={wave.viewBox} preserveAspectRatio="none" style={{ "--water-delay": `${-phase * 1.7}s` } as CSSProperties}>
           <path d={wave.line + wave.fill} fill={color} />
         </svg>

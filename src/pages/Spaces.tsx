@@ -11,7 +11,7 @@ import { formatRecency, getActiveSpaces, getItems, isSpaceKey, itemFade, lastRec
 
 type RowFill = "water" | "tint";
 /** Recency look of item rows (2026-10-17 comparison): water level vs whole-row color that fades. `?fill=` overrides. */
-const DEFAULT_FILL: RowFill = "water";
+const DEFAULT_FILL: RowFill = "tint"; // 2026-10-17: B 색 바램 chosen — rows no longer read like progress bars.
 
 export default function Spaces() {
   const records = useRecords();
@@ -80,25 +80,6 @@ export default function Spaces() {
           새 청소 항목
         </Link>
       </main>
-      {/* Review-only switch, compiled in only when VITE_REVIEW=1. */}
-      {import.meta.env.VITE_REVIEW === "1" ? (
-        <div className="fixed bottom-24 right-4 z-50 flex rounded-full bg-sky-ink/85 p-1 text-[12px] text-sky-white shadow-lg">
-          {(["water", "tint"] as const).map((key) => (
-            <button
-              key={key}
-              className={`rounded-full px-3 py-1 ${fillMode === key ? "bg-sky-white text-sky-ink" : ""}`}
-              type="button"
-              onClick={() => {
-                const next = new URLSearchParams(params);
-                next.set("fill", key);
-                setParams(next, { replace: true });
-              }}
-            >
-              {key === "water" ? "A 물" : "B 색 바램"}
-            </button>
-          ))}
-        </div>
-      ) : null}
     </PageShell>
   );
 }
