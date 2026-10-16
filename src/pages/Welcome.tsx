@@ -107,14 +107,6 @@ function StepHead({ label, title, body }: { label: string; title: string; body: 
   );
 }
 
-const Caption = ({ lines }: { lines: [string, string] }) => (
-  <p className="text-[12px] leading-[22px] text-sky-muted">
-    {lines[0]}
-    <br />
-    {lines[1]}
-  </p>
-);
-
 export default function Welcome() {
   const [step, setStep] = useState(0);
   const navigate = useNavigate();
@@ -143,7 +135,6 @@ export default function Welcome() {
             <div className="flex h-[210px] justify-center">
               <DemoCard />
             </div>
-            <Caption lines={["빛이 스치면 기록 끝. 다시 누르면 취소돼요.", "체험한 내용은 실제 기록에 남지 않아요."]} />
             <GlassButton size={52} onClick={() => setStep(1)}>
               다음 · 색의 변화 알아보기
             </GlassButton>
