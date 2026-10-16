@@ -30,7 +30,7 @@ export default function ItemHistory() {
 
   return (
     <PageShell>
-      <AppHeader title={`${item.fullName} 기록`} back="/history" />
+      <AppHeader title={`${item.fullName} 기록`} back="/history?view=space" />
       <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
         <PageIntro title={`${item.fullName}${particle(item.fullName, "을/를")} 돌본 날들`} body={<>{space.label} · {latest ? `최근 기록 ${relativeDay(latest.at)} ${formatTime(latest.at)}` : "아직 기록 없음"}</>} />
 

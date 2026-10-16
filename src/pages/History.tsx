@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom";
 import { useMemo, useState } from "react";
 import AppHeader from "../components/AppHeader";
 import Icon from "../components/Icon";
@@ -27,7 +28,10 @@ function monthWeeks(month: Date): Array<Array<Date | null>> {
 
 export default function History() {
   const records = useRecords();
-  const [view, setView] = useState<View>("date");
+  // View lives in the URL (?view=space) so coming back from 항목 히스토리 restores 공간별 (2026-10-17).
+  const [params, setParams] = useSearchParams();
+  const view: View = params.get("view") === "space" ? "space" : "date";
+  const setView = (next: View) => setParams(next === "space" ? { view: "space" } : {}, { replace: true });
   const todayKey = dayKey(new Date());
   const [selected, setSelected] = useState(todayKey);
   const [month, setMonth] = useState(() => {
