@@ -230,16 +230,16 @@ Every color does exactly one job:
 - **Cloud Blue** (`sky-sky`): text selection highlight and small illustration accents.
 
 ### Secondary: Space pastels (the record)
-Each space has a fill and an icon ink. Fill paints tiles, selected space chips and the water in recorded cards; icon ink stays at 100% on every water level.
+Each space has a fill (Figma Page 5 originals) and an icon ink (2026-10-15: a clear, deep shade of the same hue, replacing the earlier olive/brick earth tones). Fill paints tiles, selected space chips and the water in recorded cards; icon ink stays at 100% on every water level.
 
 Core spaces:
-- **Bath Sky** (`sky-bath`) with **Bath Slate** (`space-bath-icon`) for 욕실.
-- **Kitchen Lemon** (`sky-kitchen`) with **Kitchen Olive** (`space-kitchen-icon`) for 주방.
-- **Living Coral** (`sky-living`) with **Living Brick** (`space-living-icon`) for 거실.
-- **Bedroom Leaf** (`sky-bed`) with **Bedroom Forest** (`space-bed-icon`) for 방.
+- **Bath Sky** (`sky-bath`) with **Bath Teal** (`space-bath-icon`) for 욕실.
+- **Kitchen Lemon** (`sky-kitchen`) with **Kitchen Amber** (`space-kitchen-icon`) for 주방.
+- **Living Coral** (`sky-living`) with **Living Terracotta** (`space-living-icon`) for 거실.
+- **Bedroom Leaf** (`sky-bed`) with **Bedroom Green** (`space-bed-icon`) for 방.
 
 Expansion spaces (user-added; display names are user-defined, tokens are positional):
-- **공간1 Lavender** (`sky-space1`) with **Plum** (`space-space1-icon`).
+- **공간1 Lavender** (`sky-space1`) with **Violet** (`space-space1-icon`).
 - **공간2 Apricot** (`sky-space2`) with **Bronze** (`space-space2-icon`).
 - **공간3 Pink** (`sky-space3`) with **Berry** (`space-space3-icon`).
 
@@ -247,22 +247,22 @@ Expansion spaces have no dedicated glyph yet; until one exists, their tiles show
 
 | Space | Fill | Icon ink | Icon on fill |
 |---|---|---|---|
-| 욕실 | `#c4f2ff` | `#00718c` | 4.84:1 |
-| 주방 | `#fff8c4` | `#996100` | 4.40:1 |
-| 거실 | `#ffd0c4` | `#9f4325` | 5.66:1 |
-| 방 | `#c7ffc4` | `#27762f` | 4.44:1 |
-| 공간1 | `#e9c4ff` | `#724695` | 6.18:1 |
+| 욕실 | `#c4f2ff` | `#00718c` | 4.68:1 |
+| 주방 | `#fff8c4` | `#996100` | 4.79:1 |
+| 거실 | `#ffd0c4` | `#9f4325` | 4.56:1 |
+| 방 | `#c7ffc4` | `#27762f` | 4.98:1 |
+| 공간1 | `#e9c4ff` | `#724695` | 4.56:1 |
 | 공간2 | `#ffe8c4` | `#7e5f30` | 4.93:1 |
 | 공간3 | `#ffc4f7` | `#7e3073` | 5.67:1 |
 
-Icon inks are graphics (≥3:1 non-text rule); 주방 and 방 sit just under 4.5:1, so never set small text in an icon ink.
+Icon inks are graphics (≥3:1 non-text rule) and all clear 4.5:1 on their fill; still, set text in Ink, not in an icon ink.
 
 ### Neutral
-- **Charcoal Ink** (`sky-ink`): headings, row titles, selected space-chip labels, ink toast fill (≥9.7:1 on every space fill, 13.8:1 on Surface).
-- **Slate Muted** (`sky-muted`): body copy, subtitles, meta, inactive nav, unselected chip text. AA on white (5.8:1) and Surface (5.3:1). On a space fill it passes on 욕실 (4.79), 주방 (5.34), 방 (5.08) and 공간2 (4.82) but fails on 거실 (4.13), 공간1 (3.78) and 공간3 (3.97): small meta text on a (near-)100% fill of those spaces uses Charcoal Ink instead, via `metaTextOnFill(key)` in `src/data/cleaning.ts`.
+- **Charcoal Ink** (`sky-ink`): headings, row titles, selected space-chip labels, ink toast fill (≥9.7:1 on every space fill, 13.6:1 on Surface).
+- **Slate Muted** (`sky-muted`): body copy, subtitles, meta, inactive nav, unselected chip text. AA on white (5.8:1) and Surface (5.2:1). On a space fill it passes on 욕실 (4.79), 주방 (5.34), 방 (5.08) and 공간2 (4.82) but fails on 거실 (4.13), 공간1 (3.78) and 공간3 (3.97): small meta text on a (near-)100% fill of those spaces uses Charcoal Ink instead, via `metaTextOnFill(key)` in `src/data/cleaning.ts`.
 - **Hairline** (`sky-line`): borders, bottom-nav top border, switch-off track, check-off circle, disabled button fill, and the desktop backdrop outside the phone column.
 - **White Page** (`sky-bg`): app/page, header, bottom nav, dialog and text-field background.
-- **Surface** (`sky-surface`, `#f3f7fa`): every card, row, chip and tile surface that sits on the page; faintly blue-gray to sit with the sky brand. Also the "never recorded" state (no tint).
+- **Surface** (`sky-surface`, `#f2f5f7`): every card, row, chip and tile surface that sits on the page; a faintly slate-tinted gray to sit with the Slate accent. Also the "never recorded" state (no tint).
 - **White** (`sky-white`): literal white only — text on filled toasts, Glass Button border, switch thumb, specular sweep. Not a surface token.
 - **Art Line** (`art-line`) and **Art Tint** (`art-tint`): strokes and tinted fills in exported illustrations only.
 - **Scrim** (`scrim`): full-screen dialog backdrop over header and nav.
@@ -324,7 +324,7 @@ Flat by default. Depth is tonal: blue-gray Surface on the White Page, scrim for 
 
 Soft, consistently rounded rectangles, scaled to the element: 40px space tile 14px (`tile`), switch/nav row 16px (`row-sm`), item row and ink toast 18px (`row`), cards, record cards, check rows, dialogs and the Glass Button 20px (`2xl`), info cards and pill toast 24px (`3xl`), text fields 12px (`xl`), chips and switches fully round. Borders are rare: 1px Hairline on fields and on the bottom nav's top edge, 1px white on the Glass Button.
 
-Icons are a single SVG registry (`src/components/icons`): UI glyphs on a 24px grid at 2.4 stroke (chevron, check, plus, more, account, sparkle), plus nav-, space- and object- sets. Space icons render in their icon ink. The space set covers the four core spaces; expansion spaces (공간1~3) have no glyph yet.
+Icons are a single SVG registry (`src/components/icons`): UI glyphs on a 24px grid at 2.4 stroke (chevron, check, plus, more, account, sparkle), plus nav-, space- and object- sets. Space icons render in their icon ink. The space set covers the four core spaces; expansion spaces (공간1~3) have no glyph yet. Object art (record tiles) covers every 욕실·주방·거실·방 item in one language: 2.3px `art-line` (#5B7A8C) rounded strokes, white + `art-tint` fills, Cloud Blue (#8FD8FF) accent; floors share one drawing. 베란다 items still fall back to the space icon.
 
 ## Components
 
@@ -346,7 +346,9 @@ Tactile and calm: a deep-ocean slab with a white label that catches light when t
 - **Item row (list style, default for lists since 2026-10-15):** no fill, rows stacked in `RowList` with Hairline dividers; meta (recency, time, duration) right-aligned `bb-caption` Muted; a chevron only when the row navigates. Home, 히스토리 and 케어 lists use it. **Item row (card style, remaining standalone uses):** Surface, 18px radius, 64 or 72px tall, 12px left pad, 12px gap: 40px space tile, title `bb-label` Ink over subtitle `bb-caption` Muted, chevron in a 44px trailing slot (Slate, or Muted for recent-record rows). Presses to 0.97.
 - **Space tile:** 40px, 14px radius, space fill with icon ink (24px icon; expansion spaces show color only); on an already-filled row it becomes 70% white.
 - **Home space card:** 20px card, 110px tall, water rising from the bottom to the space's level (Surface when never recorded, 18% base tint otherwise); label/icon stay full strength.
-- **Record card (QuickRecord):** Surface 20px card; tapping fills it with the space color at 100% (300ms), tapping again the same day clears it. No border. It shows today's record only, not recency.
+- **Home intro (status-driven, 2026-10-16):** no record CTA on Home (the 기록 tab covers it); the 2-line headline and the line under it follow state — 첫 기록 전 `첫 기록을 남겨볼까요?`, nothing today `오늘 눈에 들어온 한 곳부터` (something overdue) or `오늘도, 내 공간을 맑게.`, some today `오늘도, 내 공간이 산뜻해요` + `오늘 N곳을 돌봤어요`, every space today `오늘은 집 전체가 반짝여요`. Until something is recorded today the second line is `공간을 눌러 청소한 곳을 기록해요` (each space card opens 기록 for that space). Below the cards: tonal `기록 모아보기`, then 최근 돌본 흔적 (read-only rows) and 이런 곳은 어때요? (rows that open 기록).
+- **Space accordion (공간 tab, 주말 대청소):** list style — no card; each space is a 72px header row (space tile, name, count, chevron) over a Hairline; the open panel indents its rows by the tile width. 공간 rows are water-level item rows (never recorded = faint Surface); 대청소 rows are list-style check rows that paint in the space color when checked. No per-space record button.
+- **Record tile (QuickRecord, 공간별 보기):** square tiles in a 3-column grid, 8px gap, 16px radius, Surface; object art (40px) over the item name (`bb-label` Ink) and recency (`bb-caption` Muted), all centered, so a whole space fits on one screen. Tapping fills the tile with the space color at 100% (300ms), tapping again the same day clears it. No border. Fill shows today's record only, not recency. 최근 기록 / 자주 views stay one-line rows.
 - **Info card:** 24px radius, 16px/20px padding, 8px gap; Slate Mist for tips/notices, Surface for FAQ.
 
 ### Inputs / Fields
@@ -358,7 +360,7 @@ Tactile and calm: a deep-ocean slab with a white label that catches light when t
 - **Check row:** 48px Surface row (20px radius), 24px circle: Hairline off, Slate with white check on, Slate Mist with Slate check when locked. May fill with the space color when on (대청소). List style (`list`): no fill while off, so checking paints the row in the space color.
 
 ### Navigation
-- **Header:** White Page, 54px. Tab-root variant: Ink `bb-title` left (Home: 28px round brand logo first, 8px gap), account icon (Muted, 44px) right to 내 정보. Sub-page variant: Slate back chevron (44px, falls back to /home on direct entry), centered Ink `bb-label` title, decorative "more" or an empty 44px spacer on the right.
+- **Header:** White Page, 54px. Tab-root variant (홈 · 공간 · 기록 · 히스토리 · 가이드; title = tab name, Home shows "뽀득뽀득"): Ink `bb-title` left (Home: 28px round brand logo first, 8px gap), account icon (Muted, 44px) right to 내 정보. Sub-page variant: Slate back chevron (44px, falls back to /home on direct entry), centered Ink `bb-label` title, decorative "more" or an empty 44px spacer on the right.
 - **Bottom nav:** White Page with a 1px Hairline top border, five tabs 홈 / 공간 / 기록 / 히스토리 / 가이드, each 64×48 with a 22px icon over a `bb-small` label, 3px gap. Active Slate, inactive Slate Muted; sub-pages light their parent tab.
 
 ### Dialog
@@ -378,7 +380,7 @@ Scrim over everything; White Page 342px card, 20px radius, 16px gap: `bb-title` 
 
 ### Content & voice
 Korean, soft 해요체, short. Color and copy describe care, never judgment.
-- **Canonical phrases:** save toast `청소 기록을 저장했어요`; undo toast `청소 기록을 취소했어요`; undo action `기록 취소`; just-now (<10 min) `방금 돌봤어요`; recency `오늘 기록 · 어제 기록 · N일 전 기록 · 아직 기록 없음` (short form `오늘 · 어제 · N일 전 · 기록 없음`); coming-soon `준비 중이에요`.
+- **Canonical phrases:** save toast `청소 기록을 저장했어요`; undo toast `청소 기록을 취소했어요`; undo action `기록 취소`; recency `방금` (<10 min) `· 오늘 · 어제 · N일 전 · 아직 기록 없음` (short form `… · 기록 없음`); no trailing "기록" since the context already says it; coming-soon `준비 중이에요`.
 - **Fade stage labels (from `FADE_STAGES`, one wording app-wide):** 100% `최근 관리했어요`, 72% `잘 유지되고 있어요`, 48% `슬슬 다시 볼 때예요`, 28% `한번 관리해볼까요?`.
 - **Space names:** core spaces are 욕실 · 주방 · 거실 · 방. Expansion spaces default to `공간1`, `공간2`, `공간3` until the user names them.
 - **Banned words:** 미완료, 실패, 지연, overdue, 위험, 더러움. No cleanliness scores or completion percentages shown to users.
