@@ -5,7 +5,7 @@ import { SPACES } from "../data/cleaning";
 export type AuthHeroVariant = "band" | "house";
 
 /** Shipped choice for 로그인·회원가입 상단. `?hero=band|house` overrides it (review comparison, 2026-10-16). */
-const DEFAULT_VARIANT: AuthHeroVariant = "house";
+const DEFAULT_VARIANT: AuthHeroVariant = "band";
 
 /**
  * Brand moment above the auth forms (2026-10-16): the forms stay quiet, color lives only here.

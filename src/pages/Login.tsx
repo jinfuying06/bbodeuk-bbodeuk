@@ -39,10 +39,18 @@ export default function Login() {
       <main className="pt-header-flow">
         <form className="flex flex-col gap-3 px-margin-screen pb-5" noValidate onSubmit={submit}>
           <AuthHero />
-          <h1 className="text-bb-heading text-sky-ink">{error ? "입력한 정보를 확인해 주세요" : "다시 만나 반가워요"}</h1>
-          <p className="text-bb-body text-sky-muted">
-            {error ? "이메일 또는 비밀번호가 맞지 않아요. 다시 확인해 주세요." : "오늘의 작은 청소를 이어가요."}
-          </p>
+          {error ? (
+            <>
+              <h1 className="text-bb-heading text-sky-ink">입력한 정보를 확인해 주세요</h1>
+              <p className="text-bb-body text-sky-muted">이메일 또는 비밀번호가 맞지 않아요. 다시 확인해 주세요.</p>
+            </>
+          ) : (
+            // App start screen: brand line instead of a greeting (2026-10-16).
+            <h1 className="flex flex-col gap-1 pb-5">
+              <span className="text-bb-body text-sky-muted">색으로 채우는 나의 청소 기록</span>
+              <span className="text-[32px] font-bold leading-[40px] text-sky-ink">뽀득뽀득</span>
+            </h1>
+          )}
 
           <div className="flex min-h-[84px] flex-col gap-1.5">
             <label className="text-bb-label text-sky-ink" htmlFor="login-email">
