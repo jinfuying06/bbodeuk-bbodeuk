@@ -7,7 +7,7 @@
  * - Records: seeded relative to "now" on first load, then kept in localStorage like the rest of
  *   the app data (Settings → 데이터 초기화 clears it). All dates are derived — no literals.
  */
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore, type CSSProperties } from "react";
 import { readHiddenItems, readOverrides } from "./itemStorage";
 import { readSetup } from "./setup";
 
@@ -420,3 +420,17 @@ export function spaceFill(key: SpaceKey, alpha: number): string {
  * so the `bg-sky-surface` class shows with no tint; recorded at least once → the 18% base tint.
  */
 export const waterBase = (key: SpaceKey, fade: number) => (fade > 0 ? spaceFill(key, WATER_BASE_TINT) : undefined);
+
+/**
+ * Object illustration palette (2026-10-16). Set on any container; the object-* art inherits it.
+ * idle   = not yet cared for, on a grey/white surface: soft grey line drawing waiting for color.
+ * filled = on a space-colored surface: lines in the space ink, white body, accent = space color deepened.
+ */
+export function objectArtVars(key: SpaceKey, state: "idle" | "filled"): CSSProperties {
+  const { color, iconColor } = getSpace(key);
+  const vars =
+    state === "idle"
+      ? { "--obj-stroke": "#97A4AC", "--obj-tint": "#FFFFFF", "--obj-accent": "#DCE3E8" }
+      : { "--obj-stroke": iconColor, "--obj-tint": "#FFFFFF", "--obj-accent": `color-mix(in srgb, ${iconColor} 30%, ${color})` };
+  return vars as CSSProperties;
+}

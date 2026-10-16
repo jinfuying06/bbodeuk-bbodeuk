@@ -1,8 +1,11 @@
 import { useState } from "react";
+import CheckRow from "../../components/CheckRow";
 import GlassButton from "../../components/GlassButton";
 import Icon from "../../components/Icon";
 import PageShell from "../../components/PageShell";
-import { getSpace, spaceColor } from "../../data/cleaning";
+import Pill from "../../components/Pill";
+import SpaceTile from "../../components/SpaceTile";
+import { getSpace } from "../../data/cleaning";
 import FlowHeader from "./FlowHeader";
 import { findItem, spaceLabels, type SpaceKey } from "./itemLibrary";
 import { DEFAULT_ITEM_SLOT_LIMIT, type AXSpaceDraft } from "./types";
@@ -70,55 +73,41 @@ export default function DraftReviewScreen({ initialDrafts, onConfirm, onBack }: 
           const isOpen = openIndex === index;
           const includedCount = draft.items.filter((item) => item.included).length;
           const space = getSpace(draft.spaceKey);
-          const fill = spaceColor(draft.spaceKey, 0.28);
 
           return (
-            <section
-              key={index}
-              className={`flex flex-col gap-2.5 rounded-row-sm transition-colors duration-300 ${isOpen ? "bg-sky-surface p-4" : "px-4"}`}
-              style={isOpen ? undefined : { backgroundColor: fill }}
-            >
+            // List-style accordion like 공간 / 대청소 (2026-10-16): hairline under each space, no grey card.
+            <section key={index} className="flex flex-col border-b border-sky-line">
               <button
                 aria-expanded={isOpen}
-                className={`flex w-full items-center justify-between text-left ${isOpen ? "h-11" : "h-[60px]"}`}
+                className="press flex h-[72px] w-full items-center gap-3 text-left"
                 type="button"
                 onClick={() => setOpenIndex(isOpen ? null : index)}
               >
-                <span className="flex min-w-0 items-center">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: fill, color: space.iconColor }}>
-                    <Icon name={space.icon} className="text-[22px]" />
-                  </span>
-                  <span className={`truncate text-sky-ink ${isOpen ? "text-bb-label font-bold" : "text-bb-label-sm"}`}>
-                    {spaceLabels[draft.spaceKey]}&nbsp;&nbsp;·&nbsp;&nbsp;{includedCount}개 선택됨
-                  </span>
+                <SpaceTile space={draft.spaceKey} />
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="truncate text-bb-label text-sky-ink">{spaceLabels[draft.spaceKey]}</span>
+                  <span className="text-bb-caption text-sky-muted">{includedCount}개 선택됨</span>
                 </span>
-                <Icon name="chevron-down" className={`shrink-0 text-[18px] text-sky-muted transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                <Icon name="chevron-down" className={`mr-1 shrink-0 text-[18px] text-sky-deep transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
               </button>
 
               {isOpen ? (
-                <>
-                  <hr className="border-sky-line/65" />
-
+                <div className="flex flex-col gap-1 pb-4 pl-[52px]">
                   {!draft.resolved && draft.ambiguousCandidates.length > 0 ? (
-                    <div className="rounded-xl bg-sky-bg p-3">
+                    <div className="mb-2 flex flex-col gap-2">
                       <p className="text-bb-label-sm text-sky-ink">어떤 공간에 가까운가요?</p>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-2">
                         {draft.ambiguousCandidates.map((candidate) => (
-                          <button
-                            key={candidate}
-                            type="button"
-                            className="press h-9 rounded-full border border-sky-line bg-sky-surface px-3 text-bb-label-sm text-sky-ink"
-                            onClick={() => resolveSpace(index, candidate)}
-                          >
+                          <Pill key={candidate} size={38} onClick={() => resolveSpace(index, candidate)}>
                             {spaceLabels[candidate]}
-                          </button>
+                          </Pill>
                         ))}
                       </div>
                     </div>
                   ) : null}
 
                   {limitWarningIndex === index ? (
-                    <p role="status" className="text-bb-caption text-sky-deep">
+                    <p role="status" className="pb-1 text-bb-caption text-sky-deep">
                       한 공간에 최대 {DEFAULT_ITEM_SLOT_LIMIT}개까지 담을 수 있어요.
                     </p>
                   ) : null}
@@ -130,28 +119,19 @@ export default function DraftReviewScreen({ initialDrafts, onConfirm, onBack }: 
                       const libraryItem = findItem(item.itemId);
                       if (!libraryItem) return null;
                       return (
-                        <button
+                        <CheckRow
                           key={item.itemId}
-                          aria-pressed={item.included}
-                          type="button"
-                          className="press flex h-[54px] items-center justify-between gap-3 rounded-xl bg-sky-bg px-3 text-left transition-colors duration-200"
-                          style={item.included ? { backgroundColor: fill } : undefined}
+                          fill={space.color}
+                          list
+                          label={libraryItem.name}
+                          on={item.included}
                           onClick={() => toggleItem(index, item.itemId)}
-                        >
-                          <span className="flex min-w-0 flex-col">
-                            <span className="truncate text-bb-label-sm text-sky-ink">{libraryItem.name}</span>
-                            <span className="text-[10px] leading-4 text-sky-muted">{item.source === "ai" ? "AI 추천" : "직접 추가"}</span>
-                          </span>
-                          <span
-                            className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-xl text-sky-deep ${item.included ? "bg-sky-bg" : "bg-sky-surface"}`}
-                          >
-                            <Icon name="check" className={`text-[20px] transition-transform duration-200 ${item.included ? "scale-100" : "scale-0"}`} />
-                          </span>
-                        </button>
+                          trailing={<span className="shrink-0 text-bb-caption text-sky-muted">{item.source === "ai" ? "AI 추천" : "직접 추가"}</span>}
+                        />
                       );
                     })
                   )}
-                </>
+                </div>
               ) : null}
             </section>
           );

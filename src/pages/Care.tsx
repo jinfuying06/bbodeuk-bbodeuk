@@ -6,7 +6,7 @@ import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
 import ItemRow, { RowList } from "../components/ItemRow";
-import { getItem, getSpace, spaceColor } from "../data/cleaning";
+import { getItem, getSpace, objectArtVars, spaceColor } from "../data/cleaning";
 import { GUIDES, type Guide } from "../data/guides";
 
 type Filter = "전체" | Guide["filter"];
@@ -27,7 +27,7 @@ export default function Care() {
 
         <Link aria-label="추천 가이드: 세면대부터 산뜻하게" className="press flex min-h-[206px] flex-col gap-2 rounded-3xl pb-4 pl-5 pr-5 pt-4"
           // Featured card wears its space color at 50% (2026-10-16): 세면대 → 욕실.
-          style={{ backgroundColor: spaceColor("bathroom", 0.5) }}
+          style={{ ...objectArtVars("bathroom", "filled"), backgroundColor: spaceColor("bathroom", 0.5) }}
           to="/care-action?item=basin"
         >
           <span className="whitespace-pre text-bb-caption text-sky-deep">{"오늘의 가벼운 청소  ·  약 3분"}</span>

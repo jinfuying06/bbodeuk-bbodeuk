@@ -4,7 +4,7 @@ import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
 import SpaceTile from "../components/SpaceTile";
-import { FADE_STAGES, getSpace, type SpaceKey } from "../data/cleaning";
+import { FADE_STAGES, getSpace, objectArtVars, type SpaceKey } from "../data/cleaning";
 
 const BATH = getSpace("bathroom");
 
@@ -45,7 +45,7 @@ function DemoCard() {
       aria-pressed={recorded}
       className="press relative flex h-[210px] w-[250px] flex-col items-center justify-center overflow-hidden rounded-2xl pl-[14px] pt-2 transition-[background-color,transform] duration-300"
       // Starts as a faint 욕실 tint (not grey) so the tap visibly fills it with the full color (2026-10-16).
-      style={{ backgroundColor: recorded ? BATH.color : mix(BATH.color, 30) }}
+      style={{ ...objectArtVars("bathroom", recorded ? "filled" : "idle"), backgroundColor: recorded ? BATH.color : mix(BATH.color, 30) }}
       type="button"
       onClick={tap}
     >

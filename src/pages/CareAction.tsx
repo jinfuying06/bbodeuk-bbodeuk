@@ -5,7 +5,7 @@ import Icon from "../components/Icon";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
-import { getSpace, isRecordedToday, spaceColor, toggleTodayRecord, useRecords } from "../data/cleaning";
+import { getSpace, isRecordedToday, objectArtVars, spaceColor, toggleTodayRecord, useRecords } from "../data/cleaning";
 import { GUIDES } from "../data/guides";
 
 // Figma reuses bath object art as placeholder 준비물 tiles (바닥/배수구/거울).
@@ -25,7 +25,7 @@ export default function CareAction() {
   return (
     <PageShell>
       <AppHeader title={title} back="/care" />
-      <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
+      <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header" style={objectArtVars(space.key, "filled")}>
         <PageIntro title={title} body={guide.intro} />
 
         {guide.id === "basin" ? (

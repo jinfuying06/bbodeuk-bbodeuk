@@ -9,7 +9,7 @@ import Pill from "../components/Pill";
 import Segmented from "../components/Segmented";
 import SpaceTile from "../components/SpaceTile";
 import Toast, { useRouteToast } from "../components/Toast";
-import { formatRecency, getActiveSpaces, getItems, getSpace, isRecordedToday, lastRecord, metaTextOnFill, toggleTodayRecord, useRecords, type Item, type SpaceKey } from "../data/cleaning";
+import { formatRecency, getActiveSpaces, getItems, getSpace, isRecordedToday, lastRecord, metaTextOnFill, toggleTodayRecord, useRecords, type Item, type SpaceKey, objectArtVars } from "../data/cleaning";
 
 type Filter = "recent" | "fav" | "space";
 
@@ -154,7 +154,7 @@ export default function QuickRecord() {
                     key={item.id}
                     aria-pressed={recorded}
                     className="press relative flex aspect-square flex-col items-center justify-center gap-1 overflow-hidden rounded-2xl bg-sky-surface px-1 text-center transition-colors duration-300"
-                    style={recorded ? { backgroundColor: space.color } : undefined}
+                    style={{ ...objectArtVars(item.space, recorded ? "filled" : "idle"), ...(recorded ? { backgroundColor: space.color } : {}) }}
                     type="button"
                     onClick={() => record(item)}
                   >
@@ -186,7 +186,7 @@ export default function QuickRecord() {
                     key={item.id}
                     aria-pressed={recorded}
                     className="press relative flex h-20 items-center gap-3 overflow-hidden rounded-2xl bg-sky-surface px-[14px] text-left transition-colors duration-300"
-                    style={recorded ? { backgroundColor: space.color } : undefined}
+                    style={{ ...objectArtVars(item.space, recorded ? "filled" : "idle"), ...(recorded ? { backgroundColor: space.color } : {}) }}
                     type="button"
                     onClick={() => record(item)}
                   >
