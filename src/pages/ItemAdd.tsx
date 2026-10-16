@@ -81,8 +81,6 @@ export default function ItemAdd() {
             <Pill
               key={entry.key}
               className="min-w-0 flex-1 !px-[7px]"
-              icon={entry.icon}
-              iconColor={entry.iconColor}
               selected={space === entry.key}
               selectedColor={entry.color}
               size={38}

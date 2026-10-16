@@ -131,8 +131,6 @@ export default function QuickRecord() {
                 <Pill
                   key={space.key}
                   className="min-w-0 flex-1 !px-[7px]"
-                  icon={space.icon}
-                  iconColor={space.iconColor}
                   selected={currentSpace === space.key}
                   selectedColor={space.color}
                   size={38}
