@@ -5,7 +5,7 @@ import Icon from "../components/Icon";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
-import { getSpace, isRecordedToday, toggleTodayRecord, useRecords } from "../data/cleaning";
+import { getSpace, isRecordedToday, spaceColor, toggleTodayRecord, useRecords } from "../data/cleaning";
 import { GUIDES } from "../data/guides";
 
 // Figma reuses bath object art as placeholder 준비물 tiles (바닥/배수구/거울).
@@ -36,8 +36,9 @@ export default function CareAction() {
 
         <ul aria-label="준비물" className="flex gap-[10px] pb-3">
           {guide.materials.map((label, index) => (
-            <li key={label} className="flex h-[104px] flex-1 flex-col items-center justify-center gap-1.5 rounded-row border bg-sky-surface" style={{ borderColor: space.color }}>
-              <span className="flex h-[52px] w-[52px] items-center justify-center rounded-row-sm" style={{ backgroundColor: space.color }}>
+            // 2026-10-16: whole card in the space color at 50% (was grey + colored border), art on a white tile.
+            <li key={label} className="flex h-[104px] flex-1 flex-col items-center justify-center gap-1.5 rounded-row" style={{ backgroundColor: spaceColor(space.key, 0.5) }}>
+              <span className="flex h-[52px] w-[52px] items-center justify-center rounded-row-sm bg-sky-white/80">
                 <Icon name={materialArt[index]} className="text-[34px]" />
               </span>
               <span className="w-[88px] text-center text-bb-caption font-medium text-sky-ink">{label}</span>
@@ -49,15 +50,15 @@ export default function CareAction() {
           {guide.steps.map(([stepTitle, desc], index) =>
             // 15 세면대 keeps its own (older) 78px step card; 40/41/42 use the 94px one.
             guide.id === "basin" ? (
-              <li key={stepTitle} className="flex min-h-[78px] items-center gap-3 rounded-row bg-sky-surface py-[10px] pl-4 pr-4">
-                <span className="text-bb-title text-sky-deep">{`0${index + 1}`}</span>
+              <li key={stepTitle} className="flex min-h-[78px] items-center gap-3 rounded-row py-[10px] pl-4 pr-4" style={{ backgroundColor: spaceColor(space.key, 0.2) }}>
+                <span className="text-bb-title" style={{ color: space.iconColor }}>{`0${index + 1}`}</span>
                 <span className="flex min-w-0 flex-col gap-1 self-start">
                   <h2 className="text-bb-label text-sky-ink">{stepTitle}</h2>
                   <span className="text-bb-caption text-sky-muted">{desc}</span>
                 </span>
               </li>
             ) : (
-              <li key={stepTitle} className="flex min-h-[94px] flex-col gap-2 rounded-3xl bg-sky-surface px-5 pb-4 pt-4">
+              <li key={stepTitle} className="flex min-h-[94px] flex-col gap-2 rounded-3xl px-5 pb-4 pt-4" style={{ backgroundColor: spaceColor(space.key, 0.2) }}>
                 <h2 className="whitespace-pre text-bb-title text-sky-ink">{`0${index + 1}  ${stepTitle}`}</h2>
                 <p className="text-bb-body text-sky-muted">{desc}</p>
               </li>
