@@ -216,9 +216,9 @@ A white neutral field with a navy interactive color, a small sky-blue brand acce
 
 ### Color roles (2026-10-15, user-approved)
 Every color does exactly one job:
-1. **Identity — space color.** 100% space fill + icon ink on space tiles, space selection chips (QuickRecord, 항목 추가), the CareAction header block and supply tiles, AX onboarding tints. Never faded.
+1. **Identity — space color.** 100% space fill + icon ink on space tiles, the guide hero block, AX onboarding tints. Never faded. Since 2026-10-16 color also appears *before* Home wherever a space appears: 공간 설정 / 공간 관리 rows (full while on, 22% while off), the Welcome demo card and 3/3 tiles, empty photo slots (50%; 12% once a photo is in so the photo leads), the Care featured card (50%), the expansion card (offered space at 50%). Rule of thumb: color goes where content is, never on controls (chips, segmented, selection).
 2. **State — water level only.** Recency is a water level of the space color (`<WaterFill>`) on Home cards, Spaces item rows and the SpaceInfo band. Never recorded = plain Surface, no tint. Recorded at least once = 18% base tint (`WATER_BASE_TINT`) under a water level of 100 / 72 / 48 / 28%.
-3. **Interactive — Slate** (`sky-deep` = `#3e5463` since 2026-10-15; the old Deep Ocean navy `#16587f` and the interim Water Blue `#0b74b0` are retired so the app has one accent) with white labels: buttons, switches, checks, non-space selection (segmented chips, filters), field focus, links, active nav.
+3. **Interactive — Slate** (`sky-deep` = `#3e5463` since 2026-10-15; the old Deep Ocean navy `#16587f` and the interim Water Blue `#0b74b0` are retired so the app has one accent) with white labels: buttons, switches, checks, every selection chip including space chips (2026-10-16), field focus, links, active nav.
 3a. **Buttons — one filled per screen** (2026-10-15, user-approved): only the screen's key action is a filled Slate button with a white label (7.9:1); every other button is tonal — Slate Mist (`sky-tint`, `#e8eef2`) fill with a Slate label (`sky-tint-ink`, 6.8:1). Ink #23282b read too heavy and Water Blue #0b74b0 fought the pastel space colors; Slate used sparingly keeps the pastels in front.
 4. **Brand sky** (`sky-brand`): small accents only — logo/favicon, illustrations, sparkles, the AI-setup card outline. Never a button, chip, switch or check fill.
 
@@ -285,7 +285,7 @@ Figma Page 5 defines the dark counterpart: brand `#4ec4ff` with `#0b3550` label,
 
 ### Hierarchy
 - **Display** (`bb-display`): reserved; not currently used.
-- **Heading** (`bb-heading`): page intro h1 (`PageIntro`), Charcoal Ink.
+- **Heading** (`bb-heading`, 26px): every screen's big h1 — `PageIntro`, Home headline, Welcome steps, photo setup flow — Charcoal Ink. **One-line rule (2026-10-16):** the h1 fits one line on a 390px phone; if it doesn't, shorten it and move the rest into the Muted body line. Only exception: the login brand block (tagline + `뽀득뽀득`, centered).
 - **Title** (`bb-title`): section h2, info-card and dialog titles; tab-root header title in Ink (Home adds the round brand logo before it).
 - **Label** (`bb-label`): row/card titles, field labels, chips, button labels, text links, sub-page header title.
 - **Body** (`bb-body`): intro sub-copy, card and dialog body, field text; usually Slate Muted.
@@ -293,7 +293,7 @@ Figma Page 5 defines the dark counterpart: brand `#4ec4ff` with `#0b3550` label,
 - **Caption** (`bb-caption`): row subtitles, meta, section links ("공간 관리 ›").
 - **Small** (`bb-small`): bottom-nav labels.
 
-The older non-`bb` tokens in `tailwind.config.js` (`headline-*`, `title-*`, `body-*`, `label-*`, `caption`) remain for legacy screens; new work uses `bb-*`. The `fontSize` token values themselves are frozen (AGENTS.md §6); per-screen heading size choices (e.g. Welcome 28/26) are allowed.
+The older non-`bb` tokens in `tailwind.config.js` (`headline-*`, `title-*`, `body-*`, `label-*`, `caption`) remain for legacy screens; new work uses `bb-*`. The `fontSize` token values themselves are frozen (AGENTS.md §6); per-screen heading sizes are retired: Welcome (28) and the photo flow (25) now use `bb-heading` too.
 
 ### Named Rules
 **The Weight Not Tracking Rule.** Letter-spacing is 0 everywhere; emphasis is weight 700 or Slate color.
@@ -324,7 +324,7 @@ Flat by default. Depth is tonal: blue-gray Surface on the White Page, scrim for 
 
 Soft, consistently rounded rectangles, scaled to the element: 40px space tile 14px (`tile`), switch/nav row 16px (`row-sm`), item row and ink toast 18px (`row`), cards, record cards, check rows, dialogs and the Glass Button 20px (`2xl`), info cards and pill toast 24px (`3xl`), text fields 12px (`xl`), chips and switches fully round. Borders are rare: 1px Hairline on fields and on the bottom nav's top edge, 1px white on the Glass Button.
 
-Icons are a single SVG registry (`src/components/icons`): UI glyphs on a 24px grid at 2.4 stroke (chevron, check, plus, more, account, sparkle), plus nav-, space- and object- sets. Space icons render in their icon ink. The space set covers the four core spaces; expansion spaces (공간1~3) have no glyph yet. Object art (record tiles) covers every 욕실·주방·거실·방 item in one language: 2.3px `art-line` (#5B7A8C) rounded strokes, white + `art-tint` fills, Cloud Blue (#8FD8FF) accent; floors share one drawing. 베란다 items still fall back to the space icon.
+Icons are a single SVG registry (`src/components/icons`): UI glyphs on a 24px grid at 2.4 stroke (chevron, check, plus, more, account, sparkle), plus nav-, space- and object- sets. Space icons render in their icon ink. The space set covers the four core spaces; expansion spaces (공간1~3) have no glyph yet. Object art covers every 욕실·주방·거실·방 item (주방 has 6 since 2026-10-16: 싱크대 · 조리대 · 후드 필터 · 식기건조대 · 냉장고 · 음식물 쓰레기통) in one language: 2.3px rounded strokes, white + tint fills, one accent; floors share one drawing. Colors are CSS variables (`--obj-stroke/--obj-tint/--obj-accent`, defaults = the original `art-line` / `art-tint` / Cloud Blue); containers set them with `objectArtVars(space, "idle" | "filled")` — idle = grey line drawing on Surface, filled = space ink lines + white body + deepened space accent on a space-colored surface. 베란다 items still fall back to the space icon.
 
 ## Components
 
@@ -338,26 +338,28 @@ Tactile and calm: a deep-ocean slab with a white label that catches light when t
 - **Text link:** Slate `bb-label` (or `bb-label-sm`) in a 44px-tall box; used for 취소, secondary navigation and "기록 취소".
 
 ### Chips (Pill)
-- **Style:** fully round, `bb-label`. Unselected Surface / Slate Muted; selected Slate / white; 150ms color transition. A two-way view switch (히스토리 날짜별/공간별) is a segmented control instead: one Surface track with 4px inset, the selected half lifts to white with a bold Slate label and a 1px soft shadow.
-- **Space chips** (`selectedColor` prop): selected = that space's color fill, Charcoal Ink bold label, icon in icon ink, no border. Unselected = Surface / Slate Muted with the icon still in its ink.
-- **Sizes:** 44px segmented chip, 38px space/filter pill (optional 16px space icon in its icon ink).
+Two kinds only (2026-10-16 chip policy):
+- **View switch → `Segmented`:** mutually exclusive views of one screen (히스토리 날짜별/공간별, 기록 최근 기록/자주/공간별 보기). One Surface track with 4px inset; the selected segment lifts to white with a bold Slate label and a 1px soft shadow.
+- **Filter / category → `Pill size={38}`:** 가이드 필터, 기록·항목 추가 공간 칩. Equal widths (`flex-1`), 8px gap, text only (no icons). Unselected Surface / Slate Muted; selected Slate / white — space chips included (the tiles below already carry the space color, and non-space filters like 전체 / 생활 팁 must read the same).
 
 ### Cards / Containers
-- **Item row (list style, default for lists since 2026-10-15):** no fill, rows stacked in `RowList` with Hairline dividers; meta (recency, time, duration) right-aligned `bb-caption` Muted; a chevron only when the row navigates. Home, 히스토리 and 케어 lists use it. **Item row (card style, remaining standalone uses):** Surface, 18px radius, 64 or 72px tall, 12px left pad, 12px gap: 40px space tile, title `bb-label` Ink over subtitle `bb-caption` Muted, chevron in a 44px trailing slot (Slate, or Muted for recent-record rows). Presses to 0.97.
+- **Item row (list style, default for lists since 2026-10-15):** no fill, rows stacked in `RowList` with Hairline dividers. Unified 2026-10-16 across 최근 돌본 흔적 · 이런 곳은 어때요? · 히스토리 (both views) · 가이드 list: 64px; leading tile = the *item* art on its space color (`icon` prop), not the space icon; line 1 item name (+ a small `숨은 관리` chip via `hidden`); line 2 always the space name (이런 곳은 adds ` · tip`); right side = time only (`방금 / N일 전`, or clock time on 히스토리 날짜별); chevron only when the row navigates. **Item row (card style, remaining standalone uses):** Surface, 18px radius, 64 or 72px tall, 12px left pad, 12px gap: 40px space tile, title `bb-label` Ink over subtitle `bb-caption` Muted, chevron in a 44px trailing slot (Slate, or Muted for recent-record rows). Presses to 0.97.
 - **Space tile:** 40px, 14px radius, space fill with icon ink (24px icon; expansion spaces show color only); on an already-filled row it becomes 70% white.
 - **Home space card:** 20px card, 110px tall, water rising from the bottom to the space's level (Surface when never recorded, 18% base tint otherwise); label/icon stay full strength.
-- **Home intro (status-driven, 2026-10-16):** no record CTA on Home (the 기록 tab covers it); the 2-line headline and the line under it follow state — 첫 기록 전 `첫 기록을 남겨볼까요?`, nothing today `오늘 눈에 들어온 한 곳부터` (something overdue) or `오늘도, 내 공간을 맑게.`, some today `오늘도, 내 공간이 산뜻해요` + `오늘 N곳을 돌봤어요`, every space today `오늘은 집 전체가 반짝여요`. Until something is recorded today the second line is `공간을 눌러 청소한 곳을 기록해요` (each space card opens 기록 for that space). Below the cards: tonal `기록 모아보기`, then 최근 돌본 흔적 (read-only rows) and 이런 곳은 어때요? (rows that open 기록).
+- **Home intro (status-driven, 2026-10-16):** no record CTA on Home (the 기록 tab covers it); a one-line headline and the line under it follow state — 첫 기록 전 `첫 기록을 남겨볼까요?`, nothing today `한 곳부터 가볍게` (something overdue) or `오늘도 내 공간을 맑게`, some today `오늘도 산뜻해요` + `오늘 N곳을 돌봤어요`, every space today `집 전체가 반짝여요` + `모든 공간을 돌봤어요`. No fixed intro height. Until something is recorded today the second line is `공간을 눌러 청소한 곳을 기록해요` (each space card opens 기록 for that space). Below the cards: tonal `기록 모아보기`, then 최근 돌본 흔적 (read-only rows) and 이런 곳은 어때요? (rows that open 기록).
 - **Space accordion (공간 tab, 주말 대청소):** list style — no card; each space is a 72px header row (space tile, name, count, chevron) over a Hairline; the open panel indents its rows by the tile width. 공간 rows are water-level item rows (never recorded = faint Surface); 대청소 rows are list-style check rows that paint in the space color when checked. No per-space record button.
-- **Record tile (QuickRecord, 공간별 보기):** square tiles in a 3-column grid, 8px gap, 16px radius, Surface; object art (40px) over the item name (`bb-label` Ink) and recency (`bb-caption` Muted), all centered, so a whole space fits on one screen. Tapping fills the tile with the space color at 100% (300ms), tapping again the same day clears it. No border. Fill shows today's record only, not recency. 최근 기록 / 자주 views stay one-line rows.
-- **Info card:** 24px radius, 16px/20px padding, 8px gap; Slate Mist for tips/notices, Surface for FAQ.
+- **Record tile (QuickRecord, 공간별 보기):** square tiles in a 3-column grid, 8px gap, 16px radius, Surface; object art (40px) over the item name (`bb-label` Ink) and recency (`bb-caption` Muted), all centered, so a whole space fits on one screen. Tapping fills the tile with the space color at 100% (300ms), tapping again the same day clears it. The object art follows the tile: idle = soft grey line drawing, filled = lines in the space ink (`objectArtVars`). No border. Fill shows today's record only, not recency. 최근 기록 / 자주 views stay one-line rows.
+- **Info card:** 24px radius, 16px/20px padding, 8px gap; Slate Mist for tips/notices, Surface for FAQ. Avoid grey boxes for one-line notes: since 2026-10-16 setup / sign-up-done / photo notes are plain text (or an icon + text row).
+- **Guide detail (2026-10-16, every guide the same):** header `청소 가이드`; h1 = guide name; body `공간 · 약 N분 · 가벼운 청소`; 132px hero = the item art on the space color at 50% (the only color on the page); `준비물` as small Surface chips; `이렇게 해요` numbered steps (28px Slate Mist number circle, bold step title, Muted one-liner) split by Hairlines; record button, then `다른 청소법 보기`.
+- **Draft review (사진 맞춤 설정 → 추천 항목 확인):** list accordion like 공간 / 대청소 (space tile header + Hairline). Selection is quiet: no row fill; only the check circle fills, in the space ink (`CheckRow checkColor`); unchecked items read Muted.
 
 ### Inputs / Fields
 - **Style:** 52px, 12px radius, White Page fill, 1px Hairline, `bb-body` Ink, Muted placeholder, 16px side padding.
 - **Focus:** border shifts to Slate; no outline ring (fields are the one exception to the global focus ring).
 
 ### Switch & Check rows
-- **Switch row:** whole 62px Surface row (16px radius) is the `role="switch"`. Track 52×32: Slate on, Hairline off, Slate Mist when locked; 24px white thumb slides 20px in 200ms ease-out.
-- **Check row:** 48px Surface row (20px radius), 24px circle: Hairline off, Slate with white check on, Slate Mist with Slate check when locked. May fill with the space color when on (대청소). List style (`list`): no fill while off, so checking paints the row in the space color.
+- **Switch row:** whole 62px Surface row (16px radius) is the `role="switch"`. Track 52×32: Slate on, Hairline off, Slate Mist when locked; 24px white thumb slides 20px in 200ms ease-out. **Space variant** (`space` prop, 공간 관리): 64px row in the space color (full on / 22% off) with the space tile; track in the space ink; required spaces show a `필수` chip instead of a switch and explain themselves in a toast.
+- **Check row:** 48px Surface row (20px radius), 24px circle: Hairline off, Slate with white check on, Slate Mist with Slate check when locked. May fill with the space color when on (대청소). List style (`list`): no fill while off, so checking paints the row in the space color. `checkColor`: on-circle in the space ink with no row fill (추천 항목 확인). 공간 설정 rows use the space-colored row pattern with a `필수` chip for 욕실·주방.
 
 ### Navigation
 - **Header:** White Page, 54px. Tab-root variant (홈 · 공간 · 기록 · 히스토리 · 가이드; title = tab name, Home shows "뽀득뽀득"): Ink `bb-title` left (Home: 28px round brand logo first, 8px gap), account icon (Muted, 44px) right to 내 정보. Sub-page variant: Slate back chevron (44px, falls back to /home on direct entry), centered Ink `bb-label` title, decorative "more" or an empty 44px spacer on the right.
@@ -384,14 +386,15 @@ Korean, soft 해요체, short. Color and copy describe care, never judgment.
 - **Fade stage labels (from `FADE_STAGES`, one wording app-wide):** 100% `최근 관리했어요`, 72% `잘 유지되고 있어요`, 48% `슬슬 다시 볼 때예요`, 28% `한번 관리해볼까요?`.
 - **Space names:** core spaces are 욕실 · 주방 · 거실 · 방. Expansion spaces default to `공간1`, `공간2`, `공간3` until the user names them.
 - **Banned words:** 미완료, 실패, 지연, overdue, 위험, 더러움. No cleanliness scores or completion percentages shown to users.
-- **Price:** the one expansion price comes from `SPACE_PRICE_KRW` (3,000원); never hard-code it in copy. Show it at low hierarchy on entry (caption) and clearly on the confirm dialog's pay button.
+- **Price:** the one expansion price comes from `SPACE_PRICE_KRW`; never hard-code it in copy. **Price not final (2026-10-16):** while `SPACE_PRICE_FINAL` is false no screen shows an amount (dialog button reads `결제하기`); flip it to true before launch so the confirm dialog shows the amount again.
+- **Titles:** one line (see Typography). Login opens with the brand block `색으로 채우는 나의 청소 기록 / 뽀득뽀득`, centered, under the five-pastel strip (`AuthHero`, also on 회원가입).
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** use `GlassButton` for every filled CTA (56 primary / 52 secondary), and the 44px Slate text link for everything lighter.
 - **Do** derive every space fill from `getSpace` / `spaceColor` and every water level from `spaceFade` / `itemFade` (background via `waterBase`), keeping icons and text at 100%.
-- **Do** use Slate with white labels for every button, switch, check and non-space selection; use the space color for space chips.
+- **Do** use Slate with white labels for every button, switch, check and selection chip (space chips included); keep space color for content (tiles, rows, cards, art).
 - **Do** use `sky-surface` for cards/rows/chips and `sky-bg` for page, header, nav, dialog and fields; `sky-white` is literal white, not a surface.
 - **Do** keep 24px gutters, 12px block gaps, 44px minimum targets, and `pb-nav` on every screen with the bottom nav.
 - **Do** reuse `ItemRow`, `SpaceTile`, `SwitchRow`, `CheckRow`, `PageIntro`, `Pill`, `Dialog`, `Toast`/`useRouteToast` before writing a new row, card or modal.
