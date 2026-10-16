@@ -130,6 +130,36 @@ export const ObjectHoodIcon: IconComponent = (props) => (
   </svg>
 );
 
+export const ObjectDishRackIcon: IconComponent = (props) => (
+  <svg viewBox="0 0 46 46" width="1.2em" height="1.2em" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <circle cx="16" cy="21" r="12" fill="white" {...strokeProps} />
+    <circle cx="16" cy="21" r="6" fill={tint} {...strokeProps} />
+    <path d="M29 18H39L37.5 32H30.5L29 18Z" fill={tint} {...strokeProps} />
+    <path d="M3 33H43V38C43 40 41.5 41.5 39.5 41.5H6.5C4.5 41.5 3 40 3 38V33Z" fill="white" {...strokeProps} />
+    <path d="M10 37H36" fill="none" {...strokeProps} strokeDasharray="2.5 3.5" />
+  </svg>
+);
+
+export const ObjectFridgeIcon: IconComponent = (props) => (
+  <svg viewBox="0 0 46 46" width="1.2em" height="1.2em" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <rect x="9" y="1.5" width="28" height="43" rx="5" fill="white" {...strokeProps} />
+    <path d="M9 17H37" fill="none" {...strokeProps} />
+    <rect x="12.5" y="20.5" width="21" height="20.5" rx="2.5" fill={tint} stroke="none" />
+    <path d="M14.5 7V12M14.5 22V30" fill="none" {...strokeProps} strokeWidth={3} />
+    <path d="M27 9.5C25.6 11.5 25.6 12.8 27 12.8C28.4 12.8 28.4 11.5 27 9.5Z" fill={accent} {...strokeProps} />
+  </svg>
+);
+
+export const ObjectFoodBinIcon: IconComponent = (props) => (
+  <svg viewBox="0 0 46 46" width="1.2em" height="1.2em" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path d="M18 7.5C18 4.5 28 4.5 28 7.5" fill="none" {...strokeProps} />
+    <rect x="6" y="8" width="34" height="7" rx="2.5" fill="white" {...strokeProps} />
+    <path d="M9 15H37L34.5 40C34.3 42 32.8 43.5 30.8 43.5H15.2C13.2 43.5 11.7 42 11.5 40L9 15Z" fill={tint} {...strokeProps} />
+    <path d="M23 23C18.5 26 18.5 32 23 35C27.5 32 27.5 26 23 23Z" fill={accent} {...strokeProps} />
+    <path d="M23 26V35" fill="none" {...strokeProps} />
+  </svg>
+);
+
 export const ObjectShelfIcon: IconComponent = (props) => (
   <svg viewBox="0 0 46 46" width="1.2em" height="1.2em" xmlns="http://www.w3.org/2000/svg" {...props}>
     <rect x="7" y="11" width="6.5" height="19" rx="1.2" fill={tint} {...strokeProps} />

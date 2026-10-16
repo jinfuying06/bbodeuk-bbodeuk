@@ -93,6 +93,10 @@ const CATALOG: CatalogItem[] = [
   { id: "sink", name: "싱크대", space: "kitchen", intervalDays: 3, icon: "object-kitchen-sink" },
   { id: "countertop", name: "조리대", space: "kitchen", intervalDays: 5, icon: "object-countertop" },
   { id: "hood", name: "후드 필터", space: "kitchen", intervalDays: 21, hiddenCare: true, icon: "object-hood" },
+  // 2026-10-16: kitchen 3 → 6 items, same ids as the AI item library.
+  { id: "dish-rack", name: "식기건조대", space: "kitchen", intervalDays: 5, icon: "object-dish-rack" },
+  { id: "fridge-interior", name: "냉장고", fullName: "냉장고 내부", space: "kitchen", intervalDays: 14, icon: "object-fridge" },
+  { id: "food-trash-bin", name: "음식물 쓰레기통", space: "kitchen", intervalDays: 3, hiddenCare: true, icon: "object-food-bin" },
   { id: "living-floor", name: "바닥", fullName: "거실 바닥", space: "living", intervalDays: 7, icon: "object-floor" },
   { id: "shelf", name: "선반", space: "living", intervalDays: 7, icon: "object-shelf" },
   { id: "air-filter", name: "공기청정기", space: "living", intervalDays: 30, hiddenCare: true, icon: "object-air-purifier" },
@@ -189,6 +193,9 @@ const SEED: Array<[string, number, string]> = [
   ["sink", 13, "19:20"],
   ["countertop", 3, "21:10"],
   ["hood", 12, "11:30"],
+  ["dish-rack", 3, "20:30"],
+  ["fridge-interior", 8, "14:00"],
+  ["food-trash-bin", 2, "21:20"],
   // 욕실 — close to the 7-day cycle → ~48%
   ["basin", 6, "20:10"],
   ["basin", 13, "19:50"],
