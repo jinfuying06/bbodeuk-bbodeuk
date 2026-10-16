@@ -29,7 +29,7 @@ export default function WaterFill({ direction, level, color, phase = 0, soft = f
       className={`water-fill water-fill-${direction}`}
       style={
         soft
-          ? { ...size, backgroundImage: `linear-gradient(${direction === "up" ? "to top" : "to right"}, ${color} 0%, ${color} max(0%, calc(100% - 40px)), color-mix(in srgb, ${color} 0%, transparent) 100%)` }
+          ? { ...size, backgroundImage: `linear-gradient(${direction === "up" ? "to top" : "to right"}, ${color} 0%, ${color} max(0%, calc(100% - 16px)), color-mix(in srgb, ${color} 0%, transparent) 100%)` }
           : { ...size, backgroundColor: color }
       }
     >
