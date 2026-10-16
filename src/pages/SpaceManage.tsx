@@ -145,9 +145,8 @@ export default function SpaceManage() {
         <p className="text-bb-caption text-sky-muted">* 욕실과 주방은 기본 관리 공간이에요.</p>
 
         <section className="flex flex-col gap-2 rounded-3xl bg-sky-tint px-5 pb-4 pt-4">
-          <h2 className="text-bb-title text-sky-ink">공간을 조금 더 넓혀볼까요?</h2>
-          <p className="text-bb-body text-sky-muted">베란다·드레스룸 같은 공간을 더할 수 있어요.</p>
-          <p className="text-bb-caption text-sky-muted">공간 1개 {SPACE_PRICE_KRW.toLocaleString()}원 · 한 번 결제로 계속 사용</p>
+          <h2 className="text-bb-title text-sky-ink">공간을 더 넓혀볼까요?</h2>
+          <p className="text-bb-body text-sky-muted">베란다 같은 공간을 더할 수 있어요.</p>
         </section>
 
         {nextExpansion ? (

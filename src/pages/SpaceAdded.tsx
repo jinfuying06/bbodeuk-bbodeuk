@@ -6,7 +6,6 @@ import ItemRow from "../components/ItemRow";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import { getItems, getSpace, isSpaceKey } from "../data/cleaning";
-import { SPACE_PRICE_KRW } from "../features/payments/prices";
 import { particle } from "../data/josa";
 
 /** Figma 34:2025 `43 / 공간 추가 완료` — reached from 공간 관리 after confirming 32:1012. */
@@ -29,13 +28,6 @@ export default function SpaceAdded() {
         </div>
 
         <ItemRow height={72} space={space.key} sub={getItems(space.key).map((item) => item.name).join(" · ")} title={space.label} to={`/space-info?space=${space.key}`} />
-
-        <section className="flex flex-col gap-2 rounded-3xl bg-sky-tint px-5 pb-4 pt-4">
-          <h2 className="text-bb-title text-sky-ink">결제 완료</h2>
-          <p className="text-bb-body text-sky-muted">
-            {SPACE_PRICE_KRW.toLocaleString()}원 결제로 {space.label}{particle(space.label, "을/를")} 열었어요.
-          </p>
-        </section>
 
         <GlassButton className="w-full" to="/spaces">
           내 공간으로 돌아가기
