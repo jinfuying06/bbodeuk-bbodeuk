@@ -46,7 +46,7 @@ export default function Login() {
             </>
           ) : (
             // App start screen: brand line instead of a greeting (2026-10-16).
-            <h1 className="flex flex-col gap-1 pb-5">
+            <h1 className="flex flex-col items-center gap-1 pb-5 text-center">
               <span className="text-bb-body text-sky-muted">색으로 채우는 나의 청소 기록</span>
               <span className="text-[32px] font-bold leading-[40px] text-sky-ink">뽀득뽀득</span>
             </h1>
