@@ -55,10 +55,7 @@ export default function Spaces() {
                         to={`/item-info?item=${item.id}`}
                       >
                         <WaterFill direction="right" level={fade} color={space.color} phase={index} />
-                        <span className="relative flex min-w-0 items-center gap-2">
-                          <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: space.iconColor }} />
-                          <span className="truncate text-bb-label text-sky-ink">{item.name}</span>
-                        </span>
+                        <span className="relative min-w-0 truncate text-bb-label text-sky-ink">{item.name}</span>
                         <span className={`relative shrink-0 pl-2 text-bb-caption ${metaTextOnFill(space.key)}`}>{formatRecency(lastRecord(item.id, records)?.at, { short: true })}</span>
                       </Link>
                     );
