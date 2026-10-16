@@ -9,7 +9,7 @@ import PageShell from "../components/PageShell";
 import SpaceExpansionDialog from "../components/SpaceExpansionDialog";
 import SwitchRow from "../components/Switch";
 import Toast, { useToast } from "../components/Toast";
-import { SPACES } from "../data/cleaning";
+import { SPACES, spaceColor } from "../data/cleaning";
 import { isOrderRecorded, isSpacePurchased, recordSpacePurchase } from "../data/purchases";
 import { SPACE_PRICE_KRW } from "../features/payments/prices";
 import {
@@ -139,12 +139,22 @@ export default function SpaceManage() {
         <PageIntro title="내 집에 맞게 관리해요" body="필요한 공간만 켜두세요." className="pb-6" />
 
         {rows.map((row) => (
-          <SwitchRow key={row.key} label={row.label} locked={row.locked} on={row.locked || setup.spaces.includes(row.key)} onToggle={() => toggle(row.key)} />
+          <SwitchRow
+            key={row.key}
+            label={row.label}
+            locked={row.locked}
+            on={row.locked || setup.spaces.includes(row.key)}
+            space={spaceKeyFor(row.key)}
+            onLockedTap={() => showToast("욕실과 주방은 꼭 필요한 공간이에요")}
+            onToggle={() => toggle(row.key)}
+          />
         ))}
 
-        <p className="text-bb-caption text-sky-muted">* 욕실과 주방은 기본 관리 공간이에요.</p>
-
-        <section className="flex flex-col gap-2 rounded-3xl bg-sky-tint px-5 pb-4 pt-4">
+        {/* Expansion card in the color of the space it offers (2026-10-16), at 50% like the guide card. */}
+        <section
+          className="mt-3 flex flex-col gap-2 rounded-3xl px-5 pb-4 pt-4"
+          style={{ backgroundColor: spaceColor(nextExpansion ? spaceKeyFor(nextExpansion.key) : "terrace", 0.5) }}
+        >
           <h2 className="text-bb-title text-sky-ink">공간을 더 넓혀볼까요?</h2>
           <p className="text-bb-body text-sky-muted">베란다 같은 공간을 더할 수 있어요.</p>
         </section>
