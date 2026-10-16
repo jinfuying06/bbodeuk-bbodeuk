@@ -5,17 +5,14 @@ import Icon from "../components/Icon";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
-import { getSpace, isRecordedToday, objectArtVars, spaceColor, toggleTodayRecord, useRecords } from "../data/cleaning";
+import { getItem, getSpace, isRecordedToday, objectArtVars, spaceColor, toggleTodayRecord, useRecords } from "../data/cleaning";
 import { GUIDES } from "../data/guides";
-
-// Figma reuses bath object art as placeholder 준비물 tiles (바닥/배수구/거울).
-const materialArt = ["object-floor", "object-drain", "object-mirror"];
 
 export default function CareAction() {
   const [searchParams] = useSearchParams();
   const guide = GUIDES.find((entry) => entry.id === searchParams.get("item")) ?? GUIDES[0];
   const space = getSpace(guide.space);
-  const title = `${space.label} · ${guide.title}`;
+  const item = getItem(guide.id);
   const recorded = isRecordedToday(guide.id, useRecords());
   const [toast, showToast] = useToast();
 
@@ -24,57 +21,47 @@ export default function CareAction() {
 
   return (
     <PageShell>
-      <AppHeader title={title} back="/care" />
+      <AppHeader title="청소 가이드" back="/care" />
+      {/* 2026-10-16 layout: item art hero → 준비물 chips → numbered steps (the main block) → record. Same for every guide. */}
       <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header" style={objectArtVars(space.key, "filled")}>
-        <PageIntro title={title} body={guide.intro} />
+        <PageIntro title={guide.title} body={`${space.label} · 약 ${guide.minutes}분 · 가벼운 청소`} />
 
-        {guide.id === "basin" ? (
-          <div className="flex h-[116px] items-center justify-center rounded-2xl" style={{ backgroundColor: space.color }}>
-            <Icon name="object-sink" className="text-[70px]" />
-          </div>
-        ) : null}
+        <div className="flex h-[132px] items-center justify-center rounded-3xl" style={{ backgroundColor: spaceColor(space.key, 0.5) }}>
+          <Icon name={item?.icon ?? space.icon} className="text-[64px]" />
+        </div>
 
-        <ul aria-label="준비물" className="flex gap-[10px] pb-3">
-          {guide.materials.map((label, index) => (
-            // 2026-10-16: whole card in the space color at 50% (was grey + colored border), art on a white tile.
-            <li key={label} className="flex h-[104px] flex-1 flex-col items-center justify-center gap-1.5 rounded-row" style={{ backgroundColor: spaceColor(space.key, 0.5) }}>
-              <span className="flex h-[52px] w-[52px] items-center justify-center rounded-row-sm bg-sky-white/80">
-                <Icon name={materialArt[index]} className="text-[34px]" />
-              </span>
-              <span className="w-[88px] text-center text-bb-caption font-medium text-sky-ink">{label}</span>
-            </li>
-          ))}
-        </ul>
+        <section aria-label="준비물" className="flex flex-col gap-2 pt-3">
+          <h2 className="text-bb-label text-sky-ink">준비물</h2>
+          <ul className="flex flex-wrap gap-2">
+            {guide.materials.map((label) => (
+              <li key={label} className="rounded-full bg-sky-surface px-3 py-1.5 text-bb-label-sm text-sky-ink">
+                {label}
+              </li>
+            ))}
+          </ul>
+        </section>
 
-        {/* Steps as a plain list with hairlines (2026-10-16), like the other lists. */}
-        <ol className="flex flex-col divide-y divide-sky-line">
-          {guide.steps.map(([stepTitle, desc], index) =>
-            // 15 세면대 keeps its own (older) 78px step card; 40/41/42 use the 94px one.
-            guide.id === "basin" ? (
-              <li key={stepTitle} className="flex min-h-[72px] items-center gap-3 py-3">
-                <span className="text-bb-title text-sky-deep">{`0${index + 1}`}</span>
-                <span className="flex min-w-0 flex-col gap-1 self-start">
-                  <h2 className="text-bb-label text-sky-ink">{stepTitle}</h2>
-                  <span className="text-bb-caption text-sky-muted">{desc}</span>
+        <section aria-label="청소 단계" className="flex flex-col pt-3">
+          <h2 className="pb-1 text-bb-label text-sky-ink">이렇게 해요</h2>
+          <ol className="flex flex-col divide-y divide-sky-line">
+            {guide.steps.map(([stepTitle, desc], index) => (
+              <li key={stepTitle} className="flex gap-3 py-4">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-tint text-bb-label-sm font-bold text-sky-deep">{index + 1}</span>
+                <span className="flex min-w-0 flex-col gap-1 pt-0.5">
+                  <h3 className="text-bb-label font-bold text-sky-ink">{stepTitle}</h3>
+                  <p className="text-bb-caption text-sky-muted">{desc}</p>
                 </span>
               </li>
-            ) : (
-              <li key={stepTitle} className="flex min-h-[80px] flex-col gap-1.5 py-4">
-                <h2 className="whitespace-pre text-bb-title text-sky-ink">{`0${index + 1}  ${stepTitle}`}</h2>
-                <p className="text-bb-body text-sky-muted">{desc}</p>
-              </li>
-            ),
-          )}
-        </ol>
+            ))}
+          </ol>
+        </section>
 
         <GlassButton variant={recorded ? "secondary" : "primary"} aria-pressed={recorded} onClick={toggle}>
           {recorded ? "오늘 기록했어요 · 기록 취소" : "청소했어요 · 기록하기"}
         </GlassButton>
-        {guide.id === "basin" ? (
-          <Link className="text-link" to="/care">
-            다른 청소법 보기
-          </Link>
-        ) : null}
+        <Link className="text-link" to="/care">
+          다른 청소법 보기
+        </Link>
       </main>
       <Toast message={toast} visible={Boolean(toast)} />
     </PageShell>
