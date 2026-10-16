@@ -10,7 +10,7 @@ import ShineOverlay from "../components/ShineOverlay";
 import SpaceTile from "../components/SpaceTile";
 import { addRecord, formatRecency, getActiveSpaces, getItems, itemStaleness, lastRecord, useRecords, type Item } from "../data/cleaning";
 
-/** Per space: the 2 spots most worth a look — 숨은 관리 first, then the stalest. */
+/** Per space: the 2 spots most worth a look — 숨은 관리 first (internal priority only, never shown as a badge since 2026-10-16), then the stalest. */
 const PICKS = 2;
 
 /** Figma 16 / 주말 대청소 (30:933). */
@@ -116,7 +116,7 @@ export default function WeekendBigClean() {
                         on={done}
                         onClick={() => toggle(item)}
                         overlay={shine[item.id] ? <ShineOverlay n={shine[item.id]} sparkleClass="right-3 top-1.5 text-[18px]" sweepClass="-left-[120px] -top-[30px] h-[110px] w-[80px]" /> : null}
-                        trailing={<span className="shrink-0 text-right text-bb-caption text-sky-muted">{item.hiddenCare ? `숨은 관리 · ${recency}` : recency}</span>}
+                        trailing={<span className="shrink-0 text-right text-bb-caption text-sky-muted">{recency}</span>}
                       />
                     );
                   })}

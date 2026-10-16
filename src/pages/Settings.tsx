@@ -54,7 +54,6 @@ export default function Settings() {
         <h2 className="text-bb-title text-sky-ink">추천과 알림</h2>
         <SettingSwitch label="기본 추천 사용" defaultOn />
         <SettingSwitch label="부드러운 추천 알림" defaultOn={false} />
-        <SettingSwitch label="숨은 관리 발견" defaultOn />
 
         <NavRow to="/help" label="도움말·서비스 정보" />
         <button className={navRow} type="button" onClick={() => setConfirmReset(true)}>
