@@ -1,8 +1,4 @@
 import { useEffect, useState } from "react";
-
-type CardFill = "water" | "soft" | "tint";
-/** Home card recency look (2026-10-17 comparison). `?card=` overrides. */
-const DEFAULT_CARD: CardFill = "water";
 import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import GlassButton from "../components/GlassButton";
@@ -22,7 +18,6 @@ import {
   lastRecord,
   metaTextOnFill,
   spaceFade,
-  spaceFill,
   waterBase,
   todaysRecords,
   useRecords,
@@ -66,9 +61,7 @@ export default function Home() {
   const allRecords = useRecords();
   const [toast] = useRouteToast();
   // `?state=empty` previews Figma 31:791 (첫 기록 전 홈) from 44/상태 미리보기 without touching real records.
-  const [params, setParams] = useSearchParams();
-  const cardParam = params.get("card");
-  const cardFill: CardFill = cardParam === "soft" || cardParam === "tint" || cardParam === "water" ? cardParam : DEFAULT_CARD;
+  const [params] = useSearchParams();
   const records = params.get("state") === "empty" ? [] : allRecords;
   const spaces = getActiveSpaces();
   const spaceKeys = new Set<string>(spaces.map((space) => space.key));
@@ -135,10 +128,10 @@ export default function Home() {
                 <Link
                   key={space.key}
                   className={`press relative flex h-[110px] flex-col justify-end gap-[3px] overflow-hidden rounded-2xl bg-sky-surface px-4 py-[14px] ${wide ? "col-span-2" : ""}`}
-                  style={{ backgroundColor: cardFill === "tint" ? (fade > 0 ? spaceFill(space.key, fade) : undefined) : waterBase(space.key, fade) }}
+                  style={{ backgroundColor: waterBase(space.key, fade) }}
                   to={`/quick-record?filter=space&space=${space.key}`}
                 >
-                  {cardFill === "tint" ? null : <WaterFill direction="up" level={fade} color={space.color} phase={index} soft={cardFill === "soft"} />}
+                  <WaterFill direction="up" level={fade} color={space.color} phase={index} />
                   <span className="absolute right-4 top-[14px]" style={{ color: space.iconColor }}>
                     <Icon name={space.icon} className="block text-[43.2px]" />
                   </span>
@@ -208,25 +201,6 @@ export default function Home() {
         </section>
       </main>
       <Toast message={toast} visible={Boolean(toast)} />
-      {/* Review-only switch, compiled in only when VITE_REVIEW=1. */}
-      {import.meta.env.VITE_REVIEW === "1" ? (
-        <div className="fixed bottom-24 right-4 z-50 flex rounded-full bg-sky-ink/85 p-1 text-[12px] text-sky-white shadow-lg">
-          {([["water", "A 물"], ["soft", "B 부드러운 물"], ["tint", "C 색 바램"]] as const).map(([key, label]) => (
-            <button
-              key={key}
-              className={`rounded-full px-2.5 py-1 ${cardFill === key ? "bg-sky-white text-sky-ink" : ""}`}
-              type="button"
-              onClick={() => {
-                const next = new URLSearchParams(params);
-                next.set("card", key);
-                setParams(next, { replace: true });
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      ) : null}
     </PageShell>
   );
 }

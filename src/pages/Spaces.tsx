@@ -5,20 +5,13 @@ import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
-import WaterFill from "../components/WaterFill";
 import SpaceTile from "../components/SpaceTile";
-import { formatRecency, getActiveSpaces, getItems, isSpaceKey, itemFade, lastRecord, metaTextOnFill, spaceFill, useRecords, waterBase, type SpaceKey } from "../data/cleaning";
-
-type RowFill = "water" | "tint";
-/** Recency look of item rows (2026-10-17 comparison): water level vs whole-row color that fades. `?fill=` overrides. */
-const DEFAULT_FILL: RowFill = "tint"; // 2026-10-17: B 색 바램 chosen — rows no longer read like progress bars.
+import { formatRecency, getActiveSpaces, getItems, isSpaceKey, itemFade, lastRecord, metaTextOnFill, spaceFill, useRecords, type SpaceKey } from "../data/cleaning";
 
 export default function Spaces() {
   const records = useRecords();
   const spaces = getActiveSpaces();
-  const [params, setParams] = useSearchParams();
-  const requested = params.get("space");
-  const fillMode: RowFill = params.get("fill") === "tint" ? "tint" : params.get("fill") === "water" ? "water" : DEFAULT_FILL;
+  const requested = useSearchParams()[0].get("space");
   const [open, setOpen] = useState<SpaceKey | null>(isSpaceKey(requested) && spaces.some((space) => space.key === requested) ? requested : spaces[0]?.key ?? null);
 
   return (
@@ -50,17 +43,17 @@ export default function Spaces() {
 
               {expanded ? (
                 <div id={`space-panel-${space.key}`} className="flex flex-col gap-2 pb-4 pl-[52px]">
-                  {items.map((item, index) => {
+                  {items.map((item) => {
                     const fade = itemFade(item, records);
                     return (
                       <Link
                         key={item.id}
                         // Never-recorded rows: faint Surface so the row still reads as a row on the white page.
                         className="press relative flex h-11 items-center justify-between overflow-hidden rounded-xl bg-sky-surface px-[10px] transition-colors duration-500"
-                        style={{ backgroundColor: fillMode === "tint" ? (fade > 0 ? spaceFill(space.key, fade) : undefined) : waterBase(space.key, fade) }}
+                        // Recency as the row color fading (2026-10-17): whole row at the fade level, no water bar (read like progress bars).
+                        style={{ backgroundColor: fade > 0 ? spaceFill(space.key, fade) : undefined }}
                         to={`/item-info?item=${item.id}`}
                       >
-                        {fillMode === "water" ? <WaterFill direction="right" level={fade} color={space.color} phase={index} /> : null}
                         <span className="relative min-w-0 truncate text-bb-label text-sky-ink">{item.name}</span>
                         <span className={`relative shrink-0 pl-2 text-bb-caption ${metaTextOnFill(space.key)}`}>{formatRecency(lastRecord(item.id, records)?.at, { short: true })}</span>
                       </Link>
