@@ -210,12 +210,15 @@ export default function Welcome() {
                 })}
               </ul>
             </section>
-            <GlassButton size={52} to="/login">
-              로그인하기
-            </GlassButton>
-            <GlassButton size={52} variant="secondary" onClick={goSetup}>
-              게스트 모드로 시작하기
-            </GlassButton>
+            {/* The two start choices read as one pair (2026-10-16). */}
+            <div className="flex flex-col gap-2">
+              <GlassButton size={52} to="/login">
+                로그인하기
+              </GlassButton>
+              <GlassButton size={52} variant="secondary" onClick={goSetup}>
+                게스트 모드로 시작하기
+              </GlassButton>
+            </div>
             <Caption lines={["게스트도 공간을 고르고 청소를 기록할 수 있어요.", "기본 공간은 무료로 쓸 수 있어요."]} />
             <GlassButton size={52} variant="secondary" onClick={() => setStep(0)}>
               체험 다시 보기
