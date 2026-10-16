@@ -43,12 +43,13 @@ function DemoCard() {
   return (
     <button
       aria-pressed={recorded}
-      className="press relative flex h-[210px] w-[250px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-sky-line bg-sky-surface pl-[14px] pt-2 transition-[background-color,transform] duration-300"
-      style={{ backgroundColor: recorded ? BATH.color : undefined }}
+      className="press relative flex h-[210px] w-[250px] flex-col items-center justify-center overflow-hidden rounded-2xl pl-[14px] pt-2 transition-[background-color,transform] duration-300"
+      // Starts as a faint 욕실 tint (not grey) so the tap visibly fills it with the full color (2026-10-16).
+      style={{ backgroundColor: recorded ? BATH.color : mix(BATH.color, 30) }}
       type="button"
       onClick={tap}
     >
-      <span className="flex h-[62px] w-[76px] items-center justify-center">
+      <span className="flex h-[62px] w-[76px] items-center justify-center" style={{ color: BATH.iconColor }}>
         <Icon className="text-[43px]" name="object-sink" />
       </span>
       <span className="text-bb-label text-sky-ink">세면대</span>
@@ -191,19 +192,16 @@ export default function Welcome() {
               label="나에게 맞는 시작  ·  3 / 3"
               title={["이제, 내 공간을", "가볍게 돌봐요."]}
             />
-            <section className="flex h-[184px] flex-col gap-3 rounded-2xl bg-sky-surface p-5">
+            <section className="flex flex-col gap-4 py-3">
               <h2 className="text-bb-title text-sky-ink">네 가지 기본 공간은 무료예요</h2>
               <ul className="flex justify-between">
                 {START_SPACES.map((key) => {
                   const space = getSpace(key);
                   return (
                     <li key={key} className="flex w-[60px] flex-col items-center gap-1">
-                      {/* Figma draws 욕실 at full colour (r14) and the rest at 28% (r12). */}
-                      <span
-                        className={`flex h-10 w-10 items-center justify-center ${key === "bathroom" ? "rounded-tile" : "rounded-xl"}`}
-                        style={{ backgroundColor: key === "bathroom" ? space.color : mix(space.color, 28), color: space.iconColor }}
-                      >
-                        <Icon className="text-[24px]" name={space.icon} />
+                      {/* All four at full color (2026-10-16; Figma had only 욕실 full). */}
+                      <span className="flex h-14 w-14 items-center justify-center rounded-2xl" style={{ backgroundColor: space.color, color: space.iconColor }}>
+                        <Icon className="text-[30px]" name={space.icon} />
                       </span>
                       <span className="text-[12px] leading-[22px] text-sky-ink">
                         {key === "bedroom" ? "방" : space.label}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import AuthHero from "../components/AuthHero";
 import GlassButton from "../components/GlassButton";
 import PageShell from "../components/PageShell";
 import Toast, { useToast } from "../components/Toast";
@@ -37,6 +38,7 @@ export default function Login() {
       <AppHeader back="/welcome" right={null} title={error ? "로그인 확인" : "로그인"} />
       <main className="pt-header-flow">
         <form className="flex flex-col gap-3 px-margin-screen pb-5" noValidate onSubmit={submit}>
+          <AuthHero />
           <h1 className="text-bb-heading text-sky-ink">{error ? "입력한 정보를 확인해 주세요" : "다시 만나 반가워요"}</h1>
           <p className="text-bb-body text-sky-muted">
             {error ? "이메일 또는 비밀번호가 맞지 않아요. 다시 확인해 주세요." : "오늘의 작은 청소를 이어가요."}

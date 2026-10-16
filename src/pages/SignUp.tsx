@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import AuthHero from "../components/AuthHero";
 import CheckRow from "../components/CheckRow";
 import GlassButton from "../components/GlassButton";
 import PageShell from "../components/PageShell";
@@ -56,6 +57,7 @@ export default function SignUp() {
       <AppHeader back="/login" right={null} title="회원가입" />
       <main className="pt-header-flow">
         <form className="flex flex-col gap-2 px-margin-screen pb-5" onSubmit={submit}>
+          <AuthHero />
           <h1 className="text-bb-heading text-sky-ink">작은 청결 관리를 시작해요</h1>
           <p className="text-bb-body text-sky-muted">예시 입력 · 필수 항목에 동의하면 시작할 수 있어요.</p>
 
