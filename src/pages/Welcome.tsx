@@ -193,16 +193,16 @@ export default function Welcome() {
             />
             <section className="flex flex-col gap-4 py-3">
               <h2 className="text-bb-title text-sky-ink">네 가지 기본 공간은 무료예요</h2>
-              <ul className="flex justify-between">
+              <ul className="grid grid-cols-4 gap-2.5">
                 {START_SPACES.map((key) => {
                   const space = getSpace(key);
                   return (
-                    <li key={key} className="flex w-[60px] flex-col items-center gap-1">
+                    <li key={key} className="flex flex-col items-center gap-1.5">
                       {/* All four at full color (2026-10-16; Figma had only 욕실 full). */}
-                      <span className="flex h-14 w-14 items-center justify-center rounded-2xl" style={{ backgroundColor: space.color, color: space.iconColor }}>
-                        <Icon className="text-[30px]" name={space.icon} />
+                      <span className="flex aspect-square w-full items-center justify-center rounded-2xl" style={{ backgroundColor: space.color, color: space.iconColor }}>
+                        <Icon className="text-[38px]" name={space.icon} />
                       </span>
-                      <span className="text-[12px] leading-[22px] text-sky-ink">
+                      <span className="text-bb-label text-sky-ink">
                         {key === "bedroom" ? "방" : space.label}
                       </span>
                     </li>
