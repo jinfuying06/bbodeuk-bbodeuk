@@ -6,6 +6,7 @@ import CheckRow from "../components/CheckRow";
 import GlassButton from "../components/GlassButton";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
+import ShineOverlay from "../components/ShineOverlay";
 import SpaceTile from "../components/SpaceTile";
 import { addRecord, formatRecency, getActiveSpaces, getItems, itemStaleness, lastRecord, useRecords, type Item } from "../data/cleaning";
 
@@ -28,13 +29,39 @@ export default function WeekendBigClean() {
           .map(({ item }) => item),
       })),
   );
-  const [open, setOpen] = useState<string | null>(groups[0]?.space.key ?? null);
+  // Every space open by default (2026-10-16): a big clean is scanned as a whole, not one space at a time.
+  const [closed, setClosed] = useState<Set<string>>(new Set());
   const [checked, setChecked] = useState<Set<string>>(new Set());
+  // Per-item replay counter for the glass sweep (same feedback as 기록).
+  const [shine, setShine] = useState<Record<string, number>>({});
+  const allItems = groups.flatMap(({ items }) => items);
+  const allChecked = allItems.length > 0 && allItems.every((item) => checked.has(item.id));
 
-  const toggle = (item: Item) =>
+  const flash = (ids: string[]) => setShine((current) => Object.fromEntries([...Object.entries(current), ...ids.map((id) => [id, (current[id] ?? 0) + 1])]));
+
+  const toggle = (item: Item) => {
+    const turningOn = !checked.has(item.id);
     setChecked((current) => {
       const next = new Set(current);
       if (!next.delete(item.id)) next.add(item.id);
+      return next;
+    });
+    if (turningOn) flash([item.id]);
+  };
+
+  const toggleAll = () => {
+    if (allChecked) {
+      setChecked(new Set());
+      return;
+    }
+    flash(allItems.filter((item) => !checked.has(item.id)).map((item) => item.id));
+    setChecked(new Set(allItems.map((item) => item.id)));
+  };
+
+  const toggleOpen = (key: string) =>
+    setClosed((current) => {
+      const next = new Set(current);
+      if (!next.delete(key)) next.add(key);
       return next;
     });
 
@@ -51,7 +78,7 @@ export default function WeekendBigClean() {
         <PageIntro title="오래 안 본 곳부터 가볍게" body="숨은 관리 자리도 함께 챙겨요." className="pb-3" />
 
         {groups.map(({ space, items }) => {
-          const isOpen = open === space.key;
+          const isOpen = !closed.has(space.key);
           const panelId = `deep-clean-${space.key}`;
           return (
             // Same list-style accordion as 내 공간 (2026-10-15).
@@ -61,7 +88,7 @@ export default function WeekendBigClean() {
                 aria-expanded={isOpen}
                 className="press flex h-[72px] items-center gap-3 text-left"
                 type="button"
-                onClick={() => setOpen(isOpen ? null : space.key)}
+                onClick={() => toggleOpen(space.key)}
               >
                 <SpaceTile space={space.key} />
                 <span className="flex min-w-0 flex-1 flex-col">
@@ -88,6 +115,7 @@ export default function WeekendBigClean() {
                         label={item.name}
                         on={done}
                         onClick={() => toggle(item)}
+                        overlay={shine[item.id] ? <ShineOverlay n={shine[item.id]} sparkleClass="right-3 top-1.5 text-[18px]" sweepClass="-left-[120px] -top-[30px] h-[110px] w-[80px]" /> : null}
                         trailing={<span className="shrink-0 text-right text-bb-caption text-sky-muted">{item.hiddenCare ? `숨은 관리 · ${recency}` : recency}</span>}
                       />
                     );
@@ -101,9 +129,14 @@ export default function WeekendBigClean() {
 
       {/* Fixed 대청소 종료 bar, sitting right above the bottom nav (72px + safe area). */}
       <div className="bottom-nav fixed left-1/2 z-40 w-full max-w-[430px] -translate-x-1/2 bg-sky-bg px-margin-screen py-3">
-        <GlassButton size={52} onClick={finish}>
-          오늘의 대청소 종료
-        </GlassButton>
+        <div className="flex flex-col gap-2">
+          <GlassButton size={52} variant="secondary" onClick={toggleAll}>
+            {allChecked ? "모두 해제하기" : "모두 체크하기"}
+          </GlassButton>
+          <GlassButton size={52} onClick={finish}>
+            오늘의 대청소 종료
+          </GlassButton>
+        </div>
       </div>
     </PageShell>
   );

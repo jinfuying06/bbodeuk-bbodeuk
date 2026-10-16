@@ -14,15 +14,17 @@ type CheckRowProps = {
   list?: boolean;
   /** On-state check circle color (e.g. the space ink) instead of Slate. */
   checkColor?: string;
+  /** Absolutely positioned decoration inside the row (e.g. <ShineOverlay>). */
+  overlay?: ReactNode;
 };
 
 /** Sky / Check row (Figma 25:155): 48px Surface row, 24px check circle (off = sky-line, on = sky-deep). */
-export default function CheckRow({ label, on, onClick, locked = false, fill, trailing, list = false, checkColor }: CheckRowProps) {
+export default function CheckRow({ label, on, onClick, locked = false, fill, trailing, list = false, checkColor, overlay }: CheckRowProps) {
   return (
     <button
       aria-disabled={locked || undefined}
       aria-pressed={on}
-      className={`press flex h-12 items-center gap-3 rounded-2xl pl-3 pr-4 text-left transition-colors duration-300 ${list ? "" : "bg-sky-surface"}`}
+      className={`press relative flex h-12 items-center gap-3 overflow-hidden rounded-2xl pl-3 pr-4 text-left transition-colors duration-300 ${list ? "" : "bg-sky-surface"}`}
       style={on && fill ? { backgroundColor: fill } : undefined}
       type="button"
       onClick={locked ? undefined : onClick}
@@ -36,6 +38,7 @@ export default function CheckRow({ label, on, onClick, locked = false, fill, tra
       </span>
       <span className="flex-1 text-bb-label text-sky-ink">{label}</span>
       {trailing}
+      {overlay}
     </button>
   );
 }

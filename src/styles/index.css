@@ -98,9 +98,9 @@
     padding-bottom: calc(72px + 24px + env(safe-area-inset-bottom, 0px));
   }
 
-  /* Screens with a fixed CTA bar (76px) sitting on top of the nav (주말 대청소). */
+  /* Screens with a fixed CTA bar sitting on top of the nav (주말 대청소: 모두 체크하기 + 종료 = 136px). */
   .pb-nav-cta {
-    padding-bottom: calc(76px + 72px + 24px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(136px + 72px + 24px + env(safe-area-inset-bottom, 0px));
   }
   /* Bottom edge of the nav's tab row: 48 tabs + 12 top pad + max(12px, safe area). */
   .bottom-nav {
