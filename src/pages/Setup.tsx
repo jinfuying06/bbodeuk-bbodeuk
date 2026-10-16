@@ -77,7 +77,7 @@ export default function Setup() {
           </button>
         )}
 
-        <h2 className="text-bb-label text-sky-deep">기본 공간 4개는 무료예요</h2>
+        <h2 className="pt-2 text-bb-title text-sky-ink">공간 선택하기</h2>
         {/* Space rows in their home colors (2026-10-16): on = filled like the home card, off = faint. */}
         {BASIC_SPACES.map(({ key, label, required }) => {
           const space = spaceFor(key);
