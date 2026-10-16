@@ -219,7 +219,6 @@ export default function Welcome() {
                 게스트 모드로 시작하기
               </GlassButton>
             </div>
-            <Caption lines={["게스트도 공간을 고르고 청소를 기록할 수 있어요.", "기본 공간은 무료로 쓸 수 있어요."]} />
             <GlassButton size={52} variant="secondary" onClick={() => setStep(0)}>
               체험 다시 보기
             </GlassButton>
