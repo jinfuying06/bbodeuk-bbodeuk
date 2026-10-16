@@ -11,12 +11,7 @@ import { GUIDES, type Guide } from "../data/guides";
 
 type Filter = "전체" | Guide["filter"];
 
-const filters: Array<[Filter, string]> = [
-  ["전체", "w-[68px]"],
-  ["욕실", "w-[76px]"],
-  ["주방", "w-[76px]"],
-  ["생활 팁", "w-[98px]"],
-];
+const filters: Filter[] = ["전체", "욕실", "주방", "생활 팁"];
 
 /** Figma 14 / 청소 가이드 (29:742). */
 export default function Care() {
@@ -54,8 +49,8 @@ export default function Care() {
         </Link>
 
         <div aria-label="가이드 필터" className="flex gap-2" role="group">
-          {filters.map(([key, width]) => (
-            <Pill key={key} className={`${width} !px-0`} selected={filter === key} size={38} onClick={() => setFilter(key)}>
+          {filters.map((key) => (
+            <Pill key={key} className="min-w-0 flex-1 !px-0" selected={filter === key} size={38} onClick={() => setFilter(key)}>
               {key}
             </Pill>
           ))}

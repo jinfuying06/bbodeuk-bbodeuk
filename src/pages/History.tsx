@@ -5,6 +5,7 @@ import ItemRow, { RowList } from "../components/ItemRow";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
+import Segmented from "../components/Segmented";
 import { dayKey, formatDay, formatRecency, formatTime, getActiveSpaces, getItem, getItems, getSpace, lastRecord, useRecords } from "../data/cleaning";
 
 type View = "date" | "space";
@@ -50,22 +51,16 @@ export default function History() {
     setMonth(new Date(now.getFullYear(), now.getMonth(), 1));
   };
 
-  // Segmented view switch (2026-10-15): one Surface track, the selected half lifts to white with a Slate label.
-  const segment = (key: View, label: string) => (
-    <button
-      aria-pressed={view === key}
-      className={`h-10 flex-1 rounded-full text-bb-label transition-colors duration-150 ${view === key ? "bg-sky-bg font-bold text-sky-deep shadow-[0_1px_3px_rgba(35,40,43,0.12)]" : "text-sky-muted"}`}
-      type="button"
-      onClick={() => setView(key)}
-    >
-      {label}
-    </button>
-  );
   const chips = (
-    <div aria-label="히스토리 보기" className="flex rounded-full bg-sky-surface p-1" role="group">
-      {segment("date", "날짜별")}
-      {segment("space", "공간별")}
-    </div>
+    <Segmented
+      label="히스토리 보기"
+      options={[
+        { key: "date", label: "날짜별" },
+        { key: "space", label: "공간별" },
+      ]}
+      value={view}
+      onChange={setView}
+    />
   );
 
   const arrow = (dir: -1 | 1, enabled: boolean) => (

@@ -6,6 +6,7 @@ import Icon from "../components/Icon";
 import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
+import Segmented from "../components/Segmented";
 import SpaceTile from "../components/SpaceTile";
 import Toast, { useRouteToast } from "../components/Toast";
 import { formatRecency, getActiveSpaces, getItems, getSpace, isRecordedToday, lastRecord, metaTextOnFill, toggleTodayRecord, useRecords, type Item, type SpaceKey } from "../data/cleaning";
@@ -121,13 +122,7 @@ export default function QuickRecord() {
       <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
         <PageIntro title={heading} body={body} />
 
-        <div aria-label="기록 보기 방식" className="flex gap-2" role="group">
-          {filters.map((entry) => (
-            <Pill key={entry.key} className="flex-1" selected={filter === entry.key} onClick={() => setView(entry.key)}>
-              {entry.label}
-            </Pill>
-          ))}
-        </div>
+        <Segmented label="기록 보기 방식" options={filters} value={filter} onChange={(key) => setView(key)} />
 
         {filter === "space" ? (
           <>

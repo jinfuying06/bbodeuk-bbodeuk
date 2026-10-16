@@ -76,7 +76,7 @@ export default function ItemAdd() {
         </label>
 
         <p className="text-bb-label text-sky-ink">공간 선택</p>
-        <div aria-label="공간 선택" className="flex gap-[10px]" role="group">
+        <div aria-label="공간 선택" className="flex gap-2" role="group">
           {spaces.map((entry) => (
             <Pill
               key={entry.key}
@@ -85,6 +85,7 @@ export default function ItemAdd() {
               iconColor={entry.iconColor}
               selected={space === entry.key}
               selectedColor={entry.color}
+              size={38}
               onClick={() => {
                 setSpace(entry.key);
                 setSpaceTouchedByUser(true);
