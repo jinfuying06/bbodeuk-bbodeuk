@@ -6,7 +6,7 @@ import PageIntro from "../components/PageIntro";
 import PageShell from "../components/PageShell";
 import Pill from "../components/Pill";
 import ItemRow, { RowList } from "../components/ItemRow";
-import { getSpace, spaceColor } from "../data/cleaning";
+import { getItem, getSpace, spaceColor } from "../data/cleaning";
 import { GUIDES, type Guide } from "../data/guides";
 
 type Filter = "전체" | Guide["filter"];
@@ -59,7 +59,7 @@ export default function Care() {
         <h2 className="text-bb-title text-sky-ink">나에게 필요한 청소법</h2>
         <RowList>
           {list.map((guide) => (
-            <ItemRow key={guide.id} list chevron="muted" height={72} meta={`약 ${guide.minutes}분`} space={guide.space} sub={getSpace(guide.space).label} title={guide.listTitle} to={`/care-action?item=${guide.id}`} />
+            <ItemRow key={guide.id} list chevron="muted" height={72} icon={getItem(guide.id)?.icon} meta={`약 ${guide.minutes}분`} space={guide.space} sub={getSpace(guide.space).label} title={guide.listTitle} to={`/care-action?item=${guide.id}`} />
           ))}
         </RowList>
       </main>

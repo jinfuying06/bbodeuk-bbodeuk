@@ -10,6 +10,8 @@ type ItemRowProps = {
   /** Omit for a read-only row (no link, no chevron). */
   to?: string;
   space?: SpaceKey;
+  /** Item art (object-*) in the space tile instead of the space icon. */
+  icon?: string;
   /** Right-aligned caption (recency, time). */
   meta?: string;
   /** deep = item/nav rows (default); muted = Figma "Recent record" rows. */
@@ -23,12 +25,12 @@ type ItemRowProps = {
 };
 
 /** Space row: [space tile] title/sub [meta]. With `to` it is tappable and shows a chevron. */
-export default function ItemRow({ title, sub, to, space, meta, chevron = "deep", height = 64, list = false }: ItemRowProps) {
+export default function ItemRow({ title, sub, to, space, icon, meta, chevron = "deep", height = 64, list = false }: ItemRowProps) {
   const shape = list ? "" : "rounded-row bg-sky-surface pl-3";
   const base = `flex items-center gap-3 ${shape} ${height === 72 ? "h-[72px]" : "h-16"}`;
   const body = (
     <>
-      {space ? <SpaceTile space={space} /> : null}
+      {space ? <SpaceTile icon={icon} space={space} /> : null}
       <span className="min-w-0 flex-1">
         <span className="block truncate text-bb-label text-sky-ink">{title}</span>
         {sub ? <span className="block truncate text-bb-caption text-sky-muted">{sub}</span> : null}
