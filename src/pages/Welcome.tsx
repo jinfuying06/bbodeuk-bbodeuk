@@ -4,6 +4,7 @@ import GlassButton from "../components/GlassButton";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
 import SpaceTile from "../components/SpaceTile";
+import { hasCompletedSetup } from "../data/setup";
 import { FADE_STAGES, getSpace, objectArtVars, type SpaceKey } from "../data/cleaning";
 
 const BATH = getSpace("bathroom");
@@ -81,7 +82,7 @@ function DemoCard() {
 }
 
 /** One-line title (2026-10-16 rule: every big title fits one line, 26px; overflow moves into the body). */
-function StepHead({ label, title, body }: { label: string; title: string; body: [string, string?] }) {
+function StepHead({ label, title, body }: { label: string; title: string; body: string }) {
   const ref = useRef<HTMLHeadingElement>(null);
   useEffect(() => ref.current?.focus(), []);
   return (
@@ -94,15 +95,7 @@ function StepHead({ label, title, body }: { label: string; title: string; body: 
       >
         {title}
       </h1>
-      <p className="text-bb-body text-sky-muted">
-        {body[0]}
-        {body[1] ? (
-          <>
-            <br />
-            {body[1]}
-          </>
-        ) : null}
-      </p>
+      <p className="text-bb-body text-sky-muted">{body}</p>
     </>
   );
 }
@@ -111,9 +104,7 @@ export default function Welcome() {
   const [step, setStep] = useState(0);
   const navigate = useNavigate();
 
-  const goSetup = () => {
-    navigate("/setup");
-  };
+  const setupDone = hasCompletedSetup();
 
   return (
     <PageShell bottomNav={false}>
@@ -128,9 +119,9 @@ export default function Welcome() {
         {step === 0 ? (
           <>
             <StepHead
-              body={["세면대를 닦았다고 생각하고", "아래 카드를 눌러보세요."]}
+              body="세면대를 닦았다 생각하고 아래 카드를 눌러보세요."
               label="처음 만나는 뽀득뽀득  ·  1 / 3"
-              title="한 번 톡, 청소가 반짝."
+              title="누르면 바로 기록돼요"
             />
             <div className="flex h-[210px] justify-center">
               <DemoCard />
@@ -147,7 +138,7 @@ export default function Welcome() {
         {step === 1 ? (
           <>
             <StepHead
-              body={["시간이 지나면 관리 주기에 맞춰", "천천히 옅어져요."]}
+              body="시간이 지나면 관리 주기에 맞춰 천천히 옅어져요."
               label="공간의 색 변화  ·  2 / 3"
               title="기록하면 색이 채워져요"
             />
@@ -176,9 +167,9 @@ export default function Welcome() {
         {step === 2 ? (
           <>
             <StepHead
-              body={["로그인하거나, 가입 없이 먼저 시작해보세요."]}
+              body="고른 공간은 나중에 언제든 바꿀 수 있어요."
               label="나에게 맞는 시작  ·  3 / 3"
-              title="이제 가볍게 시작해요"
+              title="청소할 곳만 고르면 준비 끝이에요"
             />
             <section className="flex flex-col gap-4 py-3">
               <h2 className="text-bb-title text-sky-ink">네 가지 기본 공간은 무료예요</h2>
@@ -199,15 +190,10 @@ export default function Welcome() {
                 })}
               </ul>
             </section>
-            {/* The two start choices read as one pair (2026-10-16). */}
-            <div className="flex flex-col gap-2">
-              <GlassButton size={52} to="/login">
-                로그인하기
-              </GlassButton>
-              <GlassButton size={52} variant="secondary" onClick={goSetup}>
-                게스트 모드로 시작하기
-              </GlassButton>
-            </div>
+            {/* Login/guest moved to the start screen (2026-10-21); one primary into Setup. */}
+            <GlassButton size={52} onClick={() => navigate(setupDone ? "/home" : "/setup")}>
+              {setupDone ? "시작하기" : "내 공간 설정하러 가기"}
+            </GlassButton>
             <GlassButton size={52} variant="secondary" onClick={() => setStep(0)}>
               체험 다시 보기
             </GlassButton>

@@ -339,7 +339,7 @@ Tactile and calm: a deep-ocean slab with a white label that catches light when t
 
 ### Chips (Pill)
 Two kinds only (2026-10-16 chip policy):
-- **View switch → `Segmented`:** mutually exclusive views of one screen (히스토리 날짜별/공간별, 기록 최근 기록/자주/공간별 보기). One Surface track with 4px inset; the selected segment lifts to white with a bold Slate label and a 1px soft shadow.
+- **View switch → `Segmented`:** mutually exclusive views of one screen (히스토리 날짜별/공간별, 기록 최근 기록/자주/공간별 보기). Underline tab bar: no track, pill, shadow or box; the bar has a 1px `sky-line` bottom hairline. Equal-width tabs (min 44px, `text-bb-label`); unselected `sky-muted` regular, selected bold `sky-deep` with a 2px `sky-deep` underline overlapping the hairline. 150ms color transition (off under reduced motion).
 - **Filter / category → `Pill size={38}`:** 가이드 필터, 기록·항목 추가 공간 칩. Equal widths (`flex-1`), 8px gap, text only (no icons). Unselected Surface / Slate Muted; selected Slate / white — space chips included (the tiles below already carry the space color, and non-space filters like 전체 / 생활 팁 must read the same).
 
 ### Cards / Containers

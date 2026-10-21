@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import Dialog from "../components/Dialog";
 import Icon from "../components/Icon";
 import PageShell from "../components/PageShell";
 import SwitchRow from "../components/Switch";
 import { PURCHASES_KEY } from "../data/purchases";
+import { getSession, logOut } from "../data/session";
 import { PENDING_PAYMENT_KEY } from "../features/payments/toss";
 
 const navRow = "press flex h-[62px] items-center justify-between rounded-row-sm bg-sky-surface px-4";
@@ -39,13 +40,16 @@ function resetAllData() {
 
 export default function Settings() {
   const [confirmReset, setConfirmReset] = useState(false);
+  const navigate = useNavigate();
+  const session = getSession();
+  const name = session?.mode === "member" && session.nickname ? session.nickname : "게스트";
 
   return (
     <PageShell>
       <AppHeader title="설정" back />
       <main className="flex flex-col gap-3 px-margin-screen pb-nav pt-header">
         <section className="flex h-[100px] flex-col gap-2 rounded-3xl bg-sky-tint px-5 pt-4">
-          <h1 className="text-bb-title text-sky-ink">하늘님의 아늑한 집</h1>
+          <h1 className="text-bb-title text-sky-ink">{name}님의 아늑한 집</h1>
           <p className="text-bb-body text-sky-muted">오늘도 내 속도로 산뜻하게.</p>
         </section>
 
@@ -58,6 +62,17 @@ export default function Settings() {
         <NavRow to="/help" label="도움말·서비스 정보" />
         <button className={navRow} type="button" onClick={() => setConfirmReset(true)}>
           <span className="text-bb-label text-sky-ink">데이터 초기화</span>
+          <Icon name="chevron-right" className="text-[16px] text-sky-muted" />
+        </button>
+        <button
+          className={navRow}
+          type="button"
+          onClick={() => {
+            logOut();
+            navigate("/", { replace: true });
+          }}
+        >
+          <span className="text-bb-label text-sky-ink">로그아웃</span>
           <Icon name="chevron-right" className="text-[16px] text-sky-muted" />
         </button>
 

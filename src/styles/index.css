@@ -16,6 +16,11 @@
     padding: 0;
   }
 
+  /* Reserve the scrollbar's width so the centered column never shifts when the page starts scrolling. */
+  html {
+    scrollbar-gutter: stable;
+  }
+
   body {
     min-height: 100dvh;
     overflow-x: hidden;
@@ -62,6 +67,10 @@
   /* Text field (Login, SignUp, ItemAdd, ItemInfo). */
   .bb-field {
     @apply h-[52px] w-full rounded-xl border border-sky-line bg-sky-bg px-4 text-bb-body text-sky-ink outline-none transition-colors placeholder:text-sky-muted focus:border-sky-deep;
+  }
+  /* Invalid field: darker border (no red states); focus still swaps to sky-deep. */
+  .bb-field[aria-invalid="true"]:not(:focus) {
+    border-color: theme("colors.sky-ink");
   }
   /* Text-link button: 44px tap box, label type, sky-deep. `-sm` = 13/19 variant. */
   .text-link {
